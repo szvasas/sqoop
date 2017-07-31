@@ -21,14 +21,12 @@ package com.cloudera.sqoop.hbase;
 import com.cloudera.sqoop.testutil.CommonArgs;
 import com.cloudera.sqoop.testutil.HsqldbTestServer;
 import com.cloudera.sqoop.testutil.ImportJobTestCase;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.HConstants;
-import org.apache.hadoop.hbase.LocalHBaseCluster;
 import org.apache.hadoop.hbase.MiniHBaseCluster;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
@@ -39,10 +37,8 @@ import org.apache.hadoop.util.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -52,21 +48,6 @@ import static org.junit.Assert.assertNull;
  * Utility methods that facilitate HBase import tests.
  */
 public abstract class HBaseTestCase extends ImportJobTestCase {
-
-  /*
-   * This is to restore test.build.data system property which gets reset
-   * when HBase tests are run. Since other tests in Sqoop also depend upon
-   * this property, they can fail if are run subsequently in the same VM.
-   */
-  private static String testBuildDataProperty = "";
-
-  private static void recordTestBuildDataProperty() {
-    testBuildDataProperty = System.getProperty("test.build.data", "");
-  }
-
-  private static void restoreTestBuidlDataProperty() {
-    System.setProperty("test.build.data", testBuildDataProperty);
-  }
 
   public static final Log LOG = LogFactory.getLog(
       HBaseTestCase.class.getName());
@@ -110,10 +91,7 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
 
     return args.toArray(new String[0]);
   }
-  // Starts a mini hbase cluster in this process.
-  // Starts a mini hbase cluster in this process.
   private HBaseTestingUtility hbaseTestUtil;
-  private String workDir = createTempDir().getAbsolutePath();
   private MiniHBaseCluster hbaseCluster;
   private int zookeeperPort;
 
@@ -125,7 +103,7 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
       hbaseTestUtil.startMiniZKCluster();
       zookeeperPort = hbaseTestUtil.getZkCluster().getClientPort();
 
-      Path rootdir = hbaseTestUtil.getDataTestDirOnTestFS("TestGenerateDelegationToken");
+      Path rootdir = hbaseTestUtil.getDataTestDirOnTestFS("HBaseTestCase");
       hbaseTestUtil.getConfiguration().set(HConstants.HBASE_DIR, rootdir.toString());
       hbaseCluster = new MiniHBaseCluster(hbaseTestUtil.getConfiguration(), 1);
       hbaseCluster.startMaster();
@@ -137,14 +115,12 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
 
   public void shutdown() throws Exception {
     LOG.info("In shutdown() method");
-    if (null != hbaseTestUtil) {
-      LOG.info("Shutting down HBase cluster");
-      hbaseCluster.shutdown();
-      hbaseCluster.join();
-      hbaseTestUtil.shutdownMiniCluster();
-      hbaseTestUtil = null;
-    }
-    FileUtils.deleteDirectory(new File(workDir));
+    LOG.info("Shutting down HBase cluster");
+    hbaseCluster.shutdown();
+    hbaseCluster.join();
+    hbaseTestUtil.shutdownMiniCluster();
+    hbaseTestUtil.cleanupDataTestDirOnTestFS();
+    hbaseTestUtil = null;
     LOG.info("shutdown() method returning.");
   }
 
@@ -157,7 +133,6 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
       LOG.warn("Error shutting down HBase minicluster: "
               + StringUtils.stringifyException(e));
     }
-    HBaseTestCase.restoreTestBuidlDataProperty();
     super.tearDown();
   }
 
@@ -180,14 +155,6 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
     } finally {
       table.close();
     }
-  }
-  public static File createTempDir() {
-    File baseDir = new File(System.getProperty("java.io.tmpdir"));
-    File tempDir = new File(baseDir, UUID.randomUUID().toString());
-    if (tempDir.mkdir()) {
-      return tempDir;
-    }
-    throw new IllegalStateException("Failed to create directory");
   }
 
   protected int countHBaseTable(String tableName, String colFamily)
