@@ -5,11 +5,10 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.LocalHBaseCluster;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
-import org.apache.hadoop.hbase.http.ssl.KeyStoreTestUtil;
 import org.apache.hadoop.hbase.security.HBaseKerberosUtils;
-import org.apache.hadoop.hbase.security.token.TestGenerateDelegationToken;
 import org.apache.hadoop.hbase.security.token.TokenProvider;
 import org.apache.hadoop.hbase.util.FSUtils;
+import org.apache.hadoop.hbase.zookeeper.MiniZooKeeperCluster;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.http.HttpConfig;
 import org.apache.hadoop.minikdc.MiniKdc;
@@ -36,7 +35,9 @@ public class HBaseSecureCluster {
   private static String PRINCIPAL;
 
   private static String HTTP_PRINCIPAL;
+  private static MiniZooKeeperCluster zookeeperCluster;
 
+  private static int zookeeperPort;
   /**
    * Setup the security configuration for hdfs.
    */
@@ -55,8 +56,8 @@ public class HBaseSecureCluster {
 
     File keystoresDir = new File(TEST_UTIL.getDataTestDir("keystore").toUri().getPath());
     keystoresDir.mkdirs();
-    String sslConfDir = KeyStoreTestUtil.getClasspathDir(TestGenerateDelegationToken.class);
-    KeyStoreTestUtil.setupSSLConfig(keystoresDir.getAbsolutePath(), sslConfDir, conf, false);
+    //String sslConfDir = KeyStoreTestUtil.getClasspathDir(TestGenerateDelegationToken.class);
+    //KeyStoreTestUtil.setupSSLConfig(keystoresDir.getAbsolutePath(), sslConfDir, conf, false);
 
     conf.setBoolean("ignore.secure.ports.for.testing", true);
   }
@@ -66,6 +67,7 @@ public class HBaseSecureCluster {
    */
   @BeforeClass
   public static void setUp() throws Exception {
+    TEST_UTIL.getConfiguration().set("hbase.rpc.protection", "privacy");
     KDC = TEST_UTIL.setupMiniKdc(KEYTAB_FILE);
     USERNAME = UserGroupInformation.getLoginUser().getShortUserName();
     PRINCIPAL = USERNAME + "/" + HOST;
@@ -76,15 +78,25 @@ public class HBaseSecureCluster {
     HBaseKerberosUtils.setPrincipalForTesting(PRINCIPAL + "@" + KDC.getRealm());
     HBaseKerberosUtils.setSecuredConfiguration(TEST_UTIL.getConfiguration());
 
-    //setHdfsSecuredConfiguration(TEST_UTIL.getConfiguration());
+    //startupZookeeper();
+    setHdfsSecuredConfiguration(TEST_UTIL.getConfiguration());
     UserGroupInformation.setConfiguration(TEST_UTIL.getConfiguration());
     TEST_UTIL.getConfiguration().setStrings(CoprocessorHost.REGION_COPROCESSOR_CONF_KEY,
         TokenProvider.class.getName());
+
     //TEST_UTIL.startMiniDFSCluster(1);
     Path rootdir = TEST_UTIL.getDataTestDirOnTestFS("TestGenerateDelegationToken");
     FSUtils.setRootDir(TEST_UTIL.getConfiguration(), rootdir);
     CLUSTER = new LocalHBaseCluster(TEST_UTIL.getConfiguration(), 1);
     CLUSTER.startup();
+  }
+
+
+  private static void startupZookeeper() throws Exception {
+    String zookeeperDir = new File(new File(TEST_UTIL.getDataTestDir("zookeeper").toUri()), "zk").getAbsolutePath();
+    zookeeperCluster = new MiniZooKeeperCluster();
+    zookeeperCluster.startup(new File(zookeeperDir));
+    zookeeperPort = zookeeperCluster.getClientPort();
   }
 
   @AfterClass
