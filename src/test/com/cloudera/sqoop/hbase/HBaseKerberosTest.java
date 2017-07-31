@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-public class HBaseKerberosTest extends HBaseTestCase2 {
+public class HBaseKerberosTest extends HBaseTestCase {
 
   @Test
   public void testBasicUsage() throws IOException {
