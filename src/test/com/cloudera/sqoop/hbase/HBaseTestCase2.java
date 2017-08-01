@@ -34,6 +34,7 @@ import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.master.HMaster;
+import org.apache.hadoop.hbase.security.HBaseKerberosUtils;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.zookeeper.MiniZooKeeperCluster;
 import org.apache.hadoop.util.StringUtils;
@@ -88,6 +89,8 @@ public abstract class HBaseTestCase2 extends ImportJobTestCase {
       args.add("-D");
       String zookeeperPort = HBaseSecureCluster.TEST_UTIL.getConfiguration().get(HConstants.ZOOKEEPER_CLIENT_PORT);
       args.add("hbase.zookeeper.property.clientPort=" + zookeeperPort);
+
+
     }
 
     if (null != queryStr) {

@@ -21,6 +21,7 @@ package com.cloudera.sqoop.hbase;
 import com.cloudera.sqoop.testutil.CommonArgs;
 import com.cloudera.sqoop.testutil.HsqldbTestServer;
 import com.cloudera.sqoop.testutil.ImportJobTestCase;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -32,14 +33,24 @@ import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
+import org.apache.hadoop.hbase.security.HBaseKerberosUtils;
+import org.apache.hadoop.hbase.security.token.TokenProvider;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.minikdc.MiniKdc;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.util.StringUtils;
+import org.apache.sqoop.util.rules.MiniKdcInfrastructureRule;
+import org.apache.sqoop.util.rules.MiniKdcProvider;
 import org.junit.After;
 import org.junit.Before;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.UUID;
 
+import static org.apache.hadoop.hbase.coprocessor.CoprocessorHost.REGION_COPROCESSOR_CONF_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -51,6 +62,16 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
 
   public static final Log LOG = LogFactory.getLog(
       HBaseTestCase.class.getName());
+
+  private final MiniKdcProvider miniKdcProvider;
+
+  public HBaseTestCase() {
+    this(null);
+  }
+
+  public HBaseTestCase(MiniKdcProvider miniKdcProvider) {
+    this.miniKdcProvider = miniKdcProvider;
+  }
 
   /**
    * Create the argv to pass to Sqoop.
@@ -64,8 +85,21 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
 
     if (includeHadoopFlags) {
       CommonArgs.addHadoopFlags(args);
+      String zookeeperPort = hbaseTestUtil.getConfiguration().get(HConstants.ZOOKEEPER_CLIENT_PORT);
       args.add("-D");
       args.add("hbase.zookeeper.property.clientPort=" + zookeeperPort);
+
+      if (isKeberized()) {
+        String principalForTesting = HBaseKerberosUtils.getPrincipalForTesting();
+        args.add("-D");
+        args.add("hbase.security.authentication=kerberos");
+        args.add("-D");
+        args.add("hbase.master.kerberos.principal=" + principalForTesting);
+        args.add("-D");
+        args.add("hbase.regionserver.kerberos.principal=" + principalForTesting);
+        args.add("-D");
+        args.add("yarn.resourcemanager.principal=" + principalForTesting);
+      }
     }
 
     if (null != queryStr) {
@@ -93,22 +127,50 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
   }
   private HBaseTestingUtility hbaseTestUtil;
   private MiniHBaseCluster hbaseCluster;
-  private int zookeeperPort;
+  private File rootDir;
 
   @Override
   @Before
   public void setUp() {
     try {
+      rootDir = new File(TEMP_BASE_DIR + "HBaseTestCase" + UUID.randomUUID());
+      rootDir.mkdirs();
       hbaseTestUtil = new HBaseTestingUtility();
-      hbaseTestUtil.startMiniZKCluster();
-      zookeeperPort = hbaseTestUtil.getZkCluster().getClientPort();
+      setupKerberos();
 
-      Path rootdir = hbaseTestUtil.getDataTestDirOnTestFS("HBaseTestCase");
-      hbaseTestUtil.getConfiguration().set(HConstants.HBASE_DIR, rootdir.toString());
+      hbaseTestUtil.startMiniZKCluster();
+
+      hbaseTestUtil.getConfiguration().set(HConstants.HBASE_DIR, rootDir.getAbsolutePath());
       hbaseCluster = new MiniHBaseCluster(hbaseTestUtil.getConfiguration(), 1);
       hbaseCluster.startMaster();
       super.setUp();
     } catch (Throwable e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void setupKerberos() {
+    if (!isKeberized()){
+      return;
+    }
+
+    try {
+      MiniKdc miniKdc = miniKdcProvider.getMiniKdc();
+
+      File keytabFile = new File(rootDir.getAbsolutePath(), "keytab");
+      keytabFile.createNewFile();
+      HBaseKerberosUtils.setKeytabFileForTesting(keytabFile.getAbsolutePath());
+      String userName = UserGroupInformation.getLoginUser().getShortUserName();
+      String principal = userName + "/localhost";
+      miniKdc.createPrincipal(keytabFile, principal);
+
+      HBaseKerberosUtils.setPrincipalForTesting(principal + "@" + miniKdc.getRealm());
+      HBaseKerberosUtils.setSecuredConfiguration(hbaseTestUtil.getConfiguration());
+
+      UserGroupInformation.setConfiguration(hbaseTestUtil.getConfiguration());
+      hbaseTestUtil.getConfiguration().setStrings(REGION_COPROCESSOR_CONF_KEY, TokenProvider.class.getName());
+
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
@@ -119,8 +181,8 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
     hbaseCluster.shutdown();
     hbaseCluster.join();
     hbaseTestUtil.shutdownMiniCluster();
-    hbaseTestUtil.cleanupDataTestDirOnTestFS();
     hbaseTestUtil = null;
+    FileUtils.deleteDirectory(rootDir);
     LOG.info("shutdown() method returning.");
   }
 
@@ -174,4 +236,9 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
     }
     return count;
   }
+
+  protected boolean isKeberized() {
+    return miniKdcProvider != null;
+  }
+
 }
