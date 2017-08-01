@@ -29,7 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-public class MiniKdcRule implements TestRule, MiniKdcProvider {
+public class MiniKdcInfrastructureRule implements TestRule, MiniKdcInfrastructure {
 
   private MiniKdc miniKdc;
 
@@ -37,11 +37,11 @@ public class MiniKdcRule implements TestRule, MiniKdcProvider {
 
   private File workDir;
 
-  public MiniKdcRule() {
+  public MiniKdcInfrastructureRule() {
     this(MiniKdc.createConf());
   }
 
-  public MiniKdcRule(Properties configuration) {
+  public MiniKdcInfrastructureRule(Properties configuration) {
     File baseDir = Files.createTempDir();
     this.workDir = new File(baseDir, "MiniKdcWorkDir");
     this.configuration = configuration;

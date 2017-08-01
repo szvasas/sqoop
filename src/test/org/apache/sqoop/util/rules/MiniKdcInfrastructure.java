@@ -18,10 +18,10 @@
 
 package org.apache.sqoop.util.rules;
 
-import org.apache.hadoop.minikdc.MiniKdc;
+public interface MiniKdcInfrastructure extends MiniKdcProvider {
 
-public interface MiniKdcProvider {
+  void start();
 
-  MiniKdc getMiniKdc();
+  void stop();
 
 }
