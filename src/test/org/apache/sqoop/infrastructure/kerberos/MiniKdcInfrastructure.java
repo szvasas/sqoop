@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package org.apache.sqoop.util.rules;
+package org.apache.sqoop.infrastructure.kerberos;
 
-public interface MiniKdcInfrastructure extends MiniKdcConfigurationProvider {
+public interface MiniKdcInfrastructure extends KerberosConfigurationProvider {
 
   void start();
 

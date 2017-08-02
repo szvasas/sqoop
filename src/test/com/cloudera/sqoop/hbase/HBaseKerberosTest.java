@@ -1,6 +1,6 @@
 package com.cloudera.sqoop.hbase;
 
-import org.apache.sqoop.util.rules.MiniKdcInfrastructureRule;
+import org.apache.sqoop.infrastructure.kerberos.MiniKdcInfrastructureRule;
 import org.junit.ClassRule;
 import org.junit.Test;
 

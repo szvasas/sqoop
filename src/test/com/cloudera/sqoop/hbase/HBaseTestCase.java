@@ -37,7 +37,7 @@ import org.apache.hadoop.hbase.security.token.TokenProvider;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.util.StringUtils;
-import org.apache.sqoop.util.rules.MiniKdcConfigurationProvider;
+import org.apache.sqoop.infrastructure.kerberos.KerberosConfigurationProvider;
 import org.junit.After;
 import org.junit.Before;
 
@@ -61,14 +61,14 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
   public static final Log LOG = LogFactory.getLog(
       HBaseTestCase.class.getName());
 
-  private final MiniKdcConfigurationProvider miniKdcConfigurationProvider;
+  private final KerberosConfigurationProvider kerberosConfigurationProvider;
 
   public HBaseTestCase() {
     this(null);
   }
 
-  public HBaseTestCase(MiniKdcConfigurationProvider miniKdcConfigurationProvider) {
-    this.miniKdcConfigurationProvider = miniKdcConfigurationProvider;
+  public HBaseTestCase(KerberosConfigurationProvider kerberosConfigurationProvider) {
+    this.kerberosConfigurationProvider = kerberosConfigurationProvider;
   }
 
   /**
@@ -161,9 +161,9 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
       return;
     }
 
-    String servicePrincipal = miniKdcConfigurationProvider.getTestPrincipal() + "@" + miniKdcConfigurationProvider.getRealm();
+    String servicePrincipal = kerberosConfigurationProvider.getTestPrincipal() + "@" + kerberosConfigurationProvider.getRealm();
     HBaseKerberosUtils.setPrincipalForTesting(servicePrincipal);
-    HBaseKerberosUtils.setKeytabFileForTesting(miniKdcConfigurationProvider.getKeytabFilePath());
+    HBaseKerberosUtils.setKeytabFileForTesting(kerberosConfigurationProvider.getKeytabFilePath());
     HBaseKerberosUtils.setSecuredConfiguration(hbaseTestUtil.getConfiguration());
 
     UserGroupInformation.setConfiguration(hbaseTestUtil.getConfiguration());
@@ -233,7 +233,7 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
   }
 
   protected boolean isKerberized() {
-    return miniKdcConfigurationProvider != null;
+    return kerberosConfigurationProvider != null;
   }
 
 }

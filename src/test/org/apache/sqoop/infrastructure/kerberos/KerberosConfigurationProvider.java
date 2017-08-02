@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package org.apache.sqoop.util.rules;
+package org.apache.sqoop.infrastructure.kerberos;
 
-public interface MiniKdcConfigurationProvider {
+public interface KerberosConfigurationProvider {
 
   String getTestPrincipal();
 

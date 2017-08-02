@@ -733,9 +733,9 @@
       timeout="${test.timeout}"
       dir="${build.test}/data">
 
-      <!-- enable asserts in tests
+      <!-- enable asserts in tests -->
       <jvmarg value="-ea" />
- -->
+
       <jvmarg value="${remoteDebugJvmArgs}"/>
 
       <sysproperty key="test.build.data" value="${build.test}/data"/>

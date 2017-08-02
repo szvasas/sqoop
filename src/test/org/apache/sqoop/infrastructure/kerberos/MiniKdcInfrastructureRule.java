@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.sqoop.util.rules;
+package org.apache.sqoop.infrastructure.kerberos;
 
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
@@ -56,7 +56,6 @@ public class MiniKdcInfrastructureRule implements TestRule, MiniKdcInfrastructur
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-
   }
 
   private void createPrincipals() {
