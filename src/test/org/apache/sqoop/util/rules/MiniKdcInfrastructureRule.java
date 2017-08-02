@@ -37,14 +37,14 @@ public class MiniKdcInfrastructureRule implements TestRule, MiniKdcInfrastructur
 
   private File workDir;
 
-  public MiniKdcInfrastructureRule() {
-    this(MiniKdc.createConf());
-  }
+  private String testPrincipal;
 
-  public MiniKdcInfrastructureRule(Properties configuration) {
+  private File keytabFile;
+
+  public MiniKdcInfrastructureRule() {
     File baseDir = Files.createTempDir();
     this.workDir = new File(baseDir, "MiniKdcWorkDir");
-    this.configuration = configuration;
+    this.configuration = MiniKdc.createConf();
   }
 
   @Override
@@ -52,7 +52,28 @@ public class MiniKdcInfrastructureRule implements TestRule, MiniKdcInfrastructur
     try {
       miniKdc = new MiniKdc(configuration, workDir);
       miniKdc.start();
+      createPrincipals();
     } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+  }
+
+  private void createPrincipals() {
+    try {
+      createKeytabFile();
+      testPrincipal = currentUser() + "/" + miniKdc.getHost();
+      miniKdc.createPrincipal(keytabFile, testPrincipal);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void createKeytabFile() {
+    try {
+      keytabFile = new File(workDir.getAbsolutePath(), "keytab");
+      keytabFile.createNewFile();
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -70,11 +91,6 @@ public class MiniKdcInfrastructureRule implements TestRule, MiniKdcInfrastructur
   }
 
   @Override
-  public MiniKdc getMiniKdc() {
-    return miniKdc;
-  }
-
-  @Override
   public Statement apply(final Statement base, Description description) {
     return new Statement() {
       @Override
@@ -84,5 +100,24 @@ public class MiniKdcInfrastructureRule implements TestRule, MiniKdcInfrastructur
         stop();
       }
     };
+  }
+
+  @Override
+  public String getTestPrincipal() {
+    return testPrincipal;
+  }
+
+  @Override
+  public String getRealm() {
+    return miniKdc.getRealm();
+  }
+
+  @Override
+  public String getKeytabFilePath() {
+    return keytabFile.getAbsolutePath();
+  }
+
+  private String currentUser() {
+    return System.getProperty("user.name");
   }
 }

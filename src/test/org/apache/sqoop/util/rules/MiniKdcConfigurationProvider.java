@@ -18,10 +18,12 @@
 
 package org.apache.sqoop.util.rules;
 
-import org.apache.hadoop.minikdc.MiniKdc;
+public interface MiniKdcConfigurationProvider {
 
-public interface MiniKdcProvider {
+  String getTestPrincipal();
 
-  MiniKdc getMiniKdc();
+  String getRealm();
+
+  String getKeytabFilePath();
 
 }

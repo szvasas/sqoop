@@ -18,7 +18,7 @@
 
 package org.apache.sqoop.util.rules;
 
-public interface MiniKdcInfrastructure extends MiniKdcProvider {
+public interface MiniKdcInfrastructure extends MiniKdcConfigurationProvider {
 
   void start();
 

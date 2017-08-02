@@ -35,16 +35,17 @@ import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.security.HBaseKerberosUtils;
 import org.apache.hadoop.hbase.security.token.TokenProvider;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.minikdc.MiniKdc;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.util.StringUtils;
-import org.apache.sqoop.util.rules.MiniKdcProvider;
+import org.apache.sqoop.util.rules.MiniKdcConfigurationProvider;
 import org.junit.After;
 import org.junit.Before;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import static org.apache.hadoop.hbase.coprocessor.CoprocessorHost.REGION_COPROCESSOR_CONF_KEY;
@@ -60,14 +61,14 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
   public static final Log LOG = LogFactory.getLog(
       HBaseTestCase.class.getName());
 
-  private final MiniKdcProvider miniKdcProvider;
+  private final MiniKdcConfigurationProvider miniKdcConfigurationProvider;
 
   public HBaseTestCase() {
     this(null);
   }
 
-  public HBaseTestCase(MiniKdcProvider miniKdcProvider) {
-    this.miniKdcProvider = miniKdcProvider;
+  public HBaseTestCase(MiniKdcConfigurationProvider miniKdcConfigurationProvider) {
+    this.miniKdcConfigurationProvider = miniKdcConfigurationProvider;
   }
 
   /**
@@ -85,18 +86,7 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
       String zookeeperPort = hbaseTestUtil.getConfiguration().get(HConstants.ZOOKEEPER_CLIENT_PORT);
       args.add("-D");
       args.add("hbase.zookeeper.property.clientPort=" + zookeeperPort);
-
-      if (isKeberized()) {
-        String principalForTesting = HBaseKerberosUtils.getPrincipalForTesting();
-        args.add("-D");
-        args.add("hbase.security.authentication=kerberos");
-        args.add("-D");
-        args.add("hbase.master.kerberos.principal=" + principalForTesting);
-        args.add("-D");
-        args.add("hbase.regionserver.kerberos.principal=" + principalForTesting);
-        args.add("-D");
-        args.add("yarn.resourcemanager.principal=" + principalForTesting);
-      }
+      args.addAll(getKerberosFlags());
     }
 
     if (null != queryStr) {
@@ -122,6 +112,26 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
 
     return args.toArray(new String[0]);
   }
+
+  private List<String> getKerberosFlags() {
+    if (!isKerberized()) {
+      return Collections.emptyList();
+    }
+    List<String> result = new ArrayList<>();
+
+    String principalForTesting = HBaseKerberosUtils.getPrincipalForTesting();
+    result.add("-D");
+    result.add("hbase.security.authentication=kerberos");
+    result.add("-D");
+    result.add("hbase.master.kerberos.principal=" + principalForTesting);
+    result.add("-D");
+    result.add("hbase.regionserver.kerberos.principal=" + principalForTesting);
+    result.add("-D");
+    result.add("yarn.resourcemanager.principal=" + principalForTesting);
+
+    return result;
+  }
+
   private HBaseTestingUtility hbaseTestUtil;
   private MiniHBaseCluster hbaseCluster;
   private File rootDir;
@@ -147,29 +157,17 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
   }
 
   private void setupKerberos() {
-    if (!isKeberized()){
+    if (!isKerberized()){
       return;
     }
 
-    try {
-      MiniKdc miniKdc = miniKdcProvider.getMiniKdc();
+    String servicePrincipal = miniKdcConfigurationProvider.getTestPrincipal() + "@" + miniKdcConfigurationProvider.getRealm();
+    HBaseKerberosUtils.setPrincipalForTesting(servicePrincipal);
+    HBaseKerberosUtils.setKeytabFileForTesting(miniKdcConfigurationProvider.getKeytabFilePath());
+    HBaseKerberosUtils.setSecuredConfiguration(hbaseTestUtil.getConfiguration());
 
-      File keytabFile = new File(rootDir.getAbsolutePath(), "keytab");
-      keytabFile.createNewFile();
-      HBaseKerberosUtils.setKeytabFileForTesting(keytabFile.getAbsolutePath());
-      String userName = UserGroupInformation.getLoginUser().getShortUserName();
-      String principal = userName + "/localhost";
-      miniKdc.createPrincipal(keytabFile, principal);
-
-      HBaseKerberosUtils.setPrincipalForTesting(principal + "@" + miniKdc.getRealm());
-      HBaseKerberosUtils.setSecuredConfiguration(hbaseTestUtil.getConfiguration());
-
-      UserGroupInformation.setConfiguration(hbaseTestUtil.getConfiguration());
-      hbaseTestUtil.getConfiguration().setStrings(REGION_COPROCESSOR_CONF_KEY, TokenProvider.class.getName());
-
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    UserGroupInformation.setConfiguration(hbaseTestUtil.getConfiguration());
+    hbaseTestUtil.getConfiguration().setStrings(REGION_COPROCESSOR_CONF_KEY, TokenProvider.class.getName());
   }
 
   public void shutdown() throws Exception {
@@ -234,8 +232,8 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
     return count;
   }
 
-  protected boolean isKeberized() {
-    return miniKdcProvider != null;
+  protected boolean isKerberized() {
+    return miniKdcConfigurationProvider != null;
   }
 
 }
