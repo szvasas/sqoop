@@ -19,6 +19,10 @@
 package com.cloudera.sqoop.hbase;
 
 import static org.apache.hadoop.hbase.coprocessor.CoprocessorHost.REGION_COPROCESSOR_CONF_KEY;
+import static org.apache.hadoop.hbase.security.HBaseKerberosUtils.KRB_PRINCIPAL;
+import static org.apache.hadoop.hbase.security.HBaseKerberosUtils.MASTER_KRB_PRINCIPAL;
+import static org.apache.hadoop.hbase.security.User.HBASE_SECURITY_CONF_KEY;
+import static org.apache.hadoop.yarn.conf.YarnConfiguration.RM_PRINCIPAL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -43,10 +47,12 @@ import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.security.HBaseKerberosUtils;
+import org.apache.hadoop.hbase.security.User;
 import org.apache.hadoop.hbase.security.token.TokenProvider;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.util.StringUtils;
+import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.sqoop.infrastructure.kerberos.KerberosConfigurationProvider;
 import org.junit.After;
 import org.junit.Before;
@@ -154,13 +160,13 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
 
     String principalForTesting = HBaseKerberosUtils.getPrincipalForTesting();
     result.add("-D");
-    result.add("hbase.security.authentication=kerberos");
+    result.add(createFlagWithValue(HBASE_SECURITY_CONF_KEY, "kerberos"));
     result.add("-D");
-    result.add("hbase.master.kerberos.principal=" + principalForTesting);
+    result.add(createFlagWithValue(MASTER_KRB_PRINCIPAL, principalForTesting));
     result.add("-D");
-    result.add("hbase.regionserver.kerberos.principal=" + principalForTesting);
+    result.add(createFlagWithValue(KRB_PRINCIPAL, principalForTesting));
     result.add("-D");
-    result.add("yarn.resourcemanager.principal=" + principalForTesting);
+    result.add(createFlagWithValue(RM_PRINCIPAL, principalForTesting));
 
     return result;
   }
@@ -267,5 +273,9 @@ public abstract class HBaseTestCase extends ImportJobTestCase {
 
   protected boolean isKerberized() {
     return kerberosConfigurationProvider != null;
+  }
+
+  private String createFlagWithValue(String flag, String value) {
+    return String.format("%s=%s", flag, value);
   }
 }
