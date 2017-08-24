@@ -687,7 +687,7 @@
   </target>
 
   <target name="test-prep-categories">
-    <taskdef name="findTestsByCategories" classname="org.apache.sqoop.tool.ant.FindTestsByCategoriesTask" classpath="build/test/classes"/>
+    <taskdef name="findTestsByCategories" classname="org.apache.sqoop.util.ant.FindTestsByCategoriesTask" classpath="build/test/classes"/>
     <findTestsByCategories testCategories="org.apache.sqoop.orm.TestCompilationManager"/>
   </target>
 

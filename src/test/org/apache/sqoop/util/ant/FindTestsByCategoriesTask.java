@@ -1,4 +1,4 @@
-package org.apache.sqoop.tool.ant;
+package org.apache.sqoop.util.ant;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
