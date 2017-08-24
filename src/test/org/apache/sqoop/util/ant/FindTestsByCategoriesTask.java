@@ -1,5 +1,6 @@
 package org.apache.sqoop.util.ant;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
@@ -7,14 +8,10 @@ import org.apache.tools.ant.types.Path;
 import org.junit.experimental.categories.Category;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-
 
 public class FindTestsByCategoriesTask extends Task {
 
@@ -26,10 +23,10 @@ public class FindTestsByCategoriesTask extends Task {
 
   private Collection<Class<?>> testCategories;
 
-  private Path testDir;
+  private String testDir;
 
   public FindTestsByCategoriesTask() {
-    testCategories = new ArrayList<>();
+    testCategories = new HashSet<>();
   }
 
   @Override
@@ -50,7 +47,7 @@ public class FindTestsByCategoriesTask extends Task {
     }
   }
 
-  public void setTestDir(Path testDir) {
+  public void setTestDir(String testDir) {
     this.testDir = testDir;
   }
 
@@ -103,10 +100,9 @@ public class FindTestsByCategoriesTask extends Task {
   private Collection<Class<?>> findTestClasses() {
     try {
       Collection<Class<?>> result = new ArrayList<>();
-      File root = new File(testDir.toString());
-      Collection<String> testClassNames = findTestClassesRecursively(root, EMPTY);
+      Collection<String> testClassNames = findTestClassesRecursively();
       for (String testClassName : testClassNames) {
-        Class<?> e = Class.forName(testClassName);
+        Class<?> e = Class.forName(testClassName.replace('/', '.'));
         if (e.isAnnotationPresent(Category.class)) {
           result.add(e);
         }
@@ -117,38 +113,16 @@ public class FindTestsByCategoriesTask extends Task {
     }
   }
 
-  private Collection<String> findTestClassesRecursively(File root, String packageName) {
+  private Collection<String> findTestClassesRecursively() {
+    Collection<File> classFiles = FileUtils.listFiles(new File(testDir), new String[]{"class"}, true);
     Collection<String> result = new ArrayList<>();
-    for (File file : root.listFiles(new ClassFilter())) {
-      if (file.isFile()) {
-        result.add(appendToPackage(packageName, stripClassExtension(file.getName())));
-      } else if (file.isDirectory()) {
-        result.addAll(findTestClassesRecursively(file, appendToPackage(packageName, file.getName())));
-      }
+    for (File file : classFiles) {
+      result.add(getClassNameFromClassAbsolutePath(testDir, file.getAbsolutePath()));
     }
     return result;
   }
 
-  private String stripClassExtension(String classFile) {
-    if (!classFile.endsWith(".class")) {
-      return classFile;
-    }
-
-    return classFile.substring(0, classFile.length() - ".class".length());
-  }
-
-  private String appendToPackage(String packageName, String fileName) {
-    if (packageName.isEmpty()) {
-      return fileName;
-    }
-    return packageName + "." + fileName;
-  }
-
-  private static class ClassFilter implements FileFilter {
-
-    @Override
-    public boolean accept(File pathname) {
-      return pathname.isDirectory() || pathname.getName().endsWith(".class");
-    }
+  private static String getClassNameFromClassAbsolutePath(String root, String absolutePath) {
+    return absolutePath.substring(root.length() + 1, absolutePath.length() - ".class".length());
   }
 }
