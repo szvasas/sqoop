@@ -659,6 +659,7 @@
       <or>
         <isset property="thirdparty"/>
         <isset property="manual"/>
+        <isset property="categories"/>
       </or>
     </condition>
   </target>
@@ -668,27 +669,29 @@
   <target name="test-prep-normal" unless="thirdparty_or_manual"
                                   depends="test-eval-condition">
     <!-- Set this to run all the "standard" tests -->
-    <property name="test.pattern" value="Test*" />
+    <property name="test.pattern" value="**/Test*.java" />
     <property name="cobertura.testset" value="base" />
   </target>
 
   <target name="test-prep-thirdparty" if="thirdparty">
     <!-- Run tests that *end* with the name Test, instead of starting with it;
          this runs non-standard tests e.g. third-party database tests. -->
-    <property name="test.pattern" value="*Test" />
-    <property name="test.exclude" value="*ManualTest" />
+    <property name="test.pattern" value="**/*Test.java" />
+    <property name="test.exclude" value="**/*ManualTest.java" />
     <property name="cobertura.testset" value="thirdparty" />
   </target>
 
   <target name="test-prep-manual" if="manual">
     <!-- Run tests that are marked for manualtest execution -->
-    <property name="test.pattern" value="*ManualTest" />
+    <property name="test.pattern" value="**/*ManualTest.java" />
     <property name="cobertura.testset" value="manual" />
   </target>
 
-  <target name="test-prep-categories">
-    <taskdef name="findTestsByCategories" classname="org.apache.sqoop.util.ant.FindTestsByCategoriesTask" classpath="build/test/classes"/>
-    <findTestsByCategories testCategories="org.apache.sqoop.orm.TestCompilationManager"/>
+  <target name="test-prep-categories" if="categories">
+    <taskdef name="findTestsByCategories" classname="org.apache.sqoop.util.ant.FindTestsByCategoriesTask">
+       <classpath refid="test.classpath"/>
+    </taskdef>
+    <findTestsByCategories testCategories="${categories}" testDir="${build.test.classes}"/>
   </target>
 
   <!-- ================================================================== -->
@@ -901,8 +904,8 @@
       <formatter type="${test.junit.output.format}" />
       <batchtest todir="${build.test}" unless="testcase">
         <fileset dir="${test.dir}"
-                 includes="**/${test.pattern}.java"
-                 excludes="**/${test.exclude}.java" />
+                 includes="${test.pattern}"
+                 excludes="${test.exclude}" />
       </batchtest>
       <batchtest todir="${build.test}" if="testcase">
         <fileset dir="${test.dir}" includes="**/${testcase}.java"/>
