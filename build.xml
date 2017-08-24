@@ -649,7 +649,7 @@
 
   <!-- set variables that configure the actual test -->
   <target name="test-prep" depends="test-prep-normal,test-prep-thirdparty,
-                                    test-prep-manual"/>
+                                    test-prep-manual,test-prep-categories"/>
 
   <path id="hcatalog.conf.dir">
      <pathelement location="${basedir}/testdata/hcatalog/conf"/>
@@ -684,6 +684,11 @@
     <!-- Run tests that are marked for manualtest execution -->
     <property name="test.pattern" value="*ManualTest" />
     <property name="cobertura.testset" value="manual" />
+  </target>
+
+  <target name="test-prep-categories">
+    <taskdef name="findTestsByCategories" classname="org.apache.sqoop.tool.ant.FindTestsByCategoriesTask" classpath="build/test/classes"/>
+    <findTestsByCategories testCategories="org.apache.sqoop.orm.TestCompilationManager"/>
   </target>
 
   <!-- ================================================================== -->
