@@ -18,9 +18,9 @@ services:
       interval: 30s
       timeout: 10s
       retries: 10
-  postgres:
+  postgresql:
     image: postgres:9.6.4
-    container_name: sqoop_postgres_container
+    container_name: sqoop_postgresql_container
     environment:
       COMPOSE_HTTP_TIMEOUT: 200
       POSTGRES_DB: sqoop
@@ -63,7 +63,7 @@ services:
       timeout: 10s
       retries: 10
   oracle:
-    image: docker-registry.infra.cloudera.com/sqoop/oracle/database:12.2.0.1-ee
+    image: oracle/database:12.2.0.1-ee
     container_name: sqoop_oracle_container
     environment:
       COMPOSE_HTTP_TIMEOUT: 200

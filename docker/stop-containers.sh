@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
-docker-compose -f ./docker-compose/docker-compose.yml stop
-docker-compose -f ./docker-compose/docker-compose.yml rm -f
+BASEDIR=$(dirname "$0")
+
+docker-compose -f $BASEDIR/docker-compose/sqoop-thirdpartytest-db-services.yml stop
+docker-compose -f $BASEDIR/docker-compose/sqoop-thirdpartytest-db-services.yml rm -f

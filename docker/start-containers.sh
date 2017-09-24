@@ -1,2 +1,4 @@
 #!/usr/bin/env bash
-docker-compose -f ./docker-compose/docker-compose.yml up -d
+BASEDIR=$(dirname "$0")
+
+docker-compose -f $BASEDIR/docker-compose/sqoop-thirdpartytest-db-services.yml up -d "$@"
