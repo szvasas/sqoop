@@ -210,13 +210,17 @@ public class GenericJobStorage extends JobStorage {
    * Initialize the connection to the database.
    */
   public void open(Map<String, String> descriptor) throws IOException {
-    setMetastoreConnectStr(defaultIfBlank(descriptor.get(META_CONNECT_KEY), getLocalAutoConnectString()));
-    setMetastoreUser(defaultIfBlank(descriptor.get(META_USERNAME_KEY), getConf().get(AUTO_STORAGE_USER_KEY)));
-    setMetastorePassword(defaultIfBlank(descriptor.get(META_PASSWORD_KEY), getConf().get(AUTO_STORAGE_PASS_KEY)));
+    setConnectionParameters(descriptor);
     setDriverClass(chooseDriverType(metastoreConnectStr));
     setConnectedDescriptor(descriptor);
 
     init();
+  }
+
+  protected void setConnectionParameters(Map<String, String> descriptor) {
+    setMetastoreConnectStr(descriptor.get(META_CONNECT_KEY));
+    setMetastoreUser(descriptor.get(META_USERNAME_KEY));
+    setMetastorePassword(descriptor.get(META_PASSWORD_KEY));
   }
 
   protected void init() throws IOException {
@@ -286,12 +290,7 @@ public class GenericJobStorage extends JobStorage {
   @Override
   /** {@inheritDoc} */
   public boolean canAccept(Map<String, String> descriptor) {
-    // We return true if the desciptor contains a connect string to find
-    // the database or auto-connect is enabled
-    Configuration conf = this.getConf();
-    boolean autoConnectEnabled = conf.getBoolean(AUTO_STORAGE_IS_ACTIVE_KEY, true);
-    boolean isSpecifiedDbSupported = isDbSupported(descriptor.get(META_CONNECT_KEY));
-    return isSpecifiedDbSupported || autoConnectEnabled;
+    return isDbSupported(descriptor.get(META_CONNECT_KEY));
   }
 
   @Override
