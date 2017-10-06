@@ -46,6 +46,7 @@ import org.apache.sqoop.manager.DefaultManagerFactory;
 import org.apache.sqoop.manager.JdbcDrivers;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.sqoop.manager.JdbcDrivers.DB2;
 import static org.apache.sqoop.manager.JdbcDrivers.HSQLDB;
 import static org.apache.sqoop.manager.JdbcDrivers.MYSQL;
@@ -210,8 +211,8 @@ public class GenericJobStorage extends JobStorage {
    */
   public void open(Map<String, String> descriptor) throws IOException {
     setMetastoreConnectStr(defaultIfBlank(descriptor.get(META_CONNECT_KEY), getLocalAutoConnectString()));
-    setMetastoreUser(descriptor.get(META_USERNAME_KEY));
-    setMetastorePassword(descriptor.get(META_PASSWORD_KEY));
+    setMetastoreUser(defaultIfBlank(descriptor.get(META_USERNAME_KEY), getConf().get(AUTO_STORAGE_USER_KEY)));
+    setMetastorePassword(defaultIfBlank(descriptor.get(META_PASSWORD_KEY), getConf().get(AUTO_STORAGE_PASS_KEY)));
     setDriverClass(chooseDriverType(metastoreConnectStr));
     setConnectedDescriptor(descriptor);
 
@@ -288,9 +289,9 @@ public class GenericJobStorage extends JobStorage {
     // We return true if the desciptor contains a connect string to find
     // the database or auto-connect is enabled
     Configuration conf = this.getConf();
-    boolean metaConnectTrue = descriptor.get(META_CONNECT_KEY) != null;
     boolean autoConnectEnabled = conf.getBoolean(AUTO_STORAGE_IS_ACTIVE_KEY, true);
-    return metaConnectTrue || autoConnectEnabled;
+    boolean isSpecifiedDbSupported = isDbSupported(descriptor.get(META_CONNECT_KEY));
+    return isSpecifiedDbSupported || autoConnectEnabled;
   }
 
   @Override
@@ -883,6 +884,14 @@ public class GenericJobStorage extends JobStorage {
       }
     }
     return null;
+  }
+
+  private boolean isDbSupported(String metaConnectString) {
+    if (isBlank(metaConnectString)) {
+      return false;
+    }
+
+    return (chooseDriverType(metaConnectString) != null);
   }
 
 }
