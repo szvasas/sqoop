@@ -2807,12 +2807,26 @@ public class SqoopOptions implements Cloneable {
   public String getMetaConnectStr() {
     return metaConnectStr;
   }
+
+  public void setMetaConnectStr(String metaConnectStr) {
+    this.metaConnectStr = metaConnectStr;
+  }
+
   public String getMetaUsername() {
     return metaUsername;
+  }
+
+  public void setMetaUsername(String metaUsername) {
+    this.metaUsername = metaUsername;
   }
 
   public String getMetaPassword() {
     return metaPassword;
   }
+
+  public void setMetaPassword(String metaPassword) {
+    this.metaPassword = metaPassword;
+  }
+
 }
 

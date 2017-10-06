@@ -18,12 +18,17 @@
 
 package org.apache.sqoop.tool;
 
+import static com.cloudera.sqoop.metastore.GenericJobStorage.META_CONNECT_KEY;
+import static com.cloudera.sqoop.metastore.GenericJobStorage.META_PASSWORD_KEY;
+import static com.cloudera.sqoop.metastore.GenericJobStorage.META_USERNAME_KEY;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.apache.sqoop.manager.JdbcDrivers.DB2;
 import static org.apache.sqoop.manager.JdbcDrivers.HSQLDB;
 import static org.apache.sqoop.manager.JdbcDrivers.MYSQL;
 import static org.apache.sqoop.manager.JdbcDrivers.ORACLE;
 import static org.apache.sqoop.manager.JdbcDrivers.POSTGRES;
 import static org.apache.sqoop.manager.JdbcDrivers.SQLSERVER;
+import static org.apache.sqoop.metastore.GenericJobStorage.META_DRIVER_KEY;
 
 import java.io.IOException;
 
@@ -356,9 +361,8 @@ public class JobTool extends com.cloudera.sqoop.tool.BaseSqoopTool {
       throw new InvalidOptionsException("");
     }
 
-    this.storageDescriptor = new TreeMap<String, String>();
-
     applyMetastoreOptions(in, out);
+
     // These are generated via an option group; exactly one
     // of this exhaustive list will always be selected.
     if (in.hasOption(JOB_CMD_CREATE_ARG)) {
@@ -376,34 +380,32 @@ public class JobTool extends com.cloudera.sqoop.tool.BaseSqoopTool {
       this.operation = JobOp.JobShow;
       this.jobName = in.getOptionValue(JOB_CMD_SHOW_ARG);
     }
+
+    initializeStorageDescriptor(out);
+  }
+
+  private void initializeStorageDescriptor(SqoopOptions options) throws InvalidOptionsException {
+    storageDescriptor = new TreeMap<>();
+    final Configuration conf = options.getConf();
+    final String metaConnectString = defaultIfBlank(options.getMetaConnectStr(), conf.get(META_CONNECT_KEY));
+    final String metaUsernameString = defaultIfBlank(options.getMetaUsername(), conf.get(META_USERNAME_KEY));
+    final String metaPasswordString = defaultIfBlank(options.getMetaPassword(), conf.get(META_PASSWORD_KEY));
+
+    storageDescriptor.put(META_DRIVER_KEY, chooseDriverType(metaConnectString));
+    storageDescriptor.put(META_CONNECT_KEY, metaConnectString);
+    storageDescriptor.put(META_USERNAME_KEY, metaUsernameString);
+    storageDescriptor.put(META_PASSWORD_KEY, metaPasswordString);
   }
 
   private void applyMetastoreOptions(CommandLine in, SqoopOptions out) throws InvalidOptionsException {
-    String metaConnectString;
-    String metaUsernameString;
-    String metaPasswordString;
     if (in.hasOption(STORAGE_METASTORE_ARG)) {
-      metaConnectString = in.getOptionValue(STORAGE_METASTORE_ARG);
-      this.storageDescriptor.put(GenericJobStorage.META_DRIVER_KEY, chooseDriverType(metaConnectString));
-      this.storageDescriptor.put(GenericJobStorage.META_CONNECT_KEY, metaConnectString);
-    } else {
-      metaConnectString = out.getMetaConnectStr();
-      this.storageDescriptor.put(GenericJobStorage.META_DRIVER_KEY, chooseDriverType(metaConnectString));
-      this.storageDescriptor.put(GenericJobStorage.META_CONNECT_KEY, metaConnectString);
+      out.setMetaConnectStr(in.getOptionValue(STORAGE_METASTORE_ARG));
     }
     if (in.hasOption(METASTORE_USER_ARG)) {
-      metaUsernameString = in.getOptionValue(METASTORE_USER_ARG);
-      this.storageDescriptor.put(GenericJobStorage.META_USERNAME_KEY, metaUsernameString);
-    } else {
-      metaUsernameString = out.getMetaUsername();
-      this.storageDescriptor.put(GenericJobStorage.META_USERNAME_KEY, metaUsernameString);
+      out.setMetaUsername(in.getOptionValue(METASTORE_USER_ARG));
     }
     if (in.hasOption(METASTORE_PASS_ARG)) {
-      metaPasswordString = in.getOptionValue(METASTORE_PASS_ARG);
-      this.storageDescriptor.put(GenericJobStorage.META_PASSWORD_KEY, metaPasswordString);
-    } else {
-      metaPasswordString = out.getMetaPassword();
-      this.storageDescriptor.put(GenericJobStorage.META_PASSWORD_KEY, metaPasswordString);
+      out.setMetaPassword(in.getOptionValue(METASTORE_PASS_ARG));
     }
   }
 
