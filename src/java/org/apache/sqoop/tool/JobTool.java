@@ -21,7 +21,6 @@ package org.apache.sqoop.tool;
 import static com.cloudera.sqoop.metastore.GenericJobStorage.META_CONNECT_KEY;
 import static com.cloudera.sqoop.metastore.GenericJobStorage.META_PASSWORD_KEY;
 import static com.cloudera.sqoop.metastore.GenericJobStorage.META_USERNAME_KEY;
-import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 import java.io.IOException;
 
@@ -373,14 +372,10 @@ public class JobTool extends com.cloudera.sqoop.tool.BaseSqoopTool {
 
   private void initializeStorageDescriptor(SqoopOptions options) throws InvalidOptionsException {
     storageDescriptor = new TreeMap<>();
-    final Configuration conf = options.getConf();
-    final String metaConnectString = defaultIfBlank(options.getMetaConnectStr(), conf.get(META_CONNECT_KEY));
-    final String metaUsernameString = defaultIfBlank(options.getMetaUsername(), conf.get(META_USERNAME_KEY));
-    final String metaPasswordString = defaultIfBlank(options.getMetaPassword(), conf.get(META_PASSWORD_KEY));
 
-    storageDescriptor.put(META_CONNECT_KEY, metaConnectString);
-    storageDescriptor.put(META_USERNAME_KEY, metaUsernameString);
-    storageDescriptor.put(META_PASSWORD_KEY, metaPasswordString);
+    storageDescriptor.put(META_CONNECT_KEY, options.getMetaConnectStr());
+    storageDescriptor.put(META_USERNAME_KEY, options.getMetaUsername());
+    storageDescriptor.put(META_PASSWORD_KEY, options.getMetaPassword());
   }
 
   private void applyMetastoreOptions(CommandLine in, SqoopOptions out) throws InvalidOptionsException {
