@@ -17,7 +17,6 @@
  */
 package org.apache.sqoop.metastore;
 
-import java.io.File;
 import java.io.IOException;
 
 import java.sql.Connection;
@@ -45,8 +44,6 @@ import com.cloudera.sqoop.tool.SqoopTool;
 import org.apache.sqoop.manager.DefaultManagerFactory;
 import org.apache.sqoop.manager.JdbcDrivers;
 
-import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.sqoop.manager.JdbcDrivers.DB2;
 import static org.apache.sqoop.manager.JdbcDrivers.HSQLDB;
 import static org.apache.sqoop.manager.JdbcDrivers.MYSQL;

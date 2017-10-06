@@ -430,6 +430,5 @@ public class JobTool extends com.cloudera.sqoop.tool.BaseSqoopTool {
     System.out.println("(must preceed any tool-specific arguments)");
     ToolRunner.printGenericCommandUsage(System.out);
   }
-
 }
 

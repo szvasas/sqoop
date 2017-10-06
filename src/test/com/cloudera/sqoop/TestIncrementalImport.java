@@ -80,11 +80,6 @@ public class TestIncrementalImport  {
 
   @Before
   public void setUp() throws Exception {
-    // Delete db state between tests
-    System.setProperty(AutoGenericJobStorage.AUTO_STORAGE_USER_KEY, AUTO_STORAGE_USERNAME);
-    System.setProperty(AutoGenericJobStorage.AUTO_STORAGE_PASS_KEY, AUTO_STORAGE_PASSWORD);
-    System.setProperty(AutoGenericJobStorage.AUTO_STORAGE_CONNECT_STRING_KEY,
-            SOURCE_DB_URL);
     resetSourceDataSchema();
   }
 
