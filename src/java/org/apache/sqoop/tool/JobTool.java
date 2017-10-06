@@ -22,22 +22,13 @@ import static com.cloudera.sqoop.metastore.GenericJobStorage.META_CONNECT_KEY;
 import static com.cloudera.sqoop.metastore.GenericJobStorage.META_PASSWORD_KEY;
 import static com.cloudera.sqoop.metastore.GenericJobStorage.META_USERNAME_KEY;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
-import static org.apache.sqoop.manager.JdbcDrivers.DB2;
-import static org.apache.sqoop.manager.JdbcDrivers.HSQLDB;
-import static org.apache.sqoop.manager.JdbcDrivers.MYSQL;
-import static org.apache.sqoop.manager.JdbcDrivers.ORACLE;
-import static org.apache.sqoop.manager.JdbcDrivers.POSTGRES;
-import static org.apache.sqoop.manager.JdbcDrivers.SQLSERVER;
-import static org.apache.sqoop.metastore.GenericJobStorage.META_DRIVER_KEY;
 
 import java.io.IOException;
 
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.commons.cli.CommandLine;
@@ -52,11 +43,9 @@ import org.apache.hadoop.util.ToolRunner;
 import com.cloudera.sqoop.SqoopOptions;
 import com.cloudera.sqoop.SqoopOptions.InvalidOptionsException;
 import com.cloudera.sqoop.cli.ToolOptions;
-import com.cloudera.sqoop.metastore.GenericJobStorage;
 import com.cloudera.sqoop.metastore.JobData;
 import com.cloudera.sqoop.metastore.JobStorage;
 import com.cloudera.sqoop.metastore.JobStorageFactory;
-import org.apache.sqoop.manager.JdbcDrivers;
 import org.apache.sqoop.metastore.PasswordRedactor;
 import org.apache.sqoop.util.LoggingUtils;
 
@@ -68,8 +57,6 @@ public class JobTool extends com.cloudera.sqoop.tool.BaseSqoopTool {
   public static final Log LOG = LogFactory.getLog(
       JobTool.class.getName());
   private static final String DASH_STR  = "--";
-
-  private static Set<JdbcDrivers> SUPPORTED_DRIVERS = EnumSet.of(HSQLDB, MYSQL, ORACLE, POSTGRES, DB2, SQLSERVER);
 
   private enum JobOp {
     JobCreate,
@@ -391,7 +378,6 @@ public class JobTool extends com.cloudera.sqoop.tool.BaseSqoopTool {
     final String metaUsernameString = defaultIfBlank(options.getMetaUsername(), conf.get(META_USERNAME_KEY));
     final String metaPasswordString = defaultIfBlank(options.getMetaPassword(), conf.get(META_PASSWORD_KEY));
 
-    storageDescriptor.put(META_DRIVER_KEY, chooseDriverType(metaConnectString));
     storageDescriptor.put(META_CONNECT_KEY, metaConnectString);
     storageDescriptor.put(META_USERNAME_KEY, metaUsernameString);
     storageDescriptor.put(META_PASSWORD_KEY, metaPasswordString);
@@ -407,15 +393,6 @@ public class JobTool extends com.cloudera.sqoop.tool.BaseSqoopTool {
     if (in.hasOption(METASTORE_PASS_ARG)) {
       out.setMetaPassword(in.getOptionValue(METASTORE_PASS_ARG));
     }
-  }
-
-  private String chooseDriverType(String metaConnectString) throws InvalidOptionsException {
-    for (JdbcDrivers driver : SUPPORTED_DRIVERS) {
-      if (metaConnectString.startsWith(driver.getSchemePrefix())) {
-        return driver.getDriverClass();
-      }
-    }
-    throw new InvalidOptionsException("current meta-connect scheme not compatible with metastore");
   }
 
   @Override

@@ -26,9 +26,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import com.cloudera.sqoop.manager.ConnManager;
 import org.apache.commons.logging.Log;
@@ -41,8 +43,15 @@ import com.cloudera.sqoop.metastore.JobData;
 import com.cloudera.sqoop.metastore.JobStorage;
 import com.cloudera.sqoop.tool.SqoopTool;
 import org.apache.sqoop.manager.DefaultManagerFactory;
+import org.apache.sqoop.manager.JdbcDrivers;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static org.apache.sqoop.manager.JdbcDrivers.DB2;
+import static org.apache.sqoop.manager.JdbcDrivers.HSQLDB;
+import static org.apache.sqoop.manager.JdbcDrivers.MYSQL;
+import static org.apache.sqoop.manager.JdbcDrivers.ORACLE;
+import static org.apache.sqoop.manager.JdbcDrivers.POSTGRES;
+import static org.apache.sqoop.manager.JdbcDrivers.SQLSERVER;
 
 /**
  * JobStorage implementation that uses a database to
@@ -65,9 +74,6 @@ public class GenericJobStorage extends JobStorage {
    * to the metastore.
    */
   public static final String META_PASSWORD_KEY = "metastore.password";
-
-  /** descriptor key identifying the class name of the jdbc driver */
-  public static final String META_DRIVER_KEY = "metastore.driver.class";
 
   /** Default name for the root metadata table. */
   private static final String DEFAULT_ROOT_TABLE_NAME = "SQOOP_ROOT";
@@ -159,6 +165,7 @@ public class GenericJobStorage extends JobStorage {
    * to load.
    */
   private static final String SQOOP_TOOL_KEY = "sqoop.tool";
+  private static final Set<JdbcDrivers> SUPPORTED_DRIVERS = EnumSet.of(HSQLDB, MYSQL, ORACLE, POSTGRES, DB2, SQLSERVER);
   private Map<String, String> connectedDescriptor;
   private String metastoreConnectStr;
   private String metastoreUser;
@@ -205,7 +212,7 @@ public class GenericJobStorage extends JobStorage {
     setMetastoreConnectStr(defaultIfBlank(descriptor.get(META_CONNECT_KEY), getLocalAutoConnectString()));
     setMetastoreUser(descriptor.get(META_USERNAME_KEY));
     setMetastorePassword(descriptor.get(META_PASSWORD_KEY));
-    setDriverClass(descriptor.get(META_DRIVER_KEY));
+    setDriverClass(chooseDriverType(metastoreConnectStr));
     setConnectedDescriptor(descriptor);
 
     init();
@@ -867,6 +874,15 @@ public class GenericJobStorage extends JobStorage {
     String dbFileStr = databaseFileObj.toString();
     return "jdbc:hsqldb:file:" + dbFileStr
         + ";hsqldb.write_delay=false;shutdown=true";
+  }
+
+  private String chooseDriverType(String metaConnectString) {
+    for (JdbcDrivers driver : SUPPORTED_DRIVERS) {
+      if (metaConnectString.startsWith(driver.getSchemePrefix())) {
+        return driver.getDriverClass();
+      }
+    }
+    return null;
   }
 
 }
