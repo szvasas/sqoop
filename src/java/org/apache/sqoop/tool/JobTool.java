@@ -459,27 +459,5 @@ public class JobTool extends com.cloudera.sqoop.tool.BaseSqoopTool {
     ToolRunner.printGenericCommandUsage(System.out);
   }
 
-//
-//  this.metaConnectStr =
-//      System.getProperty(GenericJobStorage.AUTO_STORAGE_CONNECT_STRING_KEY, getLocalAutoConnectString());
-//  this.metaUsername =
-//      System.getProperty(GenericJobStorage.AUTO_STORAGE_USER_KEY, GenericJobStorage.DEFAULT_AUTO_USER);
-//  this.metaPassword =
-//      System.getProperty(GenericJobStorage.AUTO_STORAGE_PASS_KEY, GenericJobStorage.DEFAULT_AUTO_PASSWORD);
-//}
-//
-//  private String getLocalAutoConnectString() {
-//    String homeDir = System.getProperty("user.home");
-//
-//    File homeDirObj = new File(homeDir);
-//    File sqoopDataDirObj = new File(homeDirObj, ".sqoop");
-//    File databaseFileObj = new File(sqoopDataDirObj, "metastore.db");
-//
-//    String dbFileStr = databaseFileObj.toString();
-//    return "jdbc:hsqldb:file:" + dbFileStr
-//        + ";hsqldb.write_delay=false;shutdown=true";
-//  }
-
-
 }
 

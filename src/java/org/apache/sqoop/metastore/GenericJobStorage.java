@@ -17,6 +17,7 @@
  */
 package org.apache.sqoop.metastore;
 
+import java.io.File;
 import java.io.IOException;
 
 import java.sql.Connection;
@@ -40,6 +41,8 @@ import com.cloudera.sqoop.metastore.JobData;
 import com.cloudera.sqoop.metastore.JobStorage;
 import com.cloudera.sqoop.tool.SqoopTool;
 import org.apache.sqoop.manager.DefaultManagerFactory;
+
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 /**
  * JobStorage implementation that uses a database to
@@ -199,7 +202,7 @@ public class GenericJobStorage extends JobStorage {
    * Initialize the connection to the database.
    */
   public void open(Map<String, String> descriptor) throws IOException {
-    setMetastoreConnectStr(descriptor.get(META_CONNECT_KEY));
+    setMetastoreConnectStr(defaultIfBlank(descriptor.get(META_CONNECT_KEY), getLocalAutoConnectString()));
     setMetastoreUser(descriptor.get(META_USERNAME_KEY));
     setMetastorePassword(descriptor.get(META_PASSWORD_KEY));
     setDriverClass(descriptor.get(META_DRIVER_KEY));
@@ -852,6 +855,18 @@ public class GenericJobStorage extends JobStorage {
     jd.setSqoopOptions(sqoopOptions);
     DefaultManagerFactory dmf = new DefaultManagerFactory();
     return dmf.accept(jd);
+  }
+
+  private String getLocalAutoConnectString() {
+    String homeDir = System.getProperty("user.home");
+
+    File homeDirObj = new File(homeDir);
+    File sqoopDataDirObj = new File(homeDirObj, ".sqoop");
+    File databaseFileObj = new File(sqoopDataDirObj, "metastore.db");
+
+    String dbFileStr = databaseFileObj.toString();
+    return "jdbc:hsqldb:file:" + dbFileStr
+        + ";hsqldb.write_delay=false;shutdown=true";
   }
 
 }
