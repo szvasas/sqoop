@@ -129,39 +129,6 @@ public class GenericJobStorage extends JobStorage {
   private static final String PROPERTY_CLASS_CONFIG = "config";
 
   /**
-   * Configuration key specifying whether this storage agent is active.
-   * Defaults to "on" to allow zero-conf local users.
-   */
-  public static final String AUTO_STORAGE_IS_ACTIVE_KEY =
-          "sqoop.metastore.client.enable.autoconnect";
-
-  /**
-   * Configuration key specifying the connect string used by this
-   * storage agent.
-   */
-  public static final String AUTO_STORAGE_CONNECT_STRING_KEY =
-          "sqoop.metastore.client.autoconnect.url";
-
-  /**
-   * Configuration key specifying the username to bind with.
-   */
-  public static final String AUTO_STORAGE_USER_KEY =
-          "sqoop.metastore.client.autoconnect.username";
-
-
-  /** HSQLDB default user is named 'SA'. */
-  public static final String DEFAULT_AUTO_USER = "SA";
-
-  /**
-   * Configuration key specifying the password to bind with.
-   */
-  public static final String AUTO_STORAGE_PASS_KEY =
-          "sqoop.metastore.client.autoconnect.password";
-
-  /** HSQLDB default user has an empty password. */
-  public static final String DEFAULT_AUTO_PASSWORD = "";
-
-  /**
    * Per-job key with propClass 'schema' that specifies the SqoopTool
    * to load.
    */
@@ -172,7 +139,6 @@ public class GenericJobStorage extends JobStorage {
   private String metastoreUser;
   private String metastorePassword;
   private Connection connection;
-  private String driverClass;
   private ConnManager connManager;
 
   protected Connection getConnection() {
@@ -195,9 +161,6 @@ public class GenericJobStorage extends JobStorage {
     this.metastorePassword = pass;
   }
 
-  protected void setDriverClass(String driverClass) {
-    this.driverClass = driverClass;
-  }
   /**
    * Set the descriptor used to open() this storage.
    */
@@ -211,7 +174,6 @@ public class GenericJobStorage extends JobStorage {
    */
   public void open(Map<String, String> descriptor) throws IOException {
     setConnectionParameters(descriptor);
-    setDriverClass(chooseDriverType(metastoreConnectStr));
     setConnectedDescriptor(descriptor);
 
     init();
@@ -290,7 +252,8 @@ public class GenericJobStorage extends JobStorage {
   @Override
   /** {@inheritDoc} */
   public boolean canAccept(Map<String, String> descriptor) {
-    return isDbSupported(descriptor.get(META_CONNECT_KEY));
+    final String metaConnectString = descriptor.get(META_CONNECT_KEY);
+    return metaConnectString != null && isDbSupported(metaConnectString);
   }
 
   @Override
@@ -864,33 +827,13 @@ public class GenericJobStorage extends JobStorage {
     return dmf.accept(jd);
   }
 
-  private String getLocalAutoConnectString() {
-    String homeDir = System.getProperty("user.home");
-
-    File homeDirObj = new File(homeDir);
-    File sqoopDataDirObj = new File(homeDirObj, ".sqoop");
-    File databaseFileObj = new File(sqoopDataDirObj, "metastore.db");
-
-    String dbFileStr = databaseFileObj.toString();
-    return "jdbc:hsqldb:file:" + dbFileStr
-        + ";hsqldb.write_delay=false;shutdown=true";
-  }
-
-  private String chooseDriverType(String metaConnectString) {
+  protected boolean isDbSupported(String metaConnectString) {
     for (JdbcDrivers driver : SUPPORTED_DRIVERS) {
       if (metaConnectString.startsWith(driver.getSchemePrefix())) {
-        return driver.getDriverClass();
+        return true;
       }
     }
-    return null;
-  }
-
-  private boolean isDbSupported(String metaConnectString) {
-    if (isBlank(metaConnectString)) {
-      return false;
-    }
-
-    return (chooseDriverType(metaConnectString) != null);
+    return false;
   }
 
 }
