@@ -79,7 +79,7 @@ public class TestAutoGenericJobStorageCanAccept {
   }
 
   @Test
-  public void testCanWithParameters() {
+  public void testCanAcceptWithParameters() {
     assertEquals(canAccept, jobStorage.canAccept(descriptor));
   }
 
