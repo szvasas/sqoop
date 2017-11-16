@@ -113,7 +113,19 @@ public class HsqldbTestServer {
     }
   }
 
+  public void stop() {
+    if (null == server) {
+      return;
+    }
+    server.stop();
+    server = null;
+  }
+
   public Connection getConnection() throws SQLException {
+    return getConnection(null, null);
+  }
+
+  public Connection getConnection(String user, String password) throws SQLException {
     try {
       Class.forName(DRIVER_CLASS);
     } catch (ClassNotFoundException cnfe) {
@@ -122,7 +134,7 @@ public class HsqldbTestServer {
       return null;
     }
 
-    Connection connection = DriverManager.getConnection(DB_URL);
+    Connection connection = DriverManager.getConnection(DB_URL, user, password);
     connection.setAutoCommit(false);
     return connection;
   }
