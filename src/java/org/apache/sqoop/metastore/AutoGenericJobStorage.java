@@ -99,4 +99,3 @@ public class AutoGenericJobStorage extends GenericJobStorage {
     setMetastorePassword(conf.get(AUTO_STORAGE_PASS_KEY, DEFAULT_AUTO_PASSWORD));
   }
 }
-
