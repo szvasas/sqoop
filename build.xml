@@ -260,6 +260,20 @@
     </or>
   </condition>
 
+  <property name="includeCategories" value=""/>
+  <property name="excludeCategories" value=""/>
+
+  <condition property="useCategories">
+    <or>
+      <not>
+        <equals arg1="${includeCategories}" arg2="" />
+      </not>
+      <not>
+        <equals arg1="${excludeCategories}" arg2="" />
+      </not>
+    </or>
+  </condition>
+
   <if>
     <isset property="sqoop.test.msserver.connector.factory"/>
     <then>
@@ -659,7 +673,7 @@
       <or>
         <isset property="thirdparty"/>
         <isset property="manual"/>
-        <isset property="categories"/>
+        <isset property="useCategories"/>
       </or>
     </condition>
   </target>
@@ -687,11 +701,11 @@
     <property name="cobertura.testset" value="manual" />
   </target>
 
-  <target name="test-prep-categories" if="categories">
+  <target name="test-prep-categories" if="useCategories">
     <taskdef name="findTestsByCategories" classname="org.apache.sqoop.util.ant.FindTestsByCategoriesTask">
        <classpath refid="test.classpath"/>
     </taskdef>
-    <findTestsByCategories testCategories="${categories}" testDir="${build.test.classes}"/>
+    <findTestsByCategories includeCategories="${includeCategories}" excludecategories="${excludeCategories}" testDir="${build.test.classes}"/>
   </target>
 
   <!-- ================================================================== -->

@@ -4,14 +4,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
-import org.apache.tools.ant.types.Path;
 import org.junit.experimental.categories.Category;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.*;
 
 public class FindTestsByCategoriesTask extends Task {
 
@@ -21,30 +17,44 @@ public class FindTestsByCategoriesTask extends Task {
 
   private static final String TEST_POSTFIX = ".java";
 
-  private Collection<Class<?>> testCategories;
+  private Collection<Class<?>> includeCategories;
+
+  private Collection<Class<?>> excludeCategories;
 
   private String testDir;
 
   public FindTestsByCategoriesTask() {
-    testCategories = new HashSet<>();
+    includeCategories = new HashSet<>();
+    excludeCategories = new HashSet<>();
   }
 
   @Override
   public void execute() throws BuildException {
-    System.out.println("Searching for tests with the following categories: " + testCategories);
+    System.out.println("Including categories: " + includeCategories);
+    System.out.println("Excluding categories: " + excludeCategories);
     Collection<Class<?>> testsByCategories = findTestsToRun();
     Collection<String> filesetElements = transformToFilesetFormat(testsByCategories);
     getProject().setNewProperty(TEST_PATTERN_PROPERTY, StringUtils.join(filesetElements, SEPARATOR));
   }
 
-  public void setTestCategories(String testCategoriesString) {
+  public void setIncludeCategories(String includeCategoriesString) {
+    includeCategories.addAll(parseCategoriesString(includeCategoriesString));
+  }
+
+  public void setExcludeCategories(String excludeCategoriesString) {
+    excludeCategories.addAll(parseCategoriesString(excludeCategoriesString));
+  }
+
+  private Collection<Class<?>> parseCategoriesString(String categoriesString) {
+    Collection<Class<?>> result = new HashSet<>();
     try {
-      for (String testCategoryString : splitTestCategoriesString(testCategoriesString)) {
-        testCategories.add(Class.forName(testCategoryString));
+      for (String testCategoryString : splitTestCategoriesString(categoriesString)) {
+        result.add(Class.forName(testCategoryString));
       }
     } catch (ClassNotFoundException e) {
       throw new RuntimeException(e);
     }
+    return result;
   }
 
   public void setTestDir(String testDir) {
@@ -52,6 +62,9 @@ public class FindTestsByCategoriesTask extends Task {
   }
 
   private Collection<String> splitTestCategoriesString(String testCategoriesString) {
+    if (testCategoriesString == null || testCategoriesString.isEmpty()) {
+      return Collections.emptyList();
+    }
     return Arrays.asList(testCategoriesString.split(SEPARATOR));
   }
 
@@ -89,7 +102,7 @@ public class FindTestsByCategoriesTask extends Task {
   }
 
   private boolean isApplicable(Class<?> testCategory) {
-    for (Class<?> categoryToInclude : testCategories) {
+    for (Class<?> categoryToInclude : includeCategories) {
       if (categoryToInclude.isAssignableFrom(testCategory)) {
         return true;
       }
