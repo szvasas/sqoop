@@ -85,12 +85,11 @@ public class SQLServerDatatypeImportSequenceFileTest extends
       tdfs.parse();
       report = new HashMap();
     } catch (Exception e) {
-//      LOG.error(StringUtils.stringifyException(e));
-//      System.out
-//       .println("Error with test data file, check stack trace for cause"
-//         + ".\nTests cannont continue.");
-//      System.exit(0);
-      e.printStackTrace();
+      LOG.error(StringUtils.stringifyException(e));
+      System.out
+       .println("Error with test data file, check stack trace for cause"
+         + ".\nTests cannont continue.");
+      throw new RuntimeException(e);
     }
   }
 

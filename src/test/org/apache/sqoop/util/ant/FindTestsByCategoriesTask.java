@@ -123,19 +123,21 @@ public class FindTestsByCategoriesTask extends Task {
   }
 
   private Collection<Class<?>> findTestClasses() {
-    try {
-      Collection<Class<?>> result = new ArrayList<>();
-      Collection<String> testClassNames = findTestClassesRecursively();
-      for (String testClassName : testClassNames) {
-        Class<?> e = Class.forName(testClassName.replace('/', '.'));
-        if (e.isAnnotationPresent(Category.class)) {
-          result.add(e);
+    Collection<Class<?>> result = new ArrayList<>();
+    Collection<String> testClassNames = findTestClassesRecursively();
+    for (String testClassName : testClassNames) {
+      Class<?> loadedClass = null;
+      String testClass = testClassName.replace('/', '.');
+      try {
+        loadedClass = Class.forName(testClass);
+        if (loadedClass.isAnnotationPresent(Category.class)) {
+          result.add(loadedClass);
         }
+      } catch (Throwable e) {
+        System.out.println("Cannot load class: " + testClass);
       }
-      return result;
-    } catch (ClassNotFoundException e) {
-      throw new RuntimeException(e);
     }
+    return result;
   }
 
   private Collection<String> findTestClassesRecursively() {
