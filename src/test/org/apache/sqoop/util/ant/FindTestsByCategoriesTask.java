@@ -91,20 +91,32 @@ public class FindTestsByCategoriesTask extends Task {
 
     for (Class<?> categorizedTestClass : categorizedTests) {
       Category categoryAnnotation = categorizedTestClass.getAnnotation(Category.class);
-      for (Class<?> testCategory : categoryAnnotation.value()) {
-        if (isApplicable(testCategory)) {
-          testsToRun.add(categorizedTestClass);
-        }
+      if (isApplicable(categoryAnnotation.value())) {
+        testsToRun.add(categorizedTestClass);
       }
     }
 
     return testsToRun;
   }
 
-  private boolean isApplicable(Class<?> testCategory) {
-    for (Class<?> categoryToInclude : includeCategories) {
-      if (categoryToInclude.isAssignableFrom(testCategory)) {
-        return true;
+  private boolean isApplicable(Class<?>[] testCategories) {
+    return (isIncluded(testCategories) && !isExcluded(testCategories));
+  }
+
+  private boolean isIncluded(Class<?>[] testCategory) {
+    return isSuperClassOfAtLeastOneCategory(testCategory, includeCategories);
+  }
+
+  private boolean isExcluded(Class<?>[] testCategory) {
+    return isSuperClassOfAtLeastOneCategory(testCategory, excludeCategories);
+  }
+
+  private boolean isSuperClassOfAtLeastOneCategory(Class<?>[] testCategories, Collection<Class<?>> categories) {
+    for (Class<?> testCategory : testCategories) {
+      for (Class<?> category : categories) {
+        if (category.isAssignableFrom(testCategory)) {
+          return true;
+        }
       }
     }
     return false;

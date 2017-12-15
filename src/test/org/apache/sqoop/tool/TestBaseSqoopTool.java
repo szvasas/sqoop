@@ -19,6 +19,7 @@
 package org.apache.sqoop.tool;
 
 import com.cloudera.sqoop.SqoopOptions;
+import org.apache.sqoop.testcategories.HiveTest;
 import org.apache.sqoop.testcategories.UnitTest;
 import org.junit.Before;
 import org.junit.Rule;
@@ -30,7 +31,7 @@ import org.mockito.Mockito;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.mockito.Mockito.mock;
 
-@Category(UnitTest.class)
+@Category({UnitTest.class, HiveTest.class})
 public class TestBaseSqoopTool {
 
   @Rule
