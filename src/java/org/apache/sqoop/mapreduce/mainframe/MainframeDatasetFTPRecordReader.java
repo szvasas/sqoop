@@ -38,12 +38,16 @@ import org.apache.sqoop.util.MainframeFTPClientUtils;
  */
 public class MainframeDatasetFTPRecordReader <T extends SqoopRecord>
     extends MainframeDatasetRecordReader<T> {
-  private FTPClient ftp = null;
+  private final FTPClient ftp;
   private BufferedReader datasetReader = null;
   private BufferedInputStream inputStream = null;
 
   private static final Log LOG = LogFactory.getLog(
       MainframeDatasetFTPRecordReader.class.getName());
+
+  public MainframeDatasetFTPRecordReader(FTPClient ftpClient) {
+    ftp = ftpClient;
+  }
 
   @Override
   public void initialize(InputSplit inputSplit,
@@ -52,7 +56,6 @@ public class MainframeDatasetFTPRecordReader <T extends SqoopRecord>
     super.initialize(inputSplit, taskAttemptContext);
 
     Configuration conf = getConfiguration();
-    ftp = MainframeFTPClientUtils.getFTPConnection(conf);
     if (ftp != null) {
 		String dsName = conf.get(MainframeConfiguration.MAINFRAME_INPUT_DATASET_NAME);
 		String dsType = conf.get(MainframeConfiguration.MAINFRAME_INPUT_DATASET_TYPE);
@@ -68,31 +71,6 @@ public class MainframeDatasetFTPRecordReader <T extends SqoopRecord>
 			dsName = p.getMainframeDatasetFolder();
 		}
 		ftp.changeWorkingDirectory("'" + dsName + "'");
-    }
-  }
-
-  // used for testing
-  public void initialize(InputSplit inputSplit,
-       TaskAttemptContext taskAttemptContext,
-       FTPClient ftpClient, Configuration conf)
-    throws IOException, InterruptedException {
-    ftp = ftpClient;
-    if (ftp != null) {
-      String dsName = conf.get(MainframeConfiguration.MAINFRAME_INPUT_DATASET_NAME);
-      String dsType = conf.get(MainframeConfiguration.MAINFRAME_INPUT_DATASET_TYPE);
-      inputStream = new BufferedInputStream(ftp.retrieveFileStream(dsName));
-      MainframeDatasetPath p = null;
-      try {
-        p = new MainframeDatasetPath(dsName,conf);
-      } catch (Exception e) {
-        LOG.error(e.getMessage());
-        LOG.error("MainframeDatasetPath helper class incorrectly initialised");
-        e.printStackTrace();
-      }
-      if (dsType != null && p != null) {
-        dsName = p.getMainframeDatasetFolder();
-      }
-      ftp.changeWorkingDirectory("'" + dsName + "'");
     }
   }
 

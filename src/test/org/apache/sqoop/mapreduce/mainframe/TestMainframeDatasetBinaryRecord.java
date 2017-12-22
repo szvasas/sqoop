@@ -48,17 +48,18 @@ public class TestMainframeDatasetBinaryRecord {
 
   @Before
   public void setUp() throws IOException, InterruptedException {
-    mfDFTPRR = new MainframeDatasetFTPRecordReader();
-    is = mock(InputStream.class);
     ftp = mock(FTPClient.class);
+    mfDFTPRR = new MainframeDatasetFTPRecordReader(ftp);
+    is = mock(InputStream.class);
     split = mock(MainframeDatasetInputSplit.class);
     context = mock(TaskAttemptContext.class);
     conf = new Configuration();
+    when(context.getConfiguration()).thenReturn(conf);
     when(ftp.retrieveFileStream(any(String.class))).thenReturn(is);
     when(ftp.changeWorkingDirectory(any(String.class))).thenReturn(true);
     conf.set(MainframeConfiguration.MAINFRAME_INPUT_DATASET_NAME,DATASET_NAME);
     conf.set(MainframeConfiguration.MAINFRAME_INPUT_DATASET_TYPE,DATASET_TYPE);
-    mfDFTPRR.initialize(split, context, ftp, conf);
+    mfDFTPRR.initialize(split, context);
   }
 
   // Mock the inputstream.read method and manipulate the function parameters

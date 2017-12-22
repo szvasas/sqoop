@@ -209,7 +209,7 @@ public class TestMainframeDatasetFTPRecordReader {
     mfDIS.addDataset("test2");
     context = mock(TaskAttemptContext.class);
     when(context.getConfiguration()).thenReturn(job.getConfiguration());
-    mfDFTPRR = new MainframeDatasetFTPRecordReader();
+    mfDFTPRR = new MainframeDatasetFTPRecordReader(MainframeFTPClientUtils.getFTPConnection(job.getConfiguration()));
   }
 
   @After

@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.net.ftp.FTPClient;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.InputFormat;
@@ -50,7 +51,8 @@ public class MainframeDatasetInputFormat<T extends SqoopRecord>
   public RecordReader<LongWritable, T> createRecordReader(
       InputSplit inputSplit, TaskAttemptContext taskAttemptContext)
       throws IOException, InterruptedException {
-    return new MainframeDatasetFTPRecordReader<T>();
+    FTPClient ftpClient = MainframeFTPClientUtils.getFTPConnection(taskAttemptContext.getConfiguration());
+    return new MainframeDatasetFTPRecordReader<>(ftpClient);
   }
 
   @Override
