@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.apache.sqoop.metastore.AutoGenericJobStorage.AUTO_STORAGE_IS_ACTIVE_KEY;
 import static org.junit.Assert.assertFalse;
@@ -34,10 +35,13 @@ public class TestAutoGenericJobStorage {
 
   private Configuration jobStorageConfiguration;
 
+  private Map<String, String> descriptor;
+
   @Before
   public void before() {
     jobStorage = new AutoGenericJobStorage();
     jobStorageConfiguration = new Configuration();
+    descriptor = new HashMap<>();
 
     jobStorage.setConf(jobStorageConfiguration);
   }
@@ -45,18 +49,18 @@ public class TestAutoGenericJobStorage {
   @Test
   public void testCanAcceptWithAutoStorageDisabledReturnsFalse() {
     jobStorageConfiguration.setBoolean(AUTO_STORAGE_IS_ACTIVE_KEY, false);
-    assertFalse(jobStorage.canAccept(new HashMap<>()));
+    assertFalse(jobStorage.canAccept(descriptor));
   }
 
   @Test
   public void testCanAcceptWithAutoStorageEnabledReturnsTrue() {
     jobStorageConfiguration.setBoolean(AUTO_STORAGE_IS_ACTIVE_KEY, true);
-    assertTrue(jobStorage.canAccept(new HashMap<>()));
+    assertTrue(jobStorage.canAccept(descriptor));
   }
 
   @Test
   public void testCanAcceptWithAutoStorageDefaultValueReturnsTrue() {
-    assertTrue(jobStorage.canAccept(new HashMap<>()));
+    assertTrue(jobStorage.canAccept(descriptor));
   }
 
 }

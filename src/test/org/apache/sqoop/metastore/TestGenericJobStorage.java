@@ -54,7 +54,7 @@ public class TestGenericJobStorage {
 
   @Test
   public void testCanAcceptWithoutMetaConnectStringSetReturnsFalse() {
-    assertFalse(jobStorage.canAccept(new HashMap<>()));
+    assertFalse(jobStorage.canAccept(descriptor));
   }
 
   /**
