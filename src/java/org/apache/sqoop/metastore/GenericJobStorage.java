@@ -44,6 +44,7 @@ import com.cloudera.sqoop.tool.SqoopTool;
 import org.apache.sqoop.manager.DefaultManagerFactory;
 import org.apache.sqoop.manager.JdbcDrivers;
 
+import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.apache.sqoop.manager.JdbcDrivers.DB2;
 import static org.apache.sqoop.manager.JdbcDrivers.HSQLDB;
 import static org.apache.sqoop.manager.JdbcDrivers.MYSQL;
@@ -171,9 +172,18 @@ public class GenericJobStorage extends JobStorage {
    */
   public void open(Map<String, String> descriptor) throws IOException {
     setConnectionParameters(descriptor);
+    validateMetastoreConnectionString(metastoreConnectStr);
     setConnectedDescriptor(descriptor);
 
     init();
+  }
+
+  protected void validateMetastoreConnectionString(String metastoreConnectStr) {
+    if (!isDbSupported(metastoreConnectStr)) {
+      String errorMessage = metastoreConnectStr + " is an invalid connection string or the required RDBMS is not supported." +
+          "Supported RDBMSs are: " + SUPPORTED_DRIVERS.toString();
+      throw new RuntimeException(errorMessage);
+    }
   }
 
   protected void setConnectionParameters(Map<String, String> descriptor) {
@@ -237,8 +247,10 @@ public class GenericJobStorage extends JobStorage {
   @Override
   public void close() throws IOException {
       try {
-          LOG.debug("Closing connection manager");
-          connManager.close();
+          if (connManager != null) {
+            LOG.debug("Closing connection manager");
+            connManager.close();
+          }
       } catch (SQLException sqlE) {
           throw new IOException("Exception closing connection manager", sqlE);
       } finally {
@@ -249,8 +261,7 @@ public class GenericJobStorage extends JobStorage {
   @Override
   /** {@inheritDoc} */
   public boolean canAccept(Map<String, String> descriptor) {
-    final String metaConnectString = descriptor.get(META_CONNECT_KEY);
-    return metaConnectString != null && isDbSupported(metaConnectString);
+    return descriptor.get(META_CONNECT_KEY) != null;
   }
 
   @Override
@@ -826,7 +837,7 @@ public class GenericJobStorage extends JobStorage {
 
   protected boolean isDbSupported(String metaConnectString) {
     for (JdbcDrivers driver : SUPPORTED_DRIVERS) {
-      if (metaConnectString.startsWith(driver.getSchemePrefix())) {
+      if (startsWith(metaConnectString, driver.getSchemePrefix())) {
         return true;
       }
     }

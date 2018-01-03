@@ -68,10 +68,7 @@ public class AutoGenericJobStorage extends GenericJobStorage {
   /** {@inheritDoc} */
   public boolean canAccept(Map<String, String> descriptor) {
     Configuration conf = this.getConf();
-    final boolean isAutoStorageEnabled = conf.getBoolean(AUTO_STORAGE_IS_ACTIVE_KEY, true);
-    final String autoStorageConnectString = conf.get(AUTO_STORAGE_CONNECT_STRING_KEY);
-    final boolean isAutostorageDbSupported = (autoStorageConnectString == null || isDbSupported(autoStorageConnectString));
-    return isAutoStorageEnabled && isAutostorageDbSupported;
+    return conf.getBoolean(AUTO_STORAGE_IS_ACTIVE_KEY, true);
   }
 
   /**
