@@ -19,8 +19,11 @@
 package org.apache.sqoop.metastore;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +32,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class TestGenericJobStorage {
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   private GenericJobStorage jobStorage;
 
@@ -49,6 +55,22 @@ public class TestGenericJobStorage {
   @Test
   public void testCanAcceptWithoutMetaConnectStringSetReturnsFalse() {
     assertFalse(jobStorage.canAccept(new HashMap<>()));
+  }
+
+  /**
+   * This method validates that the public open() method invokes the connection string validation before connecting.
+   * For detailed testing of the validation check TestGenericJobStorageValidate test class.
+   * @see org.apache.sqoop.metastore.TestGenericJobStorageValidate
+   * @throws IOException
+   */
+  @Test
+  public void testOpenWithInvalidConnectionStringThrows() throws IOException {
+    String invalidConnectionString = "invalidConnectionString";
+    expectedException.expect(RuntimeException.class);
+    expectedException.expectMessage(invalidConnectionString + " is an invalid connection string or the required RDBMS is not supported.");
+    descriptor.put(META_CONNECT_KEY, invalidConnectionString);
+
+    jobStorage.open(descriptor);
   }
 
 }
