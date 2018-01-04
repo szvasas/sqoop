@@ -96,7 +96,6 @@ public class TestMetastoreConfigurationParameters {
 
     private String[] getArgsWithConfigs(List<String> configs) {
         List<String> args = new ArrayList<>();
-        CommonArgs.addHadoopFlags(args);
 
         for (String config : configs) {
             args.add("-D");
