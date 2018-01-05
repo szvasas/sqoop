@@ -47,8 +47,10 @@ public class TestMetastoreConfigurationParameters {
 
     private static final int STATUS_FAILURE = 1;
     private static final int STATUS_SUCCESS = 0;
-    private static String TEST_USER = "sqoop";
-    private static String TEST_PASSWORD = "sqoop";
+    private static final String TEST_USER = "sqoop";
+    private static final String TEST_PASSWORD = "sqoop";
+    private static final String DEFAULT_HSQLDB_USER = "SA";
+    private static final String NON_DEFAULT_PASSWORD = "NOT_DEFAULT";
     private static HsqldbTestServer testHsqldbServer;
 
     private Sqoop sqoop;
@@ -103,11 +105,9 @@ public class TestMetastoreConfigurationParameters {
     }
 
     private static void setupUsersForTesting() throws SQLException {
-        try (Connection connection = testHsqldbServer.getConnection(); Statement statement = connection.createStatement()) {
-            // We create a new user and change the password of SA to make sure that Sqoop does not connect to metastore with the default user and password.
-            statement.executeUpdate(String.format("CREATE USER %s PASSWORD %s ADMIN", TEST_USER, TEST_PASSWORD));
-            statement.executeUpdate("ALTER USER \"SA\" SET PASSWORD \"NOT_DEFAULT\"");
-        }
+        // We create a new user and change the password of SA to make sure that Sqoop does not connect to metastore with the default user and password.
+        testHsqldbServer.createNewUser(TEST_USER, TEST_PASSWORD);
+        testHsqldbServer.changePasswordForUser(DEFAULT_HSQLDB_USER, NON_DEFAULT_PASSWORD);
     }
 
     private void verifyMetastoreIsInitialized() throws SQLException {

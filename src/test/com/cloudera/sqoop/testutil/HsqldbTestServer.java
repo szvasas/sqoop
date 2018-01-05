@@ -279,5 +279,16 @@ public class HsqldbTestServer {
     return new HsqldbManager(getSqoopOptions());
   }
 
+  public void createNewUser(String username, String password) throws SQLException {
+    try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+      statement.executeUpdate(String.format("CREATE USER %s PASSWORD %s ADMIN", username, password));
+    }
+  }
+
+  public void changePasswordForUser(String username, String newPassword) throws SQLException {
+    try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+      statement.executeUpdate(String.format("ALTER USER %s SET PASSWORD %s", username, newPassword));
+    }
+  }
 
 }
