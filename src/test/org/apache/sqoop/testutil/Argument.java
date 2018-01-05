@@ -20,6 +20,8 @@ package org.apache.sqoop.testutil;
 
 import java.util.Objects;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 public class Argument {
 
   private final String name;
@@ -54,7 +56,7 @@ public class Argument {
 
   @Override
   public String toString() {
-    if (value == null) {
+    if (isEmpty(value)) {
       return name;
     } else {
       return String.format("%s=%s", name, value);
