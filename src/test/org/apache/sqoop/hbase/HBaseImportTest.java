@@ -84,7 +84,7 @@ public class HBaseImportTest extends HBaseTestCase {
     // Run a second time.
     argv = getIncrementalArgv(true, "OverwriteTable", "OverwriteColumnFamily", true, null, false, false, "DATA_COL3", "2017-03-24 01:01:01.0", null);
     vals = new String[] { "0", "1", null, "'2017-03-25'" };
-    updateTable(types, vals);
+    updateTable(vals);
     runImport(argv);
     verifyHBaseCell("OverwriteTable", "0", "OverwriteColumnFamily", getColName(2), null);
   }
