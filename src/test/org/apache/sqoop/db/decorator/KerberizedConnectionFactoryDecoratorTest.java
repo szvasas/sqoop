@@ -44,14 +44,14 @@ public class KerberizedConnectionFactoryDecoratorTest {
   private KerberosAuthenticator kerberosAuthenticator;
 
   private JdbcConnectionFactory decoratedFactory;
-  
+
   private UserGroupInformation testUser;
 
   private UserGroupInformation capturedCurrentUser;
-  
+
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
-  
+
   @Before
   public void before() throws Exception {
     decoratedFactory = mock(JdbcConnectionFactory.class);
@@ -85,7 +85,7 @@ public class KerberizedConnectionFactoryDecoratorTest {
 
     assertSame(expected, kerberizedConnectionFactoryDecorator.createConnection());
   }
-  
+
   @Test
   public void testCreateConnectionThrowsTheSameExceptionDecoratedFactoryThrows() throws Exception {
     RuntimeException expected = mock(RuntimeException.class);
