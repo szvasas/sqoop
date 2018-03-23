@@ -37,7 +37,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class KerberizedConnectionFactoryDecoratorTest {
+public class TestKerberizedConnectionFactoryDecorator {
 
   private KerberizedConnectionFactoryDecorator kerberizedConnectionFactoryDecorator;
 
@@ -63,7 +63,7 @@ public class KerberizedConnectionFactoryDecoratorTest {
   }
 
   @Test
-  public void testCreateConnectionInvokedAsAuthenticatedUser() throws Exception {
+  public void testCreateConnectionIsInvokedAsAuthenticatedUser() throws Exception {
     // We want to capture the current user when the createConnection() method is invoked on the decorated factory.
     doAnswer(new Answer() {
       @Override
@@ -72,9 +72,9 @@ public class KerberizedConnectionFactoryDecoratorTest {
         return null;
       }
     }).when(decoratedFactory).createConnection();
-    
+
     kerberizedConnectionFactoryDecorator.createConnection();
-    
+
     assertEquals(testUser, capturedCurrentUser);
   }
 
@@ -90,7 +90,7 @@ public class KerberizedConnectionFactoryDecoratorTest {
   public void testCreateConnectionThrowsTheSameExceptionDecoratedFactoryThrows() throws Exception {
     RuntimeException expected = mock(RuntimeException.class);
     when(decoratedFactory.createConnection()).thenThrow(expected);
-    
+
     expectedException.expect(equalTo(expected));
     kerberizedConnectionFactoryDecorator.createConnection();
   }

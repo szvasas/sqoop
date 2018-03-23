@@ -29,7 +29,7 @@ import java.sql.Connection;
 
 import static org.junit.Assert.assertFalse;
 
-public class DriverManagerJdbcConnectionFactoryTest {
+public class TestDriverManagerJdbcConnectionFactory {
 
   private static final String HSQLDB_DRIVER_CLASS = "org.hsqldb.jdbcDriver";
 
@@ -105,7 +105,7 @@ public class DriverManagerJdbcConnectionFactoryTest {
 
     try (Connection connection = connectionFactory.createConnection()) {
       assertFalse(connection.isClosed());
-    } 
+    }
   }
 
 }

@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 
-public class KerberosAuthenticatorTest {
+public class TestKerberosAuthenticator {
 
   private static final String KERBEROS_RULE_TEMPLATE = "RULE:[2:$1@$0](.*@%s)s/@%s//";
 
