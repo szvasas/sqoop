@@ -83,9 +83,6 @@ public class ImportAllTablesTool extends ImportTool {
     }
 
     try {
-      if (options.doHiveImport()) {
-        hiveImport = new HiveImport(options, manager, options.getConf(), false);
-      }
 
       if (options.getAllTablesExclude() != null) {
         excludes.addAll(Arrays.asList(options.getAllTablesExclude().split(",")));
@@ -102,7 +99,8 @@ public class ImportAllTablesTool extends ImportTool {
             System.out.println("Skipping table: " + tableName);
           } else {
             SqoopOptions clonedOptions = (SqoopOptions) options.clone();
-            importTable(clonedOptions, tableName, hiveImport);
+            clonedOptions.setTableName(tableName);
+            importTable(clonedOptions);
           }
         }
       }
