@@ -31,7 +31,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sqoop.SqoopOptions;
 import org.apache.sqoop.SqoopOptions.InvalidOptionsException;
 import org.apache.sqoop.cli.RelatedOptions;
-import org.apache.sqoop.hive.HiveImport;
 import org.apache.sqoop.util.ImportException;
 
 /**
@@ -75,7 +74,6 @@ public class ImportAllTablesTool extends ImportTool {
   @Override
   /** {@inheritDoc} */
   public int run(SqoopOptions options) {
-    HiveImport hiveImport = null;
     Set<String> excludes = new HashSet<String>();
 
     if (!init(options)) {
