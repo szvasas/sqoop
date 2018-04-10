@@ -34,5 +34,5 @@ public interface AuthenticationConfiguration {
   void init();
 
   JdbcConnectionFactory decorateConnectionFactory(JdbcConnectionFactory connectionFactory);
-  
+
 }
