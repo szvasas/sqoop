@@ -52,7 +52,7 @@ public class HiveServer2ConnectionFactory extends DriverManagerJdbcConnectionFac
     try {
       return UserGroupInformation.getCurrentUser().toString();
     } catch (IOException e) {
-      LOG.error("Unable to determine current user: " + e.getMessage());
+      LOG.error("Unable to determine current user.", e);
     }
     return EMPTY;
   }

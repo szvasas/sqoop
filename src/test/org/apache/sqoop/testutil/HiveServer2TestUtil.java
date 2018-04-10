@@ -29,17 +29,17 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class HS2TestUtil {
+public class HiveServer2TestUtil {
 
   private static final String SELECT_TABLE_QUERY = "SELECT * FROM %s";
 
   private HiveServer2ConnectionFactory hs2ConnectionFactory;
 
-  public HS2TestUtil(String url) {
+  public HiveServer2TestUtil(String url) {
     this(url, null, null);
   }
 
-  public HS2TestUtil(String url, String username, String password) {
+  public HiveServer2TestUtil(String url, String username, String password) {
     hs2ConnectionFactory = new HiveServer2ConnectionFactory(url, username, password);
   }
 

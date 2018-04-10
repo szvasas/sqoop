@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 @RunWith(Parameterized.class)
 public class TestHiveServer2OptionValidations {
 
-  @Parameters(name = "SqoopTool = {0}")
+  @Parameters(name = "sqoopTool = {0}")
   public static Iterable<? extends Object> parameters() {
     return Arrays.asList(
         new ImportTool(),
