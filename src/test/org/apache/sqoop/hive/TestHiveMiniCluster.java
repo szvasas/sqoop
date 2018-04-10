@@ -20,9 +20,7 @@ package org.apache.sqoop.hive;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.sqoop.authentication.KerberosAuthenticator;
 import org.apache.sqoop.db.JdbcConnectionFactory;
-import org.apache.sqoop.db.decorator.KerberizedConnectionFactoryDecorator;
 import org.apache.sqoop.hive.minicluster.AuthenticationConfiguration;
 import org.apache.sqoop.hive.minicluster.HiveMiniCluster;
 import org.apache.sqoop.hive.minicluster.KerberosAuthenticationConfiguration;
@@ -85,13 +83,7 @@ public class TestHiveMiniCluster {
     hiveMiniCluster = new HiveMiniCluster(authenticationConfiguration);
     hiveMiniCluster.start();
 
-    connectionFactory = new HiveServer2ConnectionFactory(hiveMiniCluster.getUrl(), TEST_USERNAME, TEST_PASSWORD);
-
-    if (authenticationConfiguration instanceof KerberosAuthenticationConfiguration) {
-      KerberosAuthenticator kerberosAuthenticator = new KerberosAuthenticator(new Configuration(), miniKdcInfrastructure.getTestPrincipal(), miniKdcInfrastructure.getKeytabFilePath());
-      connectionFactory = new KerberizedConnectionFactoryDecorator(connectionFactory, kerberosAuthenticator);
-    }
-
+    connectionFactory = authenticationConfiguration.decorateConnectionFactory(new HiveServer2ConnectionFactory(hiveMiniCluster.getUrl(), TEST_USERNAME, TEST_PASSWORD));
   }
 
   @Test

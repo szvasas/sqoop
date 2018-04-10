@@ -19,6 +19,7 @@
 package org.apache.sqoop.hive.minicluster;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.sqoop.db.JdbcConnectionFactory;
 
 import java.security.PrivilegedAction;
 import java.util.Collections;
@@ -43,5 +44,10 @@ public class NoAuthenticationConfiguration implements AuthenticationConfiguratio
   @Override
   public void init() {
     // do nothing
+  }
+
+  @Override
+  public JdbcConnectionFactory decorateConnectionFactory(JdbcConnectionFactory connectionFactory) {
+    return connectionFactory;
   }
 }

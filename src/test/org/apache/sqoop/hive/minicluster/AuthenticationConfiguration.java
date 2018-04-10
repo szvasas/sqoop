@@ -18,6 +18,8 @@
 
 package org.apache.sqoop.hive.minicluster;
 
+import org.apache.sqoop.db.JdbcConnectionFactory;
+
 import java.security.PrivilegedAction;
 import java.util.Map;
 
@@ -31,4 +33,6 @@ public interface AuthenticationConfiguration {
 
   void init();
 
+  JdbcConnectionFactory decorateConnectionFactory(JdbcConnectionFactory connectionFactory);
+  
 }

@@ -21,6 +21,7 @@ package org.apache.sqoop.hive.minicluster;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hive.service.auth.HiveAuthFactory;
 import org.apache.hive.service.auth.PasswdAuthenticationProvider;
+import org.apache.sqoop.db.JdbcConnectionFactory;
 
 import javax.security.sasl.AuthenticationException;
 import java.security.PrivilegedAction;
@@ -73,5 +74,10 @@ public class PasswordAuthenticationConfiguration implements AuthenticationConfig
   @Override
   public void init() {
     //do nothing
+  }
+
+  @Override
+  public JdbcConnectionFactory decorateConnectionFactory(JdbcConnectionFactory connectionFactory) {
+    return connectionFactory;
   }
 }

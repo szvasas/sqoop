@@ -25,6 +25,8 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hive.service.auth.HiveAuthFactory;
 import org.apache.sqoop.authentication.KerberosAuthenticator;
+import org.apache.sqoop.db.JdbcConnectionFactory;
+import org.apache.sqoop.db.decorator.KerberizedConnectionFactoryDecorator;
 import org.apache.sqoop.infrastructure.kerberos.KerberosConfigurationProvider;
 
 import java.security.PrivilegedAction;
@@ -67,6 +69,11 @@ public class KerberosAuthenticationConfiguration implements AuthenticationConfig
   @Override
   public void init() {
     authenticator = createKerberosAuthenticator();
+  }
+
+  @Override
+  public JdbcConnectionFactory decorateConnectionFactory(JdbcConnectionFactory connectionFactory) {
+    return new KerberizedConnectionFactoryDecorator(connectionFactory, authenticator);
   }
 
   private KerberosAuthenticator createKerberosAuthenticator() {
