@@ -30,6 +30,7 @@ import org.junit.runners.Parameterized.Parameters;
 import java.util.Arrays;
 import java.util.Properties;
 
+import static org.apache.sqoop.SqoopOptions.FileLayout.ParquetFile;
 import static org.apache.sqoop.SqoopOptions.IncrementalMode.None;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -132,6 +133,18 @@ public class TestHiveServer2OptionValidations {
     when(sqoopOptions.doHiveImport()).thenReturn(true);
     when(sqoopOptions.getHs2Url()).thenReturn(TEST_HS2_URL);
     when(sqoopOptions.getHs2User()).thenReturn(TEST_HS2_URL);
+
+    sqoopTool.validateOptions(sqoopOptions);
+  }
+
+  @Test
+  public void testValidateOptionsFailsWhenHs2UrlIsUsedWithParquetFormat() throws Exception {
+    expectedException.expect(SqoopOptions.InvalidOptionsException.class);
+    expectedException.expectMessage("The hs2-url option cannot be used with the as-parquetfile option.");
+
+    when(sqoopOptions.doHiveImport()).thenReturn(true);
+    when(sqoopOptions.getHs2Url()).thenReturn(TEST_HS2_URL);
+    when(sqoopOptions.getFileLayout()).thenReturn(ParquetFile);
 
     sqoopTool.validateOptions(sqoopOptions);
   }
