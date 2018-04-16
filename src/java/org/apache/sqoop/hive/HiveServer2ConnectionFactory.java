@@ -38,8 +38,8 @@ public class HiveServer2ConnectionFactory extends DriverManagerJdbcConnectionFac
     super(HS2_DRIVER_CLASS, connectionString, username, password);
   }
 
-  public HiveServer2ConnectionFactory(String connectionString) {
-    this(connectionString, null, null);
+  public HiveServer2ConnectionFactory(String connectionString, String username) {
+    this(connectionString, username, null);
   }
 
   @Override

@@ -19,13 +19,17 @@
 package org.apache.sqoop.hive;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.sqoop.SqoopOptions;
 import org.apache.sqoop.authentication.KerberosAuthenticator;
 import org.apache.sqoop.db.JdbcConnectionFactory;
 import org.apache.sqoop.db.decorator.KerberizedConnectionFactoryDecorator;
 import org.apache.sqoop.manager.ConnManager;
 
+import java.io.IOException;
+
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class HiveClientFactory {
 
@@ -48,12 +52,24 @@ public class HiveClientFactory {
   }
 
   JdbcConnectionFactory createJdbcConnectionFactory(SqoopOptions sqoopOptions) {
-    JdbcConnectionFactory connectionFactory = new HiveServer2ConnectionFactory(sqoopOptions.getHs2Url());
+    String connectionUsername = determineConnectionUsername(sqoopOptions);
+    JdbcConnectionFactory connectionFactory = new HiveServer2ConnectionFactory(sqoopOptions.getHs2Url(), connectionUsername);
     if (useKerberizedConnection(sqoopOptions)) {
       KerberosAuthenticator authenticator = createKerberosAuthenticator(sqoopOptions);
       connectionFactory = new KerberizedConnectionFactoryDecorator(connectionFactory, authenticator);
     }
     return connectionFactory;
+  }
+
+  private String determineConnectionUsername(SqoopOptions sqoopOptions) {
+    if (!isEmpty(sqoopOptions.getHs2User())) {
+      return sqoopOptions.getHs2User();
+    }
+    try {
+      return UserGroupInformation.getLoginUser().getUserName();
+    } catch (IOException e) {
+      throw new RuntimeException("Unable to determine login user.", e);
+    }
   }
 
   KerberosAuthenticator createKerberosAuthenticator(SqoopOptions sqoopOptions) {

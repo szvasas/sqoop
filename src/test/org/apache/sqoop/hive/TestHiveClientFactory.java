@@ -19,6 +19,7 @@
 package org.apache.sqoop.hive;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.sqoop.SqoopOptions;
 import org.apache.sqoop.authentication.KerberosAuthenticator;
 import org.apache.sqoop.db.JdbcConnectionFactory;
@@ -142,11 +143,27 @@ public class TestHiveClientFactory {
   }
 
   @Test
-  public void testCreateJdbcConnectionFactoryInitializesHiveServer2ConnectionFactoryProperly() throws Exception {
+  public void testCreateJdbcConnectionFactoryInitializesConnectionStringProperly() throws Exception {
     when(sqoopOptions.getHs2Url()).thenReturn(TEST_HS2_URL);
     HiveServer2ConnectionFactory connectionFactory = (HiveServer2ConnectionFactory) hiveClientFactory.createJdbcConnectionFactory(sqoopOptions);
 
     assertEquals(TEST_HS2_URL, connectionFactory.getConnectionString());
+  }
+
+  @Test
+  public void testCreateJdbcConnectionFactoryInitializesConnectionUsernameProperly() throws Exception {
+    HiveServer2ConnectionFactory connectionFactory = (HiveServer2ConnectionFactory) hiveClientFactory.createJdbcConnectionFactory(sqoopOptions);
+
+    assertEquals(TEST_HS2_USER, connectionFactory.getUsername());
+  }
+
+  @Test
+  public void testCreateJdbcConnectionFactoryWithoutHs2UserSpecifiedInitializesConnectionUsernameProperly() throws Exception {
+    when(sqoopOptions.getHs2User()).thenReturn(null);
+    String expectedUsername = UserGroupInformation.getLoginUser().getUserName();
+    HiveServer2ConnectionFactory connectionFactory = (HiveServer2ConnectionFactory) hiveClientFactory.createJdbcConnectionFactory(sqoopOptions);
+
+    assertEquals(expectedUsername, connectionFactory.getUsername());
   }
 
   @Test
