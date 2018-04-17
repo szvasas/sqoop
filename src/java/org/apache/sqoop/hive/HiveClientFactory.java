@@ -33,6 +33,16 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class HiveClientFactory {
 
+  private final HiveServer2ConnectionFactoryInitializer connectionFactoryInitializer;
+
+  public HiveClientFactory(HiveServer2ConnectionFactoryInitializer connectionFactoryInitializer) {
+    this.connectionFactoryInitializer = connectionFactoryInitializer;
+  }
+
+  public HiveClientFactory() {
+    this(new HiveServer2ConnectionFactoryInitializer());
+  }
+
   public HiveClient createHiveClient(SqoopOptions sqoopOptions, ConnManager connManager) {
     if (useHiveCli(sqoopOptions)) {
       return createHiveImport(sqoopOptions, connManager);
@@ -47,33 +57,8 @@ public class HiveClientFactory {
 
   private HiveClient createHiveServer2Client(SqoopOptions sqoopOptions, ConnManager connManager) {
     TableDefWriter tableDefWriter = createTableDefWriter(sqoopOptions, connManager);
-    JdbcConnectionFactory hs2JdbcConnectionFactory = createJdbcConnectionFactory(sqoopOptions);
+    JdbcConnectionFactory hs2JdbcConnectionFactory = connectionFactoryInitializer.createJdbcConnectionFactory(sqoopOptions);
     return new HiveServer2Client(sqoopOptions, tableDefWriter, hs2JdbcConnectionFactory);
-  }
-
-  JdbcConnectionFactory createJdbcConnectionFactory(SqoopOptions sqoopOptions) {
-    String connectionUsername = determineConnectionUsername(sqoopOptions);
-    JdbcConnectionFactory connectionFactory = new HiveServer2ConnectionFactory(sqoopOptions.getHs2Url(), connectionUsername);
-    if (useKerberizedConnection(sqoopOptions)) {
-      KerberosAuthenticator authenticator = createKerberosAuthenticator(sqoopOptions);
-      connectionFactory = new KerberizedConnectionFactoryDecorator(connectionFactory, authenticator);
-    }
-    return connectionFactory;
-  }
-
-  private String determineConnectionUsername(SqoopOptions sqoopOptions) {
-    if (!isEmpty(sqoopOptions.getHs2User())) {
-      return sqoopOptions.getHs2User();
-    }
-    try {
-      return UserGroupInformation.getLoginUser().getUserName();
-    } catch (IOException e) {
-      throw new RuntimeException("Unable to determine login user.", e);
-    }
-  }
-
-  KerberosAuthenticator createKerberosAuthenticator(SqoopOptions sqoopOptions) {
-    return new KerberosAuthenticator(sqoopOptions.getConf(), sqoopOptions.getHs2User(), sqoopOptions.getHs2Keytab());
   }
 
   TableDefWriter createTableDefWriter(SqoopOptions sqoopOptions, ConnManager connManager) {
@@ -82,10 +67,6 @@ public class HiveClientFactory {
 
   private boolean useHiveCli(SqoopOptions sqoopOptions) {
     return StringUtils.isEmpty(sqoopOptions.getHs2Url());
-  }
-
-  private boolean useKerberizedConnection(SqoopOptions sqoopOptions) {
-    return !isBlank(sqoopOptions.getHs2Keytab());
   }
 
 }
