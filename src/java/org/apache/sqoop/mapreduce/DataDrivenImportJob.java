@@ -66,10 +66,16 @@ public class DataDrivenImportJob extends ImportJobBase {
     super(opts, null, inputFormatClass, null, context);
     this.parquetImportJobConfigurator = parquetImportJobConfigurator;
   }
+  
+  public DataDrivenImportJob(final SqoopOptions opts,
+      final Class<? extends InputFormat> inputFormatClass,
+      ImportJobContext context) {
+    this(opts, inputFormatClass, context, null);
+  }
 
   @SuppressWarnings("unchecked")
   public DataDrivenImportJob(final SqoopOptions opts) {
-    this(opts, DataDrivenDBInputFormat.class, null, null);
+    this(opts, DataDrivenDBInputFormat.class, null);
   }
 
   @Override

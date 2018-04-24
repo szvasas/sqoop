@@ -44,6 +44,7 @@ import org.apache.sqoop.accumulo.AccumuloUtil;
 import org.apache.sqoop.mapreduce.AccumuloImportJob;
 import org.apache.sqoop.mapreduce.HBaseBulkImportJob;
 import org.apache.sqoop.mapreduce.JdbcCallExportJob;
+import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetImportJobConfigurator;
 import org.apache.sqoop.util.LoggingUtils;
 import org.apache.sqoop.util.SqlTypeMap;
 
@@ -682,7 +683,7 @@ public abstract class SqlManager
     } else {
       // Import to HDFS.
       importer = new DataDrivenImportJob(opts, context.getInputFormat(),
-              context);
+              context, new KiteParquetImportJobConfigurator());
     }
 
     checkTableImportOptions(context);
@@ -725,7 +726,7 @@ public abstract class SqlManager
     } else {
       // Import to HDFS.
       importer = new DataDrivenImportJob(opts, context.getInputFormat(),
-          context);
+          context, new KiteParquetImportJobConfigurator());
     }
 
     String splitCol = getSplitColumn(opts, null);
