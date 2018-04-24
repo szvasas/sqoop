@@ -18,16 +18,15 @@
 
 package org.apache.sqoop.mapreduce.parquet;
 
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.OutputFormat;
+
+import java.io.IOException;
 
 public interface ParquetExportJobConfigurator {
 
-  void configureInputFormat(Job job, String tableName, String tableClassName, String splitByCol);
-
-  Class<? extends Mapper> getMapperClass();
+  void configureInputFormat(Job job, Path inputPath) throws IOException;
 
   Class<? extends InputFormat> getInputFormatClass();
 
