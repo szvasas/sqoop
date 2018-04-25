@@ -40,6 +40,7 @@ import org.apache.sqoop.manager.GenericJdbcManager;
 import org.apache.sqoop.manager.ImportJobContext;
 import org.apache.sqoop.mapreduce.JdbcExportJob;
 import org.apache.sqoop.mapreduce.JdbcUpdateExportJob;
+import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetExportJobConfigurator;
 import org.apache.sqoop.util.ExportException;
 import org.apache.sqoop.util.ImportException;
 
@@ -321,7 +322,7 @@ public class OraOopConnManager extends GenericJdbcManager {
       throw ex;
     }
     JdbcExportJob exportJob =
-        new JdbcExportJob(context, null, null, oraOopOutputFormatClass);
+        new JdbcExportJob(context, null, null, oraOopOutputFormatClass, new KiteParquetExportJobConfigurator());
     exportJob.runExport();
   }
 

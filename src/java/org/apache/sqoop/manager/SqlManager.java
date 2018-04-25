@@ -44,6 +44,7 @@ import org.apache.sqoop.accumulo.AccumuloUtil;
 import org.apache.sqoop.mapreduce.AccumuloImportJob;
 import org.apache.sqoop.mapreduce.HBaseBulkImportJob;
 import org.apache.sqoop.mapreduce.JdbcCallExportJob;
+import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetExportJobConfigurator;
 import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetImportJobConfigurator;
 import org.apache.sqoop.util.LoggingUtils;
 import org.apache.sqoop.util.SqlTypeMap;
@@ -927,7 +928,7 @@ public abstract class SqlManager
   public void exportTable(org.apache.sqoop.manager.ExportJobContext context)
       throws IOException, ExportException {
     context.setConnManager(this);
-    JdbcExportJob exportJob = new JdbcExportJob(context);
+    JdbcExportJob exportJob = new JdbcExportJob(context, new KiteParquetExportJobConfigurator());
     exportJob.runExport();
   }
 
@@ -936,7 +937,7 @@ public abstract class SqlManager
       throws IOException,
       ExportException {
     context.setConnManager(this);
-    JdbcCallExportJob exportJob = new JdbcCallExportJob(context);
+    JdbcCallExportJob exportJob = new JdbcCallExportJob(context, new KiteParquetExportJobConfigurator());
     exportJob.runExport();
   }
 

@@ -39,6 +39,7 @@ import org.apache.sqoop.mapreduce.db.SQLServerConnectionFailureHandler;
 import org.apache.sqoop.SqoopOptions;
 import org.apache.sqoop.mapreduce.JdbcExportJob;
 import org.apache.sqoop.mapreduce.JdbcUpdateExportJob;
+import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetExportJobConfigurator;
 import org.apache.sqoop.util.ExportException;
 import org.apache.sqoop.util.ImportException;
 
@@ -181,10 +182,10 @@ public class SQLServerManager
     JdbcExportJob exportJob;
     if (isNonResilientOperation()) {
       exportJob = new JdbcExportJob(context, null, null,
-      SqlServerExportBatchOutputFormat.class);
+      SqlServerExportBatchOutputFormat.class, new KiteParquetExportJobConfigurator());
     } else {
       exportJob = new JdbcExportJob(context, null, null,
-        SQLServerResilientExportOutputFormat.class);
+        SQLServerResilientExportOutputFormat.class, new KiteParquetExportJobConfigurator());
       configureConnectionRecoveryForExport(context);
     }
     exportJob.runExport();

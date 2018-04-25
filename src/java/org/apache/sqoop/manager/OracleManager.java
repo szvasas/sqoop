@@ -49,6 +49,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.sqoop.manager.oracle.OracleUtils;
+import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetExportJobConfigurator;
 import org.apache.sqoop.util.LoggingUtils;
 
 import org.apache.sqoop.SqoopOptions;
@@ -462,7 +463,7 @@ public class OracleManager
       throws IOException, ExportException {
     context.setConnManager(this);
     JdbcExportJob exportJob = new JdbcExportJob(context,
-            null, null, ExportBatchOutputFormat.class);
+            null, null, ExportBatchOutputFormat.class, new KiteParquetExportJobConfigurator());
     exportJob.runExport();
   }
 

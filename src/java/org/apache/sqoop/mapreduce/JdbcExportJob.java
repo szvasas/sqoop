@@ -33,7 +33,6 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.OutputFormat;
 import org.apache.sqoop.mapreduce.hcat.SqoopHCatUtilities;
 import org.apache.sqoop.mapreduce.parquet.ParquetExportJobConfigurator;
-import org.kitesdk.data.mapreduce.DatasetKeyInputFormat;
 
 import java.io.IOException;
 import java.util.Map;
@@ -51,15 +50,18 @@ public class JdbcExportJob extends ExportJobBase {
   public static final Log LOG = LogFactory.getLog(
       JdbcExportJob.class.getName());
 
-  public JdbcExportJob(final ExportJobContext context) {
+  public JdbcExportJob(final ExportJobContext context, ParquetExportJobConfigurator parquetExportJobConfigurator) {
     super(context);
+    this.parquetExportJobConfigurator = parquetExportJobConfigurator;
   }
 
   public JdbcExportJob(final ExportJobContext ctxt,
       final Class<? extends Mapper> mapperClass,
       final Class<? extends InputFormat> inputFormatClass,
-      final Class<? extends OutputFormat> outputFormatClass) {
+      final Class<? extends OutputFormat> outputFormatClass,
+      final ParquetExportJobConfigurator parquetExportJobConfigurator) {
     super(ctxt, mapperClass, inputFormatClass, outputFormatClass);
+    this.parquetExportJobConfigurator = parquetExportJobConfigurator;
   }
 
   @Override

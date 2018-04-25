@@ -40,6 +40,7 @@ import org.apache.sqoop.mapreduce.db.Db2DataDrivenDBInputFormat;
 import org.apache.sqoop.SqoopOptions;
 import org.apache.sqoop.mapreduce.ExportBatchOutputFormat;
 import org.apache.sqoop.mapreduce.JdbcExportJob;
+import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetExportJobConfigurator;
 import org.apache.sqoop.util.ExportException;
 import org.apache.sqoop.util.ImportException;
 import org.apache.sqoop.util.LoggingUtils;
@@ -111,7 +112,7 @@ public class Db2Manager
       throws IOException, ExportException {
     context.setConnManager(this);
     JdbcExportJob exportJob = new JdbcExportJob(context, null, null,
-      ExportBatchOutputFormat.class);
+      ExportBatchOutputFormat.class, new KiteParquetExportJobConfigurator());
     exportJob.runExport();
   }
 
