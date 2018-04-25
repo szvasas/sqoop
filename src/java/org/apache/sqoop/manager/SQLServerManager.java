@@ -203,7 +203,7 @@ public class SQLServerManager
     } else {
       context.setConnManager(this);
       JdbcUpdateExportJob exportJob = new JdbcUpdateExportJob(context, null,
-        null, SQLServerResilientUpdateOutputFormat.class);
+        null, SQLServerResilientUpdateOutputFormat.class, new KiteParquetExportJobConfigurator());
       configureConnectionRecoveryForUpdate(context);
       exportJob.runExport();
     }
@@ -224,7 +224,7 @@ public class SQLServerManager
     }
 
     JdbcUpsertExportJob exportJob =
-        new JdbcUpsertExportJob(context, SqlServerUpsertOutputFormat.class);
+        new JdbcUpsertExportJob(context, SqlServerUpsertOutputFormat.class, new KiteParquetExportJobConfigurator());
     exportJob.runExport();
   }
 

@@ -36,7 +36,6 @@ import org.apache.sqoop.mapreduce.parquet.ParquetExportJobConfigurator;
 
 import java.io.IOException;
 import java.util.Map;
-import org.apache.sqoop.util.FileSystemUtil;
 
 /**
  * Run an export using JDBC (JDBC-based ExportOutputFormat).

@@ -962,7 +962,7 @@ public abstract class SqlManager
       org.apache.sqoop.manager.ExportJobContext context)
       throws IOException, ExportException {
     context.setConnManager(this);
-    JdbcUpdateExportJob exportJob = new JdbcUpdateExportJob(context);
+    JdbcUpdateExportJob exportJob = new JdbcUpdateExportJob(context, new KiteParquetExportJobConfigurator());
     exportJob.runExport();
   }
 

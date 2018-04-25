@@ -475,7 +475,7 @@ public class OracleManager
       throws IOException, ExportException {
     context.setConnManager(this);
     JdbcUpsertExportJob exportJob =
-      new JdbcUpsertExportJob(context, OracleUpsertOutputFormat.class);
+      new JdbcUpsertExportJob(context, OracleUpsertOutputFormat.class, new KiteParquetExportJobConfigurator());
     exportJob.runExport();
   }
 

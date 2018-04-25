@@ -39,6 +39,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.sqoop.SqoopOptions;
+import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetExportJobConfigurator;
 import org.apache.sqoop.util.ImportException;
 import org.apache.sqoop.util.ExportException;
 import org.apache.sqoop.mapreduce.JdbcUpsertExportJob;
@@ -138,7 +139,7 @@ public class MySQLManager
     LOG.warn("documentation for additional limitations.");
 
     JdbcUpsertExportJob exportJob =
-      new JdbcUpsertExportJob(context, MySQLUpsertOutputFormat.class);
+      new JdbcUpsertExportJob(context, MySQLUpsertOutputFormat.class, new KiteParquetExportJobConfigurator());
     exportJob.runExport();
   }
 

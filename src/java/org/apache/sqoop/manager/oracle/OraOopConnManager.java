@@ -344,7 +344,7 @@ public class OraOopConnManager extends GenericJdbcManager {
     }
 
     JdbcUpdateExportJob exportJob =
-        new JdbcUpdateExportJob(context, null, null, oraOopOutputFormatClass);
+        new JdbcUpdateExportJob(context, null, null, oraOopOutputFormatClass, new KiteParquetExportJobConfigurator());
     exportJob.runExport();
   }
 

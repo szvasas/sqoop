@@ -81,7 +81,7 @@ public class CubridManager extends
     context.setConnManager(this);
 
     JdbcUpsertExportJob exportJob = new JdbcUpsertExportJob(context,
-        CubridUpsertOutputFormat.class);
+        CubridUpsertOutputFormat.class, new KiteParquetExportJobConfigurator());
     exportJob.runExport();
   }
 
