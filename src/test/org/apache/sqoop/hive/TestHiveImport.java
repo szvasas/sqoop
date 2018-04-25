@@ -54,6 +54,7 @@ import org.apache.sqoop.tool.SqoopTool;
 import org.apache.commons.cli.ParseException;
 import org.junit.rules.ExpectedException;
 
+import static java.util.Collections.sort;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -302,6 +303,9 @@ public class TestHiveImport extends ImportJobTestCase {
   private void verifyHiveDataset(Object[][] valsArray) {
     List<String> expected = getExpectedLines(valsArray);
     List<String> result = new ParquetReader(getTablePath()).readAllInCsv();
+
+    sort(expected);
+    sort(result);
 
     assertEquals(expected, result);
   }
