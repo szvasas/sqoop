@@ -38,6 +38,7 @@ import org.apache.sqoop.mapreduce.mainframe.MainframeDatasetInputFormat;
 import org.apache.sqoop.mapreduce.mainframe.MainframeImportJob;
 
 import org.apache.sqoop.SqoopOptions;
+import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetImportJobConfigurator;
 import org.apache.sqoop.util.ImportException;
 
 
@@ -90,7 +91,7 @@ public class MainframeManager extends org.apache.sqoop.manager.ConnManager {
       importer = new AccumuloImportJob(opts, context);
     } else {
       // Import to HDFS.
-      importer = new MainframeImportJob(opts, context);
+      importer = new MainframeImportJob(opts, context, new KiteParquetImportJobConfigurator());
     }
 
     importer.setInputFormatClass(MainframeDatasetInputFormat.class);
