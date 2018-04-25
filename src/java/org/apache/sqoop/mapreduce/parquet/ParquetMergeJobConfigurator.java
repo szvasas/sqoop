@@ -22,8 +22,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
 
+import java.io.IOException;
+
 public interface ParquetMergeJobConfigurator {
 
-  void configueParquetMergeJob(Configuration conf, Job job, Path oldPath, Path newPath, Path finalPath);
+  void configureParquetMergeJob(Configuration conf, Job job, Path oldPath, Path newPath, Path finalPath) throws IOException;
 
 }
