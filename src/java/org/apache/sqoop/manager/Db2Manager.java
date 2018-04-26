@@ -40,7 +40,6 @@ import org.apache.sqoop.mapreduce.db.Db2DataDrivenDBInputFormat;
 import org.apache.sqoop.SqoopOptions;
 import org.apache.sqoop.mapreduce.ExportBatchOutputFormat;
 import org.apache.sqoop.mapreduce.JdbcExportJob;
-import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetExportJobConfigurator;
 import org.apache.sqoop.util.ExportException;
 import org.apache.sqoop.util.ImportException;
 import org.apache.sqoop.util.LoggingUtils;

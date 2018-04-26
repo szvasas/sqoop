@@ -71,7 +71,7 @@ public final class ParquetJob {
 
   private static final String CONF_AVRO_SCHEMA = "parquetjob.avro.schema";
   static final String CONF_OUTPUT_CODEC = "parquetjob.output.codec";
-  public enum WriteMode {
+  enum WriteMode {
     DEFAULT, APPEND, OVERWRITE
   };
 

@@ -47,7 +47,6 @@ import org.apache.sqoop.hive.HiveClientFactory;
 import org.apache.sqoop.manager.ImportJobContext;
 import org.apache.sqoop.mapreduce.MergeJob;
 import org.apache.sqoop.mapreduce.parquet.ParquetMergeJobConfigurator;
-import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetMergeJobConfigurator;
 import org.apache.sqoop.metastore.JobData;
 import org.apache.sqoop.metastore.JobStorage;
 import org.apache.sqoop.metastore.JobStorageFactory;

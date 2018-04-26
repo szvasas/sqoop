@@ -38,7 +38,6 @@ import org.apache.sqoop.mapreduce.mainframe.MainframeDatasetInputFormat;
 import org.apache.sqoop.mapreduce.mainframe.MainframeImportJob;
 
 import org.apache.sqoop.SqoopOptions;
-import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetImportJobConfigurator;
 import org.apache.sqoop.util.ImportException;
 
 

@@ -40,7 +40,6 @@ import org.apache.sqoop.manager.GenericJdbcManager;
 import org.apache.sqoop.manager.ImportJobContext;
 import org.apache.sqoop.mapreduce.JdbcExportJob;
 import org.apache.sqoop.mapreduce.JdbcUpdateExportJob;
-import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetExportJobConfigurator;
 import org.apache.sqoop.util.ExportException;
 import org.apache.sqoop.util.ImportException;
 

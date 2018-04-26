@@ -44,8 +44,6 @@ import org.apache.sqoop.accumulo.AccumuloUtil;
 import org.apache.sqoop.mapreduce.AccumuloImportJob;
 import org.apache.sqoop.mapreduce.HBaseBulkImportJob;
 import org.apache.sqoop.mapreduce.JdbcCallExportJob;
-import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetExportJobConfigurator;
-import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetImportJobConfigurator;
 import org.apache.sqoop.util.LoggingUtils;
 import org.apache.sqoop.util.SqlTypeMap;
 

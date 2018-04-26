@@ -39,7 +39,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.sqoop.SqoopOptions;
-import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetExportJobConfigurator;
 import org.apache.sqoop.util.ImportException;
 import org.apache.sqoop.util.ExportException;
 import org.apache.sqoop.mapreduce.JdbcUpsertExportJob;

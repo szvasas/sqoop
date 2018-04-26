@@ -31,7 +31,6 @@ import org.apache.sqoop.cli.RelatedOptions;
 import org.apache.sqoop.cli.ToolOptions;
 import org.apache.sqoop.mapreduce.MergeJob;
 import org.apache.sqoop.mapreduce.parquet.ParquetMergeJobConfigurator;
-import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetMergeJobConfigurator;
 import org.apache.sqoop.util.LoggingUtils;
 
 /**
