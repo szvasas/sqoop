@@ -44,7 +44,7 @@ public class JdbcCallExportJob extends JdbcExportJob {
   public static final Log LOG = LogFactory.getLog(
       JdbcCallExportJob.class.getName());
 
-  public JdbcCallExportJob(final ExportJobContext context, ParquetExportJobConfigurator parquetExportJobConfigurator) {
+  public JdbcCallExportJob(final ExportJobContext context, final ParquetExportJobConfigurator parquetExportJobConfigurator) {
     super(context, null, null, ExportCallOutputFormat.class, parquetExportJobConfigurator);
   }
 

@@ -42,7 +42,7 @@ public class PostgreSQLCopyExportJob extends JdbcExportJob {
   public static final Log LOG =
     LogFactory.getLog(PostgreSQLCopyExportJob.class.getName());
 
-  public PostgreSQLCopyExportJob(final ExportJobContext context, ParquetExportJobConfigurator parquetExportJobConfigurator) {
+  public PostgreSQLCopyExportJob(final ExportJobContext context, final ParquetExportJobConfigurator parquetExportJobConfigurator) {
     super(context, parquetExportJobConfigurator);
   }
 

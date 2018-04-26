@@ -49,7 +49,7 @@ public class JdbcExportJob extends ExportJobBase {
   public static final Log LOG = LogFactory.getLog(
       JdbcExportJob.class.getName());
 
-  public JdbcExportJob(final ExportJobContext context, ParquetExportJobConfigurator parquetExportJobConfigurator) {
+  public JdbcExportJob(final ExportJobContext context, final ParquetExportJobConfigurator parquetExportJobConfigurator) {
     super(context);
     this.parquetExportJobConfigurator = parquetExportJobConfigurator;
   }

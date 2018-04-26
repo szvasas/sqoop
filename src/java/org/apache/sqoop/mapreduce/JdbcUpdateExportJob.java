@@ -62,7 +62,7 @@ public class JdbcUpdateExportJob extends ExportJobBase {
     return UpdateOutputFormat.class;
   }
 
-  public JdbcUpdateExportJob(final ExportJobContext context, ParquetExportJobConfigurator parquetExportJobConfigurator)
+  public JdbcUpdateExportJob(final ExportJobContext context, final ParquetExportJobConfigurator parquetExportJobConfigurator)
       throws IOException {
     super(context, null, null, getUpdateOutputFormat());
     this.parquetExportJobConfigurator = parquetExportJobConfigurator;
