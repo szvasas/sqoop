@@ -18,6 +18,8 @@
 
 package org.apache.sqoop.mapreduce;
 
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.sqoop.lib.LargeObjectLoader;
 import org.apache.sqoop.lib.SqoopRecord;
 import org.apache.avro.Schema;
@@ -51,7 +53,7 @@ public class ParquetImportMapper
     bigDecimalFormatString = conf.getBoolean(
         ImportJobBase.PROPERTY_BIGDECIMAL_FORMAT,
         ImportJobBase.PROPERTY_BIGDECIMAL_FORMAT_DEFAULT);
-    lobLoader = new LargeObjectLoader(conf, new Path(conf.get("sqoop.kite.lob.extern.dir", "/tmp/sqoop-parquet-" + context.getTaskAttemptID())));
+    lobLoader = createLobLoader(context);
   }
 
   @Override
@@ -76,4 +78,7 @@ public class ParquetImportMapper
     }
   }
 
+  protected LargeObjectLoader createLobLoader(Context context) throws IOException, InterruptedException {
+    return new LargeObjectLoader(context.getConfiguration(), FileOutputFormat.getWorkOutputPath(context));
+  }
 }

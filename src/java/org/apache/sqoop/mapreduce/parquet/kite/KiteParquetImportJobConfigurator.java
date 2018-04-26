@@ -27,7 +27,6 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.OutputFormat;
 import org.apache.sqoop.SqoopOptions;
-import org.apache.sqoop.mapreduce.ParquetImportMapper;
 import org.apache.sqoop.mapreduce.parquet.ParquetImportJobConfigurator;
 import org.apache.sqoop.util.FileSystemUtil;
 import org.kitesdk.data.Datasets;
@@ -67,7 +66,7 @@ public class KiteParquetImportJobConfigurator implements ParquetImportJobConfigu
 
   @Override
   public Class<? extends Mapper> getMapperClass() {
-    return ParquetImportMapper.class;
+    return KiteParquetImportMapper.class;
   }
 
   @Override
