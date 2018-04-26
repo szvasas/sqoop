@@ -587,7 +587,7 @@ public class DirectPostgresqlManager
                                   null,
                                   ExportInputFormat.class,
                                   NullOutputFormat.class,
-                                  new KiteParquetExportJobConfigurator());
+                                  getParquetJobConfigurator().createParquetExportJobConfigurator());
     job.runExport();
   }
 }

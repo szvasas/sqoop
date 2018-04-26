@@ -91,7 +91,7 @@ public class MainframeManager extends org.apache.sqoop.manager.ConnManager {
       importer = new AccumuloImportJob(opts, context);
     } else {
       // Import to HDFS.
-      importer = new MainframeImportJob(opts, context, new KiteParquetImportJobConfigurator());
+      importer = new MainframeImportJob(opts, context, getParquetJobConfigurator().createParquetImportJobConfigurator());
     }
 
     importer.setInputFormatClass(MainframeDatasetInputFormat.class);

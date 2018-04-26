@@ -684,7 +684,7 @@ public abstract class SqlManager
     } else {
       // Import to HDFS.
       importer = new DataDrivenImportJob(opts, context.getInputFormat(),
-              context, new KiteParquetImportJobConfigurator());
+              context, getParquetJobConfigurator().createParquetImportJobConfigurator());
     }
 
     checkTableImportOptions(context);
@@ -727,7 +727,7 @@ public abstract class SqlManager
     } else {
       // Import to HDFS.
       importer = new DataDrivenImportJob(opts, context.getInputFormat(),
-          context, new KiteParquetImportJobConfigurator());
+          context, getParquetJobConfigurator().createParquetImportJobConfigurator());
     }
 
     String splitCol = getSplitColumn(opts, null);
@@ -928,7 +928,7 @@ public abstract class SqlManager
   public void exportTable(org.apache.sqoop.manager.ExportJobContext context)
       throws IOException, ExportException {
     context.setConnManager(this);
-    JdbcExportJob exportJob = new JdbcExportJob(context, new KiteParquetExportJobConfigurator());
+    JdbcExportJob exportJob = new JdbcExportJob(context, getParquetJobConfigurator().createParquetExportJobConfigurator());
     exportJob.runExport();
   }
 
@@ -937,7 +937,7 @@ public abstract class SqlManager
       throws IOException,
       ExportException {
     context.setConnManager(this);
-    JdbcCallExportJob exportJob = new JdbcCallExportJob(context, new KiteParquetExportJobConfigurator());
+    JdbcCallExportJob exportJob = new JdbcCallExportJob(context, getParquetJobConfigurator().createParquetExportJobConfigurator());
     exportJob.runExport();
   }
 
@@ -962,7 +962,7 @@ public abstract class SqlManager
       org.apache.sqoop.manager.ExportJobContext context)
       throws IOException, ExportException {
     context.setConnManager(this);
-    JdbcUpdateExportJob exportJob = new JdbcUpdateExportJob(context, new KiteParquetExportJobConfigurator());
+    JdbcUpdateExportJob exportJob = new JdbcUpdateExportJob(context, getParquetJobConfigurator().createParquetExportJobConfigurator());
     exportJob.runExport();
   }
 

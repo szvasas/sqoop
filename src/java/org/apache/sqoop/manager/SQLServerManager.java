@@ -182,10 +182,10 @@ public class SQLServerManager
     JdbcExportJob exportJob;
     if (isNonResilientOperation()) {
       exportJob = new JdbcExportJob(context, null, null,
-      SqlServerExportBatchOutputFormat.class, new KiteParquetExportJobConfigurator());
+      SqlServerExportBatchOutputFormat.class, getParquetJobConfigurator().createParquetExportJobConfigurator());
     } else {
       exportJob = new JdbcExportJob(context, null, null,
-        SQLServerResilientExportOutputFormat.class, new KiteParquetExportJobConfigurator());
+        SQLServerResilientExportOutputFormat.class, getParquetJobConfigurator().createParquetExportJobConfigurator());
       configureConnectionRecoveryForExport(context);
     }
     exportJob.runExport();
@@ -203,7 +203,7 @@ public class SQLServerManager
     } else {
       context.setConnManager(this);
       JdbcUpdateExportJob exportJob = new JdbcUpdateExportJob(context, null,
-        null, SQLServerResilientUpdateOutputFormat.class, new KiteParquetExportJobConfigurator());
+        null, SQLServerResilientUpdateOutputFormat.class, getParquetJobConfigurator().createParquetExportJobConfigurator());
       configureConnectionRecoveryForUpdate(context);
       exportJob.runExport();
     }
@@ -224,7 +224,7 @@ public class SQLServerManager
     }
 
     JdbcUpsertExportJob exportJob =
-        new JdbcUpsertExportJob(context, SqlServerUpsertOutputFormat.class, new KiteParquetExportJobConfigurator());
+        new JdbcUpsertExportJob(context, SqlServerUpsertOutputFormat.class, getParquetJobConfigurator().createParquetExportJobConfigurator());
     exportJob.runExport();
   }
 
