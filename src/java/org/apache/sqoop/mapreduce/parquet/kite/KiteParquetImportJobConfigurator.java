@@ -28,7 +28,6 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.OutputFormat;
 import org.apache.sqoop.SqoopOptions;
 import org.apache.sqoop.mapreduce.ParquetImportMapper;
-import org.apache.sqoop.mapreduce.ParquetJob;
 import org.apache.sqoop.mapreduce.parquet.ParquetImportJobConfigurator;
 import org.apache.sqoop.util.FileSystemUtil;
 import org.kitesdk.data.Datasets;
@@ -43,13 +42,13 @@ public class KiteParquetImportJobConfigurator implements ParquetImportJobConfigu
   @Override
   public void configureMapper(JobConf conf, Schema schema, SqoopOptions options, String tableName, Path destination) throws IOException {
     String uri = getKiteUri(conf, options, tableName, destination);
-    ParquetJob.WriteMode writeMode;
+    KiteParquetUtils.WriteMode writeMode;
 
     if (options.doHiveImport()) {
       if (options.doOverwriteHiveTable()) {
-        writeMode = ParquetJob.WriteMode.OVERWRITE;
+        writeMode = KiteParquetUtils.WriteMode.OVERWRITE;
       } else {
-        writeMode = ParquetJob.WriteMode.APPEND;
+        writeMode = KiteParquetUtils.WriteMode.APPEND;
         if (Datasets.exists(uri)) {
           LOG.warn("Target Hive table '" + tableName + "' exists! Sqoop will " +
               "append data into the existing Hive table. Consider using " +
@@ -61,9 +60,9 @@ public class KiteParquetImportJobConfigurator implements ParquetImportJobConfigu
       // dataset, so overwrite mode is not supported yet.
       // Sqoop's append mode means to merge two independent datasets. We
       // choose DEFAULT as write mode.
-      writeMode = ParquetJob.WriteMode.DEFAULT;
+      writeMode = KiteParquetUtils.WriteMode.DEFAULT;
     }
-    ParquetJob.configureImportJob(conf, schema, uri, writeMode);
+    KiteParquetUtils.configureImportJob(conf, schema, uri, writeMode);
   }
 
   @Override

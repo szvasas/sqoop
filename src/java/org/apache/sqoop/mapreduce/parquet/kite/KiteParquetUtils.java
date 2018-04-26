@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.sqoop.mapreduce;
+package org.apache.sqoop.mapreduce.parquet.kite;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
@@ -44,9 +44,9 @@ import java.lang.reflect.Method;
 /**
  * Helper class for setting up a Parquet MapReduce job.
  */
-public final class ParquetJob {
+public final class KiteParquetUtils {
 
-  public static final Log LOG = LogFactory.getLog(ParquetJob.class.getName());
+  public static final Log LOG = LogFactory.getLog(KiteParquetUtils.class.getName());
 
   public static final String HIVE_METASTORE_CLIENT_CLASS = "org.apache.hadoop.hive.metastore.HiveMetaStoreClient";
 
@@ -66,11 +66,11 @@ public final class ParquetJob {
 
   private static final String HIVE_URI_PREFIX = "dataset:hive";
 
-  private ParquetJob() {
+  private KiteParquetUtils() {
   }
 
   private static final String CONF_AVRO_SCHEMA = "parquetjob.avro.schema";
-  static final String CONF_OUTPUT_CODEC = "parquetjob.output.codec";
+  public static final String CONF_OUTPUT_CODEC = "parquetjob.output.codec";
   public enum WriteMode {
     DEFAULT, APPEND, OVERWRITE
   };

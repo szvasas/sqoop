@@ -26,8 +26,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.sqoop.avro.AvroUtil;
+import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -47,7 +47,7 @@ public class ParquetImportMapper
   protected void setup(Context context)
       throws IOException, InterruptedException {
     Configuration conf = context.getConfiguration();
-    schema = ParquetJob.getAvroSchema(conf);
+    schema = KiteParquetUtils.getAvroSchema(conf);
     bigDecimalFormatString = conf.getBoolean(
         ImportJobBase.PROPERTY_BIGDECIMAL_FORMAT,
         ImportJobBase.PROPERTY_BIGDECIMAL_FORMAT_DEFAULT);
