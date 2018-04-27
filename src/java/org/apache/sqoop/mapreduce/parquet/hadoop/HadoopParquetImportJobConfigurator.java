@@ -24,7 +24,6 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.OutputFormat;
 import org.apache.sqoop.SqoopOptions;
-import org.apache.sqoop.mapreduce.ParquetImportMapper;
 import org.apache.sqoop.mapreduce.parquet.ParquetImportJobConfigurator;
 import parquet.avro.AvroParquetOutputFormat;
 
@@ -42,7 +41,7 @@ public class HadoopParquetImportJobConfigurator implements ParquetImportJobConfi
 
   @Override
   public Class<? extends Mapper> getMapperClass() {
-    return ParquetImportMapper.class;
+    return HadoopParquetImportMapper.class;
   }
 
   @Override

@@ -75,10 +75,6 @@ public final class KiteParquetUtils {
     DEFAULT, APPEND, OVERWRITE
   };
 
-  public static Schema getAvroSchema(Configuration conf) {
-    return new Schema.Parser().parse(conf.get(CONF_AVRO_SCHEMA));
-  }
-
   public static CompressionType getCompressionType(Configuration conf) {
     CompressionType defaults = Formats.PARQUET.getDefaultCompressionType();
     String codec = conf.get(CONF_OUTPUT_CODEC, defaults.getName());
