@@ -18,14 +18,11 @@
 
 package org.apache.sqoop.mapreduce;
 
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.sqoop.lib.LargeObjectLoader;
 import org.apache.sqoop.lib.SqoopRecord;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.sqoop.avro.AvroUtil;
@@ -37,7 +34,7 @@ import java.sql.SQLException;
 /**
  * Imports records by writing them to a Parquet File.
  */
-public class ParquetImportMapper
+public abstract class ParquetImportMapper
     extends AutoProgressMapper<LongWritable, SqoopRecord,
         GenericRecord, NullWritable> {
 
@@ -78,7 +75,7 @@ public class ParquetImportMapper
     }
   }
 
-  protected LargeObjectLoader createLobLoader(Context context) throws IOException, InterruptedException {
-    return new LargeObjectLoader(context.getConfiguration(), FileOutputFormat.getWorkOutputPath(context));
-  }
+  protected abstract LargeObjectLoader createLobLoader(Context context) throws IOException, InterruptedException;
+  
+  protected abstract Schema getAvroSchema(Configuration configuration);
 }

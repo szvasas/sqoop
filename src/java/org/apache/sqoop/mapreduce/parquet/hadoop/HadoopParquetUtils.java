@@ -16,15 +16,15 @@
  * limitations under the License.
  */
 
-package org.apache.sqoop.mapreduce.parquet;
+package org.apache.sqoop.mapreduce.parquet.hadoop;
 
-public class ParquetUtils {
+public class HadoopParquetUtils {
 
   public static final String CONF_AVRO_SCHEMA = "parquet.avro.schema";
 
   public static final String CONF_OUTPUT_CODEC = "parquetjob.output.codec";
 
-  private ParquetUtils() {
+  private HadoopParquetUtils() {
     // This class is meant for static use only.
   }
 

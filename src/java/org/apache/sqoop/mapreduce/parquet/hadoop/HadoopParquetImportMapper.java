@@ -16,26 +16,24 @@
  * limitations under the License.
  */
 
-package org.apache.sqoop.mapreduce.parquet.kite;
+package org.apache.sqoop.mapreduce.parquet.hadoop;
 
 import org.apache.avro.Schema;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.sqoop.avro.AvroUtil;
 import org.apache.sqoop.lib.LargeObjectLoader;
 import org.apache.sqoop.mapreduce.ParquetImportMapper;
 
 import java.io.IOException;
 
-import static org.apache.sqoop.mapreduce.parquet.kite.KiteParquetUtils.CONF_AVRO_SCHEMA;
+import static org.apache.sqoop.mapreduce.parquet.hadoop.HadoopParquetUtils.CONF_AVRO_SCHEMA;
 
-public class KiteParquetImportMapper extends ParquetImportMapper {
+public class HadoopParquetImportMapper extends ParquetImportMapper {
 
   @Override
   protected LargeObjectLoader createLobLoader(Context context) throws IOException, InterruptedException {
-    Configuration conf = context.getConfiguration();
-    Path workPath = new Path(conf.get("sqoop.kite.lob.extern.dir", "/tmp/sqoop-parquet-" + context.getTaskAttemptID()));
-    return new LargeObjectLoader(conf, workPath);
+    return new LargeObjectLoader(context.getConfiguration(), FileOutputFormat.getWorkOutputPath(context));
   }
 
   @Override

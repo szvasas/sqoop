@@ -16,31 +16,37 @@
  * limitations under the License.
  */
 
-package org.apache.sqoop.mapreduce.parquet.kite;
+package org.apache.sqoop.mapreduce.parquet.hadoop;
 
 import org.apache.avro.Schema;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.sqoop.avro.AvroUtil;
-import org.apache.sqoop.lib.LargeObjectLoader;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.OutputFormat;
+import org.apache.sqoop.SqoopOptions;
 import org.apache.sqoop.mapreduce.ParquetImportMapper;
+import org.apache.sqoop.mapreduce.parquet.ParquetImportJobConfigurator;
+import parquet.avro.AvroParquetOutputFormat;
 
 import java.io.IOException;
 
-import static org.apache.sqoop.mapreduce.parquet.kite.KiteParquetUtils.CONF_AVRO_SCHEMA;
+import static org.apache.sqoop.mapreduce.parquet.hadoop.HadoopParquetUtils.CONF_AVRO_SCHEMA;
 
-public class KiteParquetImportMapper extends ParquetImportMapper {
+
+public class HadoopParquetImportJobConfigurator implements ParquetImportJobConfigurator {
 
   @Override
-  protected LargeObjectLoader createLobLoader(Context context) throws IOException, InterruptedException {
-    Configuration conf = context.getConfiguration();
-    Path workPath = new Path(conf.get("sqoop.kite.lob.extern.dir", "/tmp/sqoop-parquet-" + context.getTaskAttemptID()));
-    return new LargeObjectLoader(conf, workPath);
+  public void configureMapper(JobConf conf, Schema schema, SqoopOptions options, String tableName, Path destination) throws IOException {
+    conf.set(CONF_AVRO_SCHEMA, schema.toString());
   }
 
   @Override
-  protected Schema getAvroSchema(Configuration configuration) {
-    String schemaString = configuration.get(CONF_AVRO_SCHEMA);
-    return AvroUtil.parseAvroSchema(schemaString);
+  public Class<? extends Mapper> getMapperClass() {
+    return ParquetImportMapper.class;
+  }
+
+  @Override
+  public Class<? extends OutputFormat> getOutputFormatClass() {
+    return AvroParquetOutputFormat.class;
   }
 }
