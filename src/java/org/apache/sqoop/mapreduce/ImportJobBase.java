@@ -22,7 +22,7 @@ import org.apache.sqoop.SqoopOptions;
 import org.apache.sqoop.config.ConfigurationHelper;
 import org.apache.sqoop.io.CodecMap;
 import org.apache.sqoop.manager.ImportJobContext;
-import org.apache.sqoop.mapreduce.parquet.ParquetUtils;
+import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetUtils;
 import org.apache.sqoop.orm.TableClassName;
 import org.apache.sqoop.util.ImportException;
 import org.apache.avro.file.DataFileConstants;
@@ -150,7 +150,7 @@ public class ImportJobBase extends JobBase {
           Configuration conf = job.getConfiguration();
           String shortName = CodecMap.getCodecShortNameByName(codecName, conf);
           if (!shortName.equalsIgnoreCase("default")) {
-            conf.set(ParquetUtils.CONF_OUTPUT_CODEC, shortName);
+            conf.set(KiteParquetUtils.CONF_OUTPUT_CODEC, shortName);
           }
         }
       }

@@ -41,9 +41,6 @@ import org.kitesdk.data.spi.SchemaValidationUtil;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-import static org.apache.sqoop.mapreduce.parquet.ParquetUtils.CONF_AVRO_SCHEMA;
-import static org.apache.sqoop.mapreduce.parquet.ParquetUtils.CONF_OUTPUT_CODEC;
-
 /**
  * Helper class for setting up a Parquet MapReduce job.
  */
@@ -72,9 +69,15 @@ public final class KiteParquetUtils {
   private KiteParquetUtils() {
   }
 
+  public static final String CONF_AVRO_SCHEMA = "parquetjob.avro.schema";
+  public static final String CONF_OUTPUT_CODEC = "parquetjob.output.codec";
   public enum WriteMode {
     DEFAULT, APPEND, OVERWRITE
   };
+
+  public static Schema getAvroSchema(Configuration conf) {
+    return new Schema.Parser().parse(conf.get(CONF_AVRO_SCHEMA));
+  }
 
   public static CompressionType getCompressionType(Configuration conf) {
     CompressionType defaults = Formats.PARQUET.getDefaultCompressionType();

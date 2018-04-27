@@ -18,21 +18,14 @@
 
 package org.apache.sqoop.mapreduce.parquet;
 
-import org.apache.avro.Schema;
-import org.apache.hadoop.conf.Configuration;
-
 public class ParquetUtils {
 
-  public static final String CONF_AVRO_SCHEMA = "parquetjob.avro.schema";
+  public static final String CONF_AVRO_SCHEMA = "parquet.avro.schema";
 
   public static final String CONF_OUTPUT_CODEC = "parquetjob.output.codec";
 
   private ParquetUtils() {
     // This class is meant for static use only.
-  }
-
-  public static Schema getAvroSchema(Configuration conf) {
-    return new Schema.Parser().parse(conf.get(CONF_AVRO_SCHEMA));
   }
 
 }

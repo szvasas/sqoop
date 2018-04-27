@@ -34,7 +34,6 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.sqoop.avro.AvroUtil;
 
 import org.apache.sqoop.lib.SqoopRecord;
-import org.apache.sqoop.mapreduce.parquet.ParquetUtils;
 
 
 public class MergeParquetReducer extends Reducer<Text, MergeRecord,GenericRecord,NullWritable> {
@@ -45,7 +44,7 @@ public class MergeParquetReducer extends Reducer<Text, MergeRecord,GenericRecord
 
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
-      schema = ParquetUtils.getAvroSchema(context.getConfiguration());
+      schema = new Schema.Parser().parse(context.getConfiguration().get("parquetjob.avro.schema"));
       bigDecimalFormatString = context.getConfiguration().getBoolean(
           ImportJobBase.PROPERTY_BIGDECIMAL_FORMAT, ImportJobBase.PROPERTY_BIGDECIMAL_FORMAT_DEFAULT);
     }
