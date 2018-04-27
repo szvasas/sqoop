@@ -19,7 +19,9 @@
 package org.apache.sqoop.mapreduce.parquet.hadoop;
 
 import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.sqoop.avro.AvroUtil;
 import org.apache.sqoop.lib.LargeObjectLoader;
@@ -29,7 +31,7 @@ import java.io.IOException;
 
 import static org.apache.sqoop.mapreduce.parquet.hadoop.HadoopParquetUtils.CONF_AVRO_SCHEMA;
 
-public class HadoopParquetImportMapper extends ParquetImportMapper {
+public class HadoopParquetImportMapper extends ParquetImportMapper<NullWritable, GenericRecord> {
 
   @Override
   protected LargeObjectLoader createLobLoader(Context context) throws IOException, InterruptedException {
@@ -40,5 +42,10 @@ public class HadoopParquetImportMapper extends ParquetImportMapper {
   protected Schema getAvroSchema(Configuration configuration) {
     String schemaString = configuration.get(CONF_AVRO_SCHEMA);
     return AvroUtil.parseAvroSchema(schemaString);
+  }
+
+  @Override
+  protected void write(Context context, GenericRecord record) throws IOException, InterruptedException {
+    context.write(NullWritable.get(), record);
   }
 }

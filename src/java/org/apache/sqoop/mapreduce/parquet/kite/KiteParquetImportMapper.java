@@ -19,6 +19,7 @@
 package org.apache.sqoop.mapreduce.parquet.kite;
 
 import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.sqoop.avro.AvroUtil;
@@ -29,7 +30,7 @@ import java.io.IOException;
 
 import static org.apache.sqoop.mapreduce.parquet.kite.KiteParquetUtils.CONF_AVRO_SCHEMA;
 
-public class KiteParquetImportMapper extends ParquetImportMapper {
+public class KiteParquetImportMapper extends ParquetImportMapper<GenericRecord, Void> {
 
   @Override
   protected LargeObjectLoader createLobLoader(Context context) throws IOException, InterruptedException {
@@ -42,5 +43,10 @@ public class KiteParquetImportMapper extends ParquetImportMapper {
   protected Schema getAvroSchema(Configuration configuration) {
     String schemaString = configuration.get(CONF_AVRO_SCHEMA);
     return AvroUtil.parseAvroSchema(schemaString);
+  }
+
+  @Override
+  protected void write(Context context, GenericRecord record) throws IOException, InterruptedException {
+    context.write(record, null);
   }
 }

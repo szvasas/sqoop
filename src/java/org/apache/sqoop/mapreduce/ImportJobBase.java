@@ -45,6 +45,7 @@ import org.apache.sqoop.mapreduce.hcat.SqoopHCatUtilities;
 import org.apache.sqoop.util.PerfCounters;
 import org.apache.sqoop.validation.ValidationContext;
 import org.apache.sqoop.validation.ValidationException;
+import parquet.hadoop.ParquetOutputFormat;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -151,6 +152,7 @@ public class ImportJobBase extends JobBase {
           String shortName = CodecMap.getCodecShortNameByName(codecName, conf);
           if (!shortName.equalsIgnoreCase("default")) {
             conf.set(KiteParquetUtils.CONF_OUTPUT_CODEC, shortName);
+            conf.set(ParquetOutputFormat.COMPRESSION, shortName);
           }
         }
       }

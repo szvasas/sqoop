@@ -24,7 +24,6 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.NullWritable;
 import org.apache.sqoop.avro.AvroUtil;
 
 import java.io.IOException;
@@ -33,9 +32,9 @@ import java.sql.SQLException;
 /**
  * Imports records by writing them to a Parquet File.
  */
-public abstract class ParquetImportMapper
+public abstract class ParquetImportMapper<KEYOUT, VALOUT>
     extends AutoProgressMapper<LongWritable, SqoopRecord,
-        GenericRecord, NullWritable> {
+    KEYOUT, VALOUT> {
 
   private Schema schema = null;
   private boolean bigDecimalFormatString = true;
@@ -62,9 +61,9 @@ public abstract class ParquetImportMapper
       throw new IOException(sqlE);
     }
 
-    GenericRecord outKey = AvroUtil.toGenericRecord(val.getFieldMap(), schema,
+    GenericRecord record = AvroUtil.toGenericRecord(val.getFieldMap(), schema,
         bigDecimalFormatString);
-    context.write(outKey, null);
+    write(context, record);
   }
 
   @Override
@@ -77,4 +76,6 @@ public abstract class ParquetImportMapper
   protected abstract LargeObjectLoader createLobLoader(Context context) throws IOException, InterruptedException;
   
   protected abstract Schema getAvroSchema(Configuration configuration);
+  
+  protected abstract void write(Context context, GenericRecord record) throws IOException, InterruptedException;
 }
