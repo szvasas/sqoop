@@ -47,6 +47,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_AVRO_SCHEMA_KEY;
+
 public class KiteParquetMergeJobConfigurator implements ParquetMergeJobConfigurator {
 
   public static final Log LOG = LogFactory.getLog(KiteParquetMergeJobConfigurator.class.getName());
@@ -82,7 +84,7 @@ public class KiteParquetMergeJobConfigurator implements ParquetMergeJobConfigura
       job.setInputFormatClass(AvroParquetInputFormat.class);
       AvroParquetInputFormat.setAvroReadSchema(job, avroSchema);
 
-      conf.set(KiteParquetUtils.CONF_AVRO_SCHEMA, avroSchema.toString());
+      conf.set(SQOOP_PARQUET_AVRO_SCHEMA_KEY, avroSchema.toString());
       Class<DatasetKeyOutputFormat> outClass = DatasetKeyOutputFormat.class;
 
       job.setOutputFormatClass(outClass);

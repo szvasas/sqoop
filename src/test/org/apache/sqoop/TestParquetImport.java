@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.sqoop.mapreduce.parquet.hadoop.HadoopParquetUtils.CONF_AVRO_SCHEMA;
+import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.PARQUET_AVRO_SCHEMA_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -312,7 +312,7 @@ public class TestParquetImport extends ImportJobTestCase {
   }
 
   private Schema getSchema() {
-    String schemaString = getOutputMetadata().getFileMetaData().getKeyValueMetaData().get(CONF_AVRO_SCHEMA);
+    String schemaString = getOutputMetadata().getFileMetaData().getKeyValueMetaData().get(PARQUET_AVRO_SCHEMA_KEY);
     return new Schema.Parser().parse(schemaString);
   }
 

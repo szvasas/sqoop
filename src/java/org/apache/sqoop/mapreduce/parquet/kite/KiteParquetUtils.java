@@ -41,6 +41,9 @@ import org.kitesdk.data.spi.SchemaValidationUtil;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
+import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_AVRO_SCHEMA_KEY;
+import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_OUTPUT_CODEC_KEY;
+
 /**
  * Helper class for setting up a Parquet MapReduce job.
  */
@@ -69,15 +72,13 @@ public final class KiteParquetUtils {
   private KiteParquetUtils() {
   }
 
-  public static final String CONF_AVRO_SCHEMA = "parquetjob.avro.schema";
-  public static final String CONF_OUTPUT_CODEC = "parquetjob.output.codec";
   public enum WriteMode {
     DEFAULT, APPEND, OVERWRITE
   };
 
   public static CompressionType getCompressionType(Configuration conf) {
     CompressionType defaults = Formats.PARQUET.getDefaultCompressionType();
-    String codec = conf.get(CONF_OUTPUT_CODEC, defaults.getName());
+    String codec = conf.get(SQOOP_PARQUET_OUTPUT_CODEC_KEY, defaults.getName());
     try {
       return CompressionType.forName(codec);
     } catch (IllegalArgumentException ex) {
@@ -125,7 +126,7 @@ public final class KiteParquetUtils {
     } else {
       dataset = createDataset(schema, getCompressionType(conf), uri);
     }
-    conf.set(CONF_AVRO_SCHEMA, schema.toString());
+    conf.set(SQOOP_PARQUET_AVRO_SCHEMA_KEY, schema.toString());
 
     DatasetKeyOutputFormat.ConfigBuilder builder =
         DatasetKeyOutputFormat.configure(conf);

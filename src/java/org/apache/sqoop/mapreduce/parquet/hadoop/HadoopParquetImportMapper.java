@@ -29,7 +29,7 @@ import org.apache.sqoop.mapreduce.ParquetImportMapper;
 
 import java.io.IOException;
 
-import static org.apache.sqoop.mapreduce.parquet.hadoop.HadoopParquetUtils.CONF_AVRO_SCHEMA;
+import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.PARQUET_AVRO_SCHEMA_KEY;
 
 public class HadoopParquetImportMapper extends ParquetImportMapper<NullWritable, GenericRecord> {
 
@@ -40,12 +40,12 @@ public class HadoopParquetImportMapper extends ParquetImportMapper<NullWritable,
 
   @Override
   protected Schema getAvroSchema(Configuration configuration) {
-    String schemaString = configuration.get(CONF_AVRO_SCHEMA);
+    String schemaString = configuration.get(PARQUET_AVRO_SCHEMA_KEY);
     return AvroUtil.parseAvroSchema(schemaString);
   }
 
   @Override
   protected void write(Context context, GenericRecord record) throws IOException, InterruptedException {
-    context.write(NullWritable.get(), record);
+    context.write(null, record);
   }
 }

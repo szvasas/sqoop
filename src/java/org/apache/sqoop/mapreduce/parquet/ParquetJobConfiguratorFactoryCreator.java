@@ -1,6 +1,7 @@
 package org.apache.sqoop.mapreduce.parquet;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.sqoop.mapreduce.parquet.hadoop.HadoopParquetJobConfiguratorFactory;
 import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetJobConfiguratorFactory;
 
 public final class ParquetJobConfiguratorFactoryCreator {
@@ -10,7 +11,7 @@ public final class ParquetJobConfiguratorFactoryCreator {
   }
 
   public static ParquetJobConfiguratorFactory createParquetJobConfiguratorFactory(Configuration configuration) {
-    return new KiteParquetJobConfiguratorFactory();
+    return new HadoopParquetJobConfiguratorFactory();
   }
 
 }

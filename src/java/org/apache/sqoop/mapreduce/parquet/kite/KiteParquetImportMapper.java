@@ -28,7 +28,7 @@ import org.apache.sqoop.mapreduce.ParquetImportMapper;
 
 import java.io.IOException;
 
-import static org.apache.sqoop.mapreduce.parquet.kite.KiteParquetUtils.CONF_AVRO_SCHEMA;
+import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_AVRO_SCHEMA_KEY;
 
 public class KiteParquetImportMapper extends ParquetImportMapper<GenericRecord, Void> {
 
@@ -41,7 +41,7 @@ public class KiteParquetImportMapper extends ParquetImportMapper<GenericRecord, 
 
   @Override
   protected Schema getAvroSchema(Configuration configuration) {
-    String schemaString = configuration.get(CONF_AVRO_SCHEMA);
+    String schemaString = configuration.get(SQOOP_PARQUET_AVRO_SCHEMA_KEY);
     return AvroUtil.parseAvroSchema(schemaString);
   }
 
