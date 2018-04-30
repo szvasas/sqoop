@@ -32,7 +32,7 @@ public class HadoopParquetJobConfiguratorFactory implements ParquetJobConfigurat
 
   @Override
   public ParquetExportJobConfigurator createParquetExportJobConfigurator() {
-    return null;
+    return new HadoopParquetExportJobConfigurator();
   }
 
   @Override

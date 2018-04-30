@@ -16,20 +16,31 @@
  * limitations under the License.
  */
 
-package org.apache.sqoop.mapreduce.parquet;
+package org.apache.sqoop.mapreduce.parquet.hadoop;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.sqoop.mapreduce.parquet.ParquetExportJobConfigurator;
+import parquet.avro.AvroParquetInputFormat;
 
 import java.io.IOException;
 
-public interface ParquetExportJobConfigurator {
+public class HadoopParquetExportJobConfigurator implements ParquetExportJobConfigurator {
 
-  void configureInputFormat(Job job, Path inputPath) throws IOException;
+  @Override
+  public void configureInputFormat(Job job, Path inputPath) throws IOException {
+    // do nothing
+  }
 
-  Class<? extends Mapper> getMapperClass();
+  @Override
+  public Class<? extends Mapper> getMapperClass() {
+    return HadoopParquetExportMapper.class;
+  }
 
-  Class<? extends InputFormat> getInputFormatClass();
+  @Override
+  public Class<? extends InputFormat> getInputFormatClass() {
+    return AvroParquetInputFormat.class;
+  }
 }

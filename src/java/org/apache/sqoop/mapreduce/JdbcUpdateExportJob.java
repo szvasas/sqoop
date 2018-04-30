@@ -89,7 +89,7 @@ public class JdbcUpdateExportJob extends ExportJobBase {
     case AVRO_DATA_FILE:
       return AvroExportMapper.class;
     case PARQUET_FILE:
-      return ParquetExportMapper.class;
+      return parquetExportJobConfigurator.getMapperClass();
     case UNKNOWN:
     default:
       return TextExportMapper.class;

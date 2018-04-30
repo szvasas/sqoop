@@ -16,20 +16,22 @@
  * limitations under the License.
  */
 
-package org.apache.sqoop.mapreduce.parquet;
+package org.apache.sqoop.mapreduce.parquet.kite;
 
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapreduce.InputFormat;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.hadoop.io.NullWritable;
+import org.apache.sqoop.mapreduce.GenericRecordExportMapper;
 
 import java.io.IOException;
 
-public interface ParquetExportJobConfigurator {
+/**
+ * Exports Parquet records from a data source.
+ */
+public class KiteParquetExportMapper extends GenericRecordExportMapper<GenericRecord, NullWritable> {
 
-  void configureInputFormat(Job job, Path inputPath) throws IOException;
+  @Override
+  protected void map(GenericRecord key, NullWritable val, Context context) throws IOException, InterruptedException {
+    context.write(toSqoopRecord(key), NullWritable.get());
+  }
 
-  Class<? extends Mapper> getMapperClass();
-
-  Class<? extends InputFormat> getInputFormatClass();
 }

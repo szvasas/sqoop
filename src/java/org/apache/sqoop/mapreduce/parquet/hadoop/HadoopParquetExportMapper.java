@@ -16,28 +16,22 @@
  * limitations under the License.
  */
 
-package org.apache.sqoop.mapreduce;
+package org.apache.sqoop.mapreduce.parquet.hadoop;
 
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.sqoop.mapreduce.GenericRecordExportMapper;
 
 import java.io.IOException;
 
 /**
  * Exports Parquet records from a data source.
  */
-public class ParquetExportMapper
-    extends GenericRecordExportMapper<GenericRecord, NullWritable> {
+public class HadoopParquetExportMapper extends GenericRecordExportMapper<Void, GenericRecord> {
 
   @Override
-  protected void setup(Context context) throws IOException, InterruptedException {
-    super.setup(context);
-  }
-
-  @Override
-  protected void map(GenericRecord key, NullWritable val,
-      Context context) throws IOException, InterruptedException {
-    context.write(toSqoopRecord(key), NullWritable.get());
+  protected void map(Void key, GenericRecord val, Context context) throws IOException, InterruptedException {
+    context.write(toSqoopRecord(val), NullWritable.get());
   }
 
 }
