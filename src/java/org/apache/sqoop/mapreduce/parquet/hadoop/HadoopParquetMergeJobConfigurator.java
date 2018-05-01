@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.sqoop.mapreduce.parquet.kite;
+package org.apache.sqoop.mapreduce.parquet.hadoop;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
@@ -26,31 +26,25 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.sqoop.mapreduce.MergeParquetMapper;
 import org.apache.sqoop.mapreduce.parquet.ParquetMergeJobConfigurator;
-import org.kitesdk.data.Dataset;
-import org.kitesdk.data.DatasetDescriptor;
-import org.kitesdk.data.Datasets;
-import org.kitesdk.data.Formats;
-import org.kitesdk.data.mapreduce.DatasetKeyOutputFormat;
 import parquet.avro.AvroParquetInputFormat;
+import parquet.avro.AvroParquetOutputFormat;
 import parquet.avro.AvroSchemaConverter;
 import parquet.hadoop.Footer;
 import parquet.hadoop.ParquetFileReader;
 import parquet.schema.MessageType;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_AVRO_SCHEMA_KEY;
 
-public class KiteParquetMergeJobConfigurator implements ParquetMergeJobConfigurator {
+public class HadoopParquetMergeJobConfigurator implements ParquetMergeJobConfigurator {
 
-  public static final Log LOG = LogFactory.getLog(KiteParquetMergeJobConfigurator.class.getName());
+  public static final Log LOG = LogFactory.getLog(HadoopParquetMergeJobConfigurator.class.getName());
 
   @Override
   public void configureParquetMergeJob(Configuration conf, Job job, Path oldPath, Path newPath,
@@ -58,10 +52,10 @@ public class KiteParquetMergeJobConfigurator implements ParquetMergeJobConfigura
     try {
       FileSystem fileSystem = finalPath.getFileSystem(conf);
       LOG.info("Trying to merge parquet files");
-      job.setOutputKeyClass(GenericRecord.class);
+      job.setOutputKeyClass(Void.class);
       job.setMapperClass(MergeParquetMapper.class);
-      job.setReducerClass(KiteMergeParquetReducer.class);
-      job.setOutputValueClass(NullWritable.class);
+      job.setReducerClass(HadoopMergeParquetReducer.class);
+      job.setOutputValueClass(GenericRecord.class);
 
       List<Footer> footers = new ArrayList<Footer>();
       FileStatus oldPathfileStatus = fileSystem.getFileStatus(oldPath);
@@ -73,28 +67,18 @@ public class KiteParquetMergeJobConfigurator implements ParquetMergeJobConfigura
       AvroSchemaConverter avroSchemaConverter = new AvroSchemaConverter();
       Schema avroSchema = avroSchemaConverter.convert(schema);
 
-      if (!fileSystem.exists(finalPath)) {
-        Dataset dataset = createDataset(avroSchema, "dataset:" + finalPath);
-        DatasetKeyOutputFormat.configure(job).overwrite(dataset);
-      } else {
-        DatasetKeyOutputFormat.configure(job).overwrite(new URI("dataset:" + finalPath));
-      }
-
+      // TODO: schema comparison?
+      // TODO: compression codec?
       job.setInputFormatClass(AvroParquetInputFormat.class);
       AvroParquetInputFormat.setAvroReadSchema(job, avroSchema);
 
       conf.set(SQOOP_PARQUET_AVRO_SCHEMA_KEY, avroSchema.toString());
-      Class<DatasetKeyOutputFormat> outClass = DatasetKeyOutputFormat.class;
+      AvroParquetOutputFormat.setSchema(job, avroSchema);
 
-      job.setOutputFormatClass(outClass);
+      job.setOutputFormatClass(AvroParquetOutputFormat.class);
     } catch (Exception cnfe) {
       throw new IOException(cnfe);
     }
   }
 
-  public static Dataset createDataset(Schema schema, String uri) {
-    DatasetDescriptor descriptor =
-        new DatasetDescriptor.Builder().schema(schema).format(Formats.PARQUET).build();
-    return Datasets.create(uri, descriptor, GenericRecord.class);
-  }
 }

@@ -27,8 +27,6 @@ import java.util.Map;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.mapred.Pair;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.sqoop.avro.AvroUtil;
@@ -38,7 +36,7 @@ import org.apache.sqoop.lib.SqoopRecord;
 import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_AVRO_SCHEMA_KEY;
 
 
-public class MergeParquetReducer extends Reducer<Text, MergeRecord,GenericRecord,NullWritable> {
+public abstract class MergeParquetReducer<KEYOUT, VALUEOUT> extends Reducer<Text, MergeRecord, KEYOUT, VALUEOUT> {
 
   private Schema schema = null;
   private boolean bigDecimalFormatString = true;
@@ -69,9 +67,12 @@ public class MergeParquetReducer extends Reducer<Text, MergeRecord,GenericRecord
       }
 
       if (null != bestRecord) {
-        GenericRecord outKey = AvroUtil.toGenericRecord(bestRecord.getFieldMap(), schema,
+        GenericRecord record = AvroUtil.toGenericRecord(bestRecord.getFieldMap(), schema,
             bigDecimalFormatString);
-        context.write(outKey, null);
+        write(context, record);
       }
     }
+
+  protected abstract void write(Context context, GenericRecord record) throws IOException, InterruptedException;
+
 }

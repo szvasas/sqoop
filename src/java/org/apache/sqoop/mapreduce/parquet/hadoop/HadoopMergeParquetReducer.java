@@ -18,25 +18,15 @@
 
 package org.apache.sqoop.mapreduce.parquet.hadoop;
 
-import org.apache.sqoop.mapreduce.parquet.ParquetExportJobConfigurator;
-import org.apache.sqoop.mapreduce.parquet.ParquetImportJobConfigurator;
-import org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactory;
-import org.apache.sqoop.mapreduce.parquet.ParquetMergeJobConfigurator;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.sqoop.mapreduce.MergeParquetReducer;
 
-public class HadoopParquetJobConfiguratorFactory implements ParquetJobConfiguratorFactory {
+import java.io.IOException;
 
-  @Override
-  public ParquetImportJobConfigurator createParquetImportJobConfigurator() {
-    return new HadoopParquetImportJobConfigurator();
-  }
+public class HadoopMergeParquetReducer extends MergeParquetReducer<Void, GenericRecord> {
 
   @Override
-  public ParquetExportJobConfigurator createParquetExportJobConfigurator() {
-    return new HadoopParquetExportJobConfigurator();
-  }
-
-  @Override
-  public ParquetMergeJobConfigurator createParquetMergeJobConfigurator() {
-    return new HadoopParquetMergeJobConfigurator();
+  protected void write(Context context, GenericRecord record) throws IOException, InterruptedException {
+    context.write(null, record);
   }
 }
