@@ -25,8 +25,6 @@ public class ParquetConstants {
 
   public static final String SQOOP_PARQUET_OUTPUT_CODEC_KEY = "parquetjob.output.codec";
 
-  public static final String PARQUET_AVRO_SCHEMA_KEY = "parquet.avro.schema";
-
   private ParquetConstants() {
     // This class is meant for static use only.
   }

@@ -55,7 +55,7 @@ public class HadoopParquetImportJobConfigurator implements ParquetImportJobConfi
   private void configureOutputCodec(Job job) {
     String outputCodec = job.getConfiguration().get(SQOOP_PARQUET_OUTPUT_CODEC_KEY);
     if (outputCodec != null) {
-      ParquetOutputFormat.setCompression(job, CompressionCodecName.valueOf(outputCodec));
+      ParquetOutputFormat.setCompression(job, CompressionCodecName.fromConf(outputCodec));
     }
   }
 }

@@ -29,9 +29,13 @@ import org.apache.sqoop.mapreduce.ParquetImportMapper;
 
 import java.io.IOException;
 
-import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.PARQUET_AVRO_SCHEMA_KEY;
-
 public class HadoopParquetImportMapper extends ParquetImportMapper<NullWritable, GenericRecord> {
+
+  /**
+   * The key the get the configuration value set by
+   * parquet.avro.AvroParquetOutputFormat#setSchema(org.apache.hadoop.mapreduce.Job, org.apache.avro.Schema)
+   */
+  private static final String HADOOP_PARQUET_AVRO_SCHEMA_KEY = "parquet.avro.schema";
 
   @Override
   protected LargeObjectLoader createLobLoader(Context context) throws IOException, InterruptedException {
@@ -40,7 +44,7 @@ public class HadoopParquetImportMapper extends ParquetImportMapper<NullWritable,
 
   @Override
   protected Schema getAvroSchema(Configuration configuration) {
-    String schemaString = configuration.get(PARQUET_AVRO_SCHEMA_KEY);
+    String schemaString = configuration.get(HADOOP_PARQUET_AVRO_SCHEMA_KEY);
     return AvroUtil.parseAvroSchema(schemaString);
   }
 
