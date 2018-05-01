@@ -106,7 +106,6 @@ public class DataDrivenImportJob extends ImportJobBase {
       AvroJob.setMapOutputSchema(job.getConfiguration(), schema);
     } else if (options.getFileLayout()
         == SqoopOptions.FileLayout.ParquetFile) {
-      JobConf conf = (JobConf)job.getConfiguration();
       // Kite SDK requires an Avro schema to represent the data structure of
       // target dataset. If the schema name equals to generated java class name,
       // the import will fail. So we use table name as schema name and add a
@@ -115,7 +114,7 @@ public class DataDrivenImportJob extends ImportJobBase {
       Schema schema = generateAvroSchema(tableName, schemaNameOverride);
       Path destination = getContext().getDestination();
 
-      parquetImportJobConfigurator.configureMapper(conf, schema, options, tableName, destination);
+      parquetImportJobConfigurator.configureMapper(job, schema, options, tableName, destination);
     }
 
     job.setMapperClass(getMapperClass());

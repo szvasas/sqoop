@@ -20,7 +20,7 @@ package org.apache.sqoop.mapreduce.parquet;
 
 import org.apache.avro.Schema;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.OutputFormat;
 import org.apache.sqoop.SqoopOptions;
@@ -29,7 +29,7 @@ import java.io.IOException;
 
 public interface ParquetImportJobConfigurator {
 
-  void configureMapper(JobConf conf, Schema schema, SqoopOptions options, String tableName, Path destination) throws IOException;
+  void configureMapper(Job job, Schema schema, SqoopOptions options, String tableName, Path destination) throws IOException;
 
   Class<? extends Mapper> getMapperClass();
 

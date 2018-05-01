@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.OutputFormat;
 import org.apache.sqoop.SqoopOptions;
@@ -39,7 +40,8 @@ public class KiteParquetImportJobConfigurator implements ParquetImportJobConfigu
   public static final Log LOG = LogFactory.getLog(KiteParquetImportJobConfigurator.class.getName());
 
   @Override
-  public void configureMapper(JobConf conf, Schema schema, SqoopOptions options, String tableName, Path destination) throws IOException {
+  public void configureMapper(Job job, Schema schema, SqoopOptions options, String tableName, Path destination) throws IOException {
+    JobConf conf = (JobConf) job.getConfiguration();
     String uri = getKiteUri(conf, options, tableName, destination);
     KiteParquetUtils.WriteMode writeMode;
 

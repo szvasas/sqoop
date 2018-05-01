@@ -19,28 +19,27 @@
 package org.apache.sqoop.mapreduce.parquet.hadoop;
 
 import org.apache.avro.Schema;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.OutputFormat;
 import org.apache.sqoop.SqoopOptions;
 import org.apache.sqoop.mapreduce.parquet.ParquetImportJobConfigurator;
 import parquet.avro.AvroParquetOutputFormat;
 import parquet.hadoop.ParquetOutputFormat;
+import parquet.hadoop.metadata.CompressionCodecName;
 
 import java.io.IOException;
 
-import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.PARQUET_AVRO_SCHEMA_KEY;
 import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_OUTPUT_CODEC_KEY;
 
 
 public class HadoopParquetImportJobConfigurator implements ParquetImportJobConfigurator {
 
   @Override
-  public void configureMapper(JobConf conf, Schema schema, SqoopOptions options, String tableName, Path destination) throws IOException {
-    conf.set(PARQUET_AVRO_SCHEMA_KEY, schema.toString());
-    configureOutputCodec(conf);
+  public void configureMapper(Job job, Schema schema, SqoopOptions options, String tableName, Path destination) throws IOException {
+    AvroParquetOutputFormat.setSchema(job, schema);
+    configureOutputCodec(job);
   }
 
   @Override
@@ -53,10 +52,10 @@ public class HadoopParquetImportJobConfigurator implements ParquetImportJobConfi
     return AvroParquetOutputFormat.class;
   }
 
-  private void configureOutputCodec(Configuration conf) {
-    String outputCodec = conf.get(SQOOP_PARQUET_OUTPUT_CODEC_KEY);
+  private void configureOutputCodec(Job job) {
+    String outputCodec = job.getConfiguration().get(SQOOP_PARQUET_OUTPUT_CODEC_KEY);
     if (outputCodec != null) {
-      conf.set(ParquetOutputFormat.COMPRESSION, outputCodec);
+      ParquetOutputFormat.setCompression(job, CompressionCodecName.valueOf(outputCodec));
     }
   }
 }
