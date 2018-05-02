@@ -38,7 +38,7 @@ public class HadoopParquetImportJobConfigurator implements ParquetImportJobConfi
 
   @Override
   public void configureMapper(Job job, Schema schema, SqoopOptions options, String tableName, Path destination) throws IOException {
-    AvroParquetOutputFormat.setSchema(job, schema);
+    configureAvroSchema(job, schema);
     configureOutputCodec(job);
   }
 
@@ -52,10 +52,14 @@ public class HadoopParquetImportJobConfigurator implements ParquetImportJobConfi
     return AvroParquetOutputFormat.class;
   }
 
-  private void configureOutputCodec(Job job) {
+  void configureOutputCodec(Job job) {
     String outputCodec = job.getConfiguration().get(SQOOP_PARQUET_OUTPUT_CODEC_KEY);
     if (outputCodec != null) {
       ParquetOutputFormat.setCompression(job, CompressionCodecName.fromConf(outputCodec));
     }
+  }
+
+  void configureAvroSchema(Job job, Schema schema) {
+    AvroParquetOutputFormat.setSchema(job, schema);
   }
 }

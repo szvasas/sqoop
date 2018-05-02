@@ -23,22 +23,14 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.sqoop.avro.AvroUtil;
 import org.apache.sqoop.mapreduce.MergeParquetMapper;
 import org.apache.sqoop.mapreduce.parquet.ParquetMergeJobConfigurator;
 import parquet.avro.AvroParquetInputFormat;
-import parquet.avro.AvroParquetOutputFormat;
-import parquet.avro.AvroSchemaConverter;
-import parquet.hadoop.Footer;
-import parquet.hadoop.ParquetFileReader;
-import parquet.schema.MessageType;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_AVRO_SCHEMA_KEY;
 
@@ -46,36 +38,40 @@ public class HadoopParquetMergeJobConfigurator implements ParquetMergeJobConfigu
 
   public static final Log LOG = LogFactory.getLog(HadoopParquetMergeJobConfigurator.class.getName());
 
+  private final HadoopParquetImportJobConfigurator importJobConfigurator;
+
+  private final HadoopParquetExportJobConfigurator exportJobConfigurator;
+
+  public HadoopParquetMergeJobConfigurator(HadoopParquetImportJobConfigurator importJobConfigurator, HadoopParquetExportJobConfigurator exportJobConfigurator) {
+    this.importJobConfigurator = importJobConfigurator;
+    this.exportJobConfigurator = exportJobConfigurator;
+  }
+
+  public HadoopParquetMergeJobConfigurator() {
+    this(new HadoopParquetImportJobConfigurator(), new HadoopParquetExportJobConfigurator());
+  }
+
   @Override
   public void configureParquetMergeJob(Configuration conf, Job job, Path oldPath, Path newPath,
                                        Path finalPath) throws IOException {
     try {
-      FileSystem fileSystem = finalPath.getFileSystem(conf);
       LOG.info("Trying to merge parquet files");
       job.setOutputKeyClass(Void.class);
       job.setMapperClass(MergeParquetMapper.class);
       job.setReducerClass(HadoopMergeParquetReducer.class);
       job.setOutputValueClass(GenericRecord.class);
 
-      List<Footer> footers = new ArrayList<Footer>();
-      FileStatus oldPathfileStatus = fileSystem.getFileStatus(oldPath);
-      FileStatus newPathfileStatus = fileSystem.getFileStatus(oldPath);
-      footers.addAll(ParquetFileReader.readFooters(job.getConfiguration(), oldPathfileStatus, true));
-      footers.addAll(ParquetFileReader.readFooters(job.getConfiguration(), newPathfileStatus, true));
-
-      MessageType schema = footers.get(0).getParquetMetadata().getFileMetaData().getSchema();
-      AvroSchemaConverter avroSchemaConverter = new AvroSchemaConverter();
-      Schema avroSchema = avroSchemaConverter.convert(schema);
+      Schema oldPathAvroSchema = AvroUtil.getAvroSchemaFromParquetFile(oldPath, conf);
+      Schema newPathAvroSchema = AvroUtil.getAvroSchemaFromParquetFile(newPath, conf);
 
       // TODO: schema comparison?
       // TODO: compression codec?
-      job.setInputFormatClass(AvroParquetInputFormat.class);
-      AvroParquetInputFormat.setAvroReadSchema(job, avroSchema);
+      job.setInputFormatClass(exportJobConfigurator.getInputFormatClass());
+      AvroParquetInputFormat.setAvroReadSchema(job, oldPathAvroSchema);
 
-      conf.set(SQOOP_PARQUET_AVRO_SCHEMA_KEY, avroSchema.toString());
-      AvroParquetOutputFormat.setSchema(job, avroSchema);
-
-      job.setOutputFormatClass(AvroParquetOutputFormat.class);
+      conf.set(SQOOP_PARQUET_AVRO_SCHEMA_KEY, oldPathAvroSchema.toString());
+      importJobConfigurator.configureAvroSchema(job, oldPathAvroSchema);
+      job.setOutputFormatClass(importJobConfigurator.getOutputFormatClass());
     } catch (Exception cnfe) {
       throw new IOException(cnfe);
     }
