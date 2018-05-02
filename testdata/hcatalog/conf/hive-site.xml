@@ -45,7 +45,7 @@
     <value>${test.build.data}/sqoop/logs</value>
   </property>
   <property>
-    <name>datanucleus.schema.autoCreateTables</name>
+    <name>datanucleus.schema.autoCreateAll</name>
     <value>true</value>
   </property>
   <property>
