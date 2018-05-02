@@ -66,7 +66,7 @@ public class DataDrivenImportJob extends ImportJobBase {
     super(opts, null, inputFormatClass, null, context);
     this.parquetImportJobConfigurator = parquetImportJobConfigurator;
   }
-  
+
   public DataDrivenImportJob(final SqoopOptions opts,
       final Class<? extends InputFormat> inputFormatClass,
       ImportJobContext context) {

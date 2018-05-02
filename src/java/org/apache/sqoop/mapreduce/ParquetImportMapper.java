@@ -74,8 +74,8 @@ public abstract class ParquetImportMapper<KEYOUT, VALOUT>
   }
 
   protected abstract LargeObjectLoader createLobLoader(Context context) throws IOException, InterruptedException;
-  
+
   protected abstract Schema getAvroSchema(Configuration configuration);
-  
+
   protected abstract void write(Context context, GenericRecord record) throws IOException, InterruptedException;
 }
