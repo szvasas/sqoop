@@ -22,9 +22,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.sqoop.mapreduce.parquet.hadoop.HadoopParquetJobConfiguratorFactory;
 import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetJobConfiguratorFactory;
 
-public final class ParquetJobConfiguratorFactoryCreator {
+public final class ParquetJobConfiguratorFactoryProvider {
 
-  private ParquetJobConfiguratorFactoryCreator() {
+  private ParquetJobConfiguratorFactoryProvider() {
     // This class is meant for static use only.
   }
 

@@ -39,7 +39,7 @@ import org.apache.hadoop.util.StringUtils;
 import org.apache.sqoop.manager.SupportedManagers;
 import org.apache.sqoop.mapreduce.hcat.SqoopHCatUtilities;
 import org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactory;
-import org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryCreator;
+import org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider;
 import org.apache.sqoop.util.CredentialsUtil;
 import org.apache.sqoop.util.LoggingUtils;
 import org.apache.sqoop.util.password.CredentialProviderHelper;
@@ -1909,6 +1909,6 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
   }
 
   public ParquetJobConfiguratorFactory getParquetJobConfigurator(Configuration configuration) {
-    return ParquetJobConfiguratorFactoryCreator.createParquetJobConfiguratorFactory(configuration);
+    return ParquetJobConfiguratorFactoryProvider.createParquetJobConfiguratorFactory(configuration);
   }
 }
