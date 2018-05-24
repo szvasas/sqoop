@@ -722,7 +722,7 @@ public class SqoopOptions implements Cloneable {
                 props.getProperty(propName, f.get(this).toString())));
           }  else if (typ.equals(Map.class)) {
             f.set(this,
-                SqoopJsonUtil.getMapforJsonString(props.getProperty(propName)));
+                SqoopJsonUtil.getMapForJsonString(props.getProperty(propName)));
           } else {
             throw new RuntimeException("Could not retrieve property "
                 + propName + " for type: " + typ);
@@ -849,7 +849,7 @@ public class SqoopOptions implements Cloneable {
             putProperty(
                 props,
                 propName,
-                SqoopJsonUtil.getJsonStringforMap((Map) f.get(this)));
+                SqoopJsonUtil.getJsonStringForMap((Map) f.get(this)));
           } else {
             throw new RuntimeException("Could not set property "
                 + propName + " for type: " + typ);

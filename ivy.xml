@@ -97,6 +97,8 @@ under the License.
 
     <dependency org="log4j" name="log4j" rev="${log4j.version}"
       conf="common->master" />
+    <dependency org="org.apache.logging.log4j" name="log4j-api" rev="${log4j-api.version}"
+      conf="common->master" />
     <dependency org="junit" name="junit" rev="${junit.version}"
       conf="test->default"/>
     <dependency org="org.assertj" name="assertj-core" rev="${assertj.version}"
@@ -168,6 +170,55 @@ under the License.
       <exclude org="org.apache.thrift" module="thrift"/>
       <exclude org="log4j" module="log4j"/>
     </dependency>
+    <dependency org="org.apache.hbase" name="hbase-mapreduce" rev="${hbase.version}" conf="common->default">
+      <artifact name="hbase-mapreduce" type="jar"/>
+      <artifact name="hbase-mapreduce" type="jar" ext="jar" m:classifier="tests"/>
+      <exclude org="com.sun.jersey" module="jersey-core"/>
+      <exclude org="com.sun.jersey" module="jersey-json"/>
+      <exclude org="com.sun.jersey" module="jersey-server"/>
+      <exclude org="org.apache.thrift" module="thrift"/>
+      <exclude org="org.apache.htrace" module="htrace-core"/>
+      <exclude org="log4j" module="log4j"/>
+    </dependency>
+    <dependency org="org.apache.hbase" name="hbase-zookeeper" rev="${hbase.version}" conf="common->default">
+      <artifact name="hbase-zookeeper" type="jar"/>
+      <artifact name="hbase-zookeeper" type="jar" ext="jar" m:classifier="tests"/>
+      <exclude org="com.sun.jersey" module="jersey-core"/>
+      <exclude org="com.sun.jersey" module="jersey-json"/>
+      <exclude org="com.sun.jersey" module="jersey-server"/>
+      <exclude org="org.apache.thrift" module="thrift"/>
+      <exclude org="log4j" module="log4j"/>
+    </dependency>
+    <dependency org="org.apache.hbase" name="hbase-metrics-api" rev="${hbase.version}" conf="common->default">
+      <artifact name="hbase-metrics-api" type="jar"/>
+      <artifact name="hbase-metrics-api" type="jar" ext="jar" m:classifier="tests"/>
+      <exclude org="com.sun.jersey" module="jersey-core"/>
+      <exclude org="com.sun.jersey" module="jersey-json"/>
+      <exclude org="com.sun.jersey" module="jersey-server"/>
+      <exclude org="org.apache.thrift" module="thrift"/>
+      <exclude org="org.apache.htrace" module="htrace-core"/>
+      <exclude org="log4j" module="log4j"/>
+    </dependency>
+    <dependency org="org.apache.hbase" name="hbase-metrics" rev="${hbase.version}" conf="common->default">
+      <artifact name="hbase-metrics" type="jar"/>
+      <artifact name="hbase-metrics" type="jar" ext="jar" m:classifier="tests"/>
+      <exclude org="com.sun.jersey" module="jersey-core"/>
+      <exclude org="com.sun.jersey" module="jersey-json"/>
+      <exclude org="com.sun.jersey" module="jersey-server"/>
+      <exclude org="org.apache.thrift" module="thrift"/>
+      <exclude org="org.apache.htrace" module="htrace-core"/>
+      <exclude org="log4j" module="log4j"/>
+    </dependency>
+    <dependency org="org.apache.hbase" name="hbase-http" rev="${hbase.version}" conf="common->default">
+      <artifact name="hbase-http" type="jar"/>
+      <artifact name="hbase-http" type="jar" ext="jar" m:classifier="tests"/>
+      <exclude org="com.sun.jersey" module="jersey-core"/>
+      <exclude org="com.sun.jersey" module="jersey-json"/>
+      <exclude org="com.sun.jersey" module="jersey-server"/>
+      <exclude org="org.apache.thrift" module="thrift"/>
+      <exclude org="org.apache.htrace" module="htrace-core"/>
+      <exclude org="log4j" module="log4j"/>
+    </dependency>
     <dependency org="org.apache.hbase" name="hbase-server" rev="${hbase.version}" conf="common->default">
       <artifact name="hbase-server" type="jar"/>
       <artifact name="hbase-server" type="jar" ext="jar" m:classifier="tests"/>
@@ -175,15 +226,7 @@ under the License.
       <exclude org="com.sun.jersey" module="jersey-json"/>
       <exclude org="com.sun.jersey" module="jersey-server"/>
       <exclude org="org.apache.thrift" module="thrift"/>
-      <exclude org="log4j" module="log4j"/>
-    </dependency>
-    <dependency org="org.apache.hbase" name="hbase-hadoop-compat" rev="${hbase.version}" conf="common->default">
-      <artifact name="hbase-hadoop-compat" type="jar"/>
-      <artifact name="hbase-hadoop-compat" type="test-jar" ext="jar" m:classifier="tests"/>
-      <exclude org="com.sun.jersey" module="jersey-core"/>
-      <exclude org="com.sun.jersey" module="jersey-json"/>
-      <exclude org="com.sun.jersey" module="jersey-server"/>
-      <exclude org="org.apache.thrift" module="thrift"/>
+      <exclude org="org.apache.htrace" module="htrace-core"/>
       <exclude org="log4j" module="log4j"/>
     </dependency>
     <dependency org="org.apache.hbase" name="hbase-hadoop-compat" rev="${hbase.version}" conf="common->default">

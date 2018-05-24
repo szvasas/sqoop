@@ -44,46 +44,46 @@ public class TestSqoopJsonUtil {
 
   @Test
   public void testMapToStringAndBack() {
-    String resultJsonStr = SqoopJsonUtil.getJsonStringforMap(paramMap);
-    Map<String, String> resultMap = SqoopJsonUtil.getMapforJsonString(jsonStr);
+    String resultJsonStr = SqoopJsonUtil.getJsonStringForMap(paramMap);
+    Map<String, String> resultMap = SqoopJsonUtil.getMapForJsonString(jsonStr);
     assertEquals(paramMap, resultMap);
   }
 
   @Test
   public void testGetJsonStringFromMapNullMap() {
     Map<String, String> nullMap = null;
-    String resultJsonStr = SqoopJsonUtil.getJsonStringforMap(nullMap);
+    String resultJsonStr = SqoopJsonUtil.getJsonStringForMap(nullMap);
     assertEquals("{}", resultJsonStr);
   }
 
   @Test
   public void testGetJsonStringFromMapEmptyMap() {
     Map<String, String> nullMap = new HashMap<String, String>();
-    String resultJsonStr = SqoopJsonUtil.getJsonStringforMap(nullMap);
+    String resultJsonStr = SqoopJsonUtil.getJsonStringForMap(nullMap);
     assertEquals("{}", resultJsonStr);
   }
 
   @Test
   public void testGetMapforJsonString() {
-    Map<String, String> resultMap = SqoopJsonUtil.getMapforJsonString(jsonStr);
+    Map<String, String> resultMap = SqoopJsonUtil.getMapForJsonString(jsonStr);
     assertEquals(paramMap, resultMap);
   }
 
   @Test
   public void testGetMapforJsonStringNullString() {
-    Map<String, String> resultMap = SqoopJsonUtil.getMapforJsonString(null);
+    Map<String, String> resultMap = SqoopJsonUtil.getMapForJsonString(null);
     assertTrue(resultMap.isEmpty());
   }
 
   @Test
   public void testGetMapforJsonStringEmptyString() {
-    Map<String, String> resultMap = SqoopJsonUtil.getMapforJsonString("");
+    Map<String, String> resultMap = SqoopJsonUtil.getMapForJsonString("");
     assertTrue(resultMap.isEmpty());
   }
 
   @Test
   public void testGetMapforJsonStringEmptyMapString() {
-    Map<String, String> resultMap = SqoopJsonUtil.getMapforJsonString("{}");
+    Map<String, String> resultMap = SqoopJsonUtil.getMapForJsonString("{}");
     assertTrue(resultMap.isEmpty());
   }
 

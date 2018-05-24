@@ -33,18 +33,23 @@ import org.json.JSONObject;
 
 public class SqoopJsonUtil {
 
+  public static final String EMPTY_JSON_OBJECT = "{}";
+
   public static final Log LOG = LogFactory
     .getLog(SqoopJsonUtil.class.getName());
 
   private SqoopJsonUtil() {
   }
 
-  public static String getJsonStringforMap(Map<String, String> map) {
+  public static String getJsonStringForMap(Map<String, String> map) {
+    if (map == null) {
+      return EMPTY_JSON_OBJECT;
+    }
     JSONObject pathPartMap = new JSONObject(map);
     return pathPartMap.toString();
   }
 
-  public static Map<String, String> getMapforJsonString(String mapJsonStr) {
+  public static Map<String, String> getMapForJsonString(String mapJsonStr) {
     LOG.debug("Passed mapJsonStr ::" + mapJsonStr + " to parse");
     final Map<String, String> result;
     try {
@@ -77,7 +82,7 @@ public class SqoopJsonUtil {
   }
 
   public static boolean isEmptyJSON(String jsonStr) {
-    if (null == jsonStr || "".equals(jsonStr) || "{}".equals(jsonStr)) {
+    if (null == jsonStr || "".equals(jsonStr) || EMPTY_JSON_OBJECT.equals(jsonStr)) {
       return true;
     } else {
       return false;
