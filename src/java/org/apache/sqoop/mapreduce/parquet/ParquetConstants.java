@@ -26,6 +26,6 @@ public final class ParquetConstants {
   public static final String SQOOP_PARQUET_OUTPUT_CODEC_KEY = "parquetjob.output.codec";
 
   private ParquetConstants() {
-    // This class is meant for static use only.
+    throw new AssertionError("This class is meant for static use only."); 
   }
 }
