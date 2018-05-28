@@ -257,6 +257,13 @@ under the License.
       <exclude org="org.apache.parquet" module="parquet-hadoop-bundle"/>
       <exclude org="org.apache.avro" module="avro" />
     </dependency>
+    <!-- tests using HiveMiniCluster need Tez (even if they're running with MR)-->
+    <dependency org="org.apache.tez" name="tez-api" rev="0.9.1" conf="test->default">
+      <artifact name="tez-api" type="jar" />
+    </dependency>
+    <dependency org="org.apache.tez" name="tez-dag" rev="0.9.1" conf="test->default">
+      <artifact name="tez-dag" type="jar" />
+    </dependency>
 
     <dependency org="org.postgresql" name="postgresql"
       rev="${postgresql.version}" conf="common->default" />
@@ -265,6 +272,7 @@ under the License.
       rev="${zookeeper.version}" conf="test->default">
       <artifact name="zookeeper" type="jar" />
     </dependency>
+
 
     <dependency org="org.apache.avro" name="avro" rev="${avro.version}"
       conf="runtime->default;redist->default">
