@@ -19,13 +19,12 @@
 package org.apache.sqoop.mapreduce.parquet;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.sqoop.mapreduce.parquet.hadoop.HadoopParquetJobConfiguratorFactory;
 import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetJobConfiguratorFactory;
 
 public final class ParquetJobConfiguratorFactoryProvider {
 
   private ParquetJobConfiguratorFactoryProvider() {
-    // This class is meant for static use only.
+    throw new AssertionError("This class is meant for static use only.");
   }
 
   public static ParquetJobConfiguratorFactory createParquetJobConfiguratorFactory(Configuration configuration) {

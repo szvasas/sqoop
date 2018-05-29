@@ -328,7 +328,6 @@ public final class AvroUtil {
 
     return LogicalTypes.decimal(precision, scale);
   }
-
   private static Path getFileToTest(Path path, Configuration conf) throws IOException {
     FileSystem fs = path.getFileSystem(conf);
     if (!fs.isDirectory(path)) {
