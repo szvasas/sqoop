@@ -19,16 +19,26 @@
 package org.apache.sqoop.mapreduce.parquet;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.sqoop.mapreduce.parquet.hadoop.HadoopParquetJobConfiguratorFactory;
 import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetJobConfiguratorFactory;
 
 public final class ParquetJobConfiguratorFactoryProvider {
+
+  public static final String PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY = "sqoop.parquet.job.implementation";
+
+  public static final String PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE = "kite";
 
   private ParquetJobConfiguratorFactoryProvider() {
     throw new AssertionError("This class is meant for static use only.");
   }
 
   public static ParquetJobConfiguratorFactory createParquetJobConfiguratorFactory(Configuration configuration) {
-    return new KiteParquetJobConfiguratorFactory();
+    String implementation = configuration.get(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY);
+    if (PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE.equalsIgnoreCase(implementation)) {
+      return new KiteParquetJobConfiguratorFactory();
+    } else {
+      return new HadoopParquetJobConfiguratorFactory();
+    }
   }
 
 }

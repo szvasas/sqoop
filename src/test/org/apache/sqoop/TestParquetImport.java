@@ -32,6 +32,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sqoop.util.ParquetReader;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import parquet.avro.AvroSchemaConverter;
 import parquet.format.CompressionCodec;
 import parquet.hadoop.Footer;
@@ -46,19 +49,35 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * Tests --as-parquetfile.
  */
+@RunWith(Parameterized.class)
 public class TestParquetImport extends ImportJobTestCase {
 
   public static final Log LOG = LogFactory
       .getLog(TestParquetImport.class.getName());
+
+  @Parameters(name = "parquetImplementation = {0}")
+  public static Iterable<? extends Object> authenticationParameters() {
+    return Arrays.asList(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE, "hadoop");
+  }
+
+  private final String parquetImplementation;
+
+  public TestParquetImport(String parquetImplementation) {
+    this.parquetImplementation = parquetImplementation;
+  }
 
   /**
    * Create the argv to pass to Sqoop.
@@ -122,10 +141,23 @@ public class TestParquetImport extends ImportJobTestCase {
   }
 
   @Test
-  public void testDeflateCompression() throws IOException {
+  public void testHadoopGzipCompression() throws IOException {
+    assumeFalse(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE.equals(parquetImplementation));
+    runParquetImportTest("gzip");
+  }
+
+  @Test
+  public void testKiteDeflateCompression() throws IOException {
+    assumeTrue(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE.equals(parquetImplementation));
     // The current Kite-based Parquet writing implementation uses GZIP compression codec when Deflate is specified.
     // See: org.kitesdk.data.spi.filesystem.ParquetAppender.getCompressionCodecName()
     runParquetImportTest("deflate", "gzip");
+  }
+
+  @Test(expected = IOException.class)
+  public void testHadoopDeflateCompression() throws IOException {
+    assumeFalse(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE.equals(parquetImplementation));
+    runParquetImportTest("deflate");
   }
 
   private void runParquetImportTest(String codec) throws IOException {
@@ -325,4 +357,10 @@ public class TestParquetImport extends ImportJobTestCase {
     assertEquals(type, field.schema().getTypes().get(1).getType());
   }
 
+  @Override
+  protected Configuration getConf() {
+    Configuration conf = super.getConf();
+    conf.set(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, parquetImplementation);
+    return conf;
+  }
 }

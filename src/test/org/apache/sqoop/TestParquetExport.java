@@ -32,6 +32,8 @@ import org.junit.Rule;
 
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import parquet.avro.AvroParquetWriter;
 
 import java.io.IOException;
@@ -42,9 +44,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static parquet.hadoop.ParquetWriter.DEFAULT_BLOCK_SIZE;
@@ -55,10 +60,22 @@ import static parquet.hadoop.metadata.CompressionCodecName.SNAPPY;
 /**
  * Test that we can export Parquet Data Files from HDFS into databases.
  */
+@RunWith(Parameterized.class)
 public class TestParquetExport extends ExportJobTestCase {
+
+  @Parameterized.Parameters(name = "parquetImplementation = {0}")
+  public static Iterable<? extends Object> authenticationParameters() {
+    return Arrays.asList(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE, "hadoop");
+  }
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
+
+  private final String parquetImplementation;
+
+  public TestParquetExport(String parquetImplementation) {
+    this.parquetImplementation = parquetImplementation;
+  }
 
   /**
    * @return an argv for the CodeGenTool to use when creating tables to export.
@@ -478,5 +495,10 @@ public class TestParquetExport extends ExportJobTestCase {
     runExport(getArgv(true, 10, 10, newStrArray(argv, "-m", "" + 1)));
   }
 
-
+  @Override
+  protected Configuration getConf() {
+    Configuration conf = super.getConf();
+    conf.set(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, parquetImplementation);
+    return conf;
+  }
 }
