@@ -28,11 +28,13 @@ import org.apache.hadoop.util.StringUtils;
 
 import org.apache.sqoop.SqoopOptions;
 import org.apache.sqoop.hive.TestHiveImport;
-import org.apache.sqoop.testutil.CommonArgs;
 import org.apache.sqoop.tool.SqoopTool;
 import org.junit.After;
 import org.junit.Before;
 
+import static java.lang.String.format;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE;
 import static org.junit.Assert.fail;
 
 /**
@@ -144,7 +146,7 @@ public class SQLServerHiveImportTest extends TestHiveImport {
     ArrayList<String> args = new ArrayList<String>();
     System.out.println("Overridden getArgv is called..");
     if (includeHadoopFlags) {
-      CommonArgs.addHadoopFlags(args);
+      args.add(format("-D%s=%s", PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE));
     }
 
     if (null != moreArgs) {

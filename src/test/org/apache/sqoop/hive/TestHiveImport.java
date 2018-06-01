@@ -44,7 +44,6 @@ import org.junit.Test;
 
 import org.apache.sqoop.SqoopOptions;
 import org.apache.sqoop.SqoopOptions.InvalidOptionsException;
-import org.apache.sqoop.testutil.CommonArgs;
 import org.apache.sqoop.testutil.ImportJobTestCase;
 import org.apache.sqoop.tool.BaseSqoopTool;
 import org.apache.sqoop.tool.CodeGenTool;
@@ -54,7 +53,10 @@ import org.apache.sqoop.tool.SqoopTool;
 import org.apache.commons.cli.ParseException;
 import org.junit.rules.ExpectedException;
 
+import static java.lang.String.format;
 import static java.util.Collections.sort;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -113,7 +115,7 @@ public class TestHiveImport extends ImportJobTestCase {
     ArrayList<String> args = new ArrayList<String>();
 
     if (includeHadoopFlags) {
-      CommonArgs.addHadoopFlags(args);
+      args.add(format("-D%s=%s", PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE));
     }
 
     if (null != moreArgs) {
@@ -295,7 +297,7 @@ public class TestHiveImport extends ImportJobTestCase {
     String [] vals = { "'test'", "42", "'somestring'" };
     String [] extraArgs = {"--as-parquetfile"};
 
-    runImportTest(TABLE_NAME, types, vals, "", getArgv(false, extraArgs),
+    runImportTest(TABLE_NAME, types, vals, "", getArgv(true, extraArgs),
         new ImportTool());
     verifyHiveDataset(new Object[][]{{"test", 42, "somestring"}});
   }
@@ -379,13 +381,13 @@ public class TestHiveImport extends ImportJobTestCase {
     String [] extraArgs = {"--as-parquetfile"};
     ImportTool tool = new ImportTool();
 
-    runImportTest(TABLE_NAME, types, vals, "", getArgv(false, extraArgs), tool);
+    runImportTest(TABLE_NAME, types, vals, "", getArgv(true, extraArgs), tool);
     verifyHiveDataset(new Object[][]{{"test", 42, "somestring"}});
 
     String [] valsToOverwrite = { "'test2'", "24", "'somestring2'" };
     String [] extraArgsForOverwrite = {"--as-parquetfile", "--hive-overwrite"};
     runImportTest(TABLE_NAME, types, valsToOverwrite, "",
-        getArgv(false, extraArgsForOverwrite), tool);
+        getArgv(true, extraArgsForOverwrite), tool);
     verifyHiveDataset(new Object[][] {{"test2", 24, "somestring2"}});
   }
 
@@ -406,9 +408,11 @@ public class TestHiveImport extends ImportJobTestCase {
     thrown.expect(AvroSchemaMismatchException.class);
     thrown.expectMessage(KiteParquetUtils.INCOMPATIBLE_AVRO_SCHEMA_MSG + KiteParquetUtils.HIVE_INCOMPATIBLE_AVRO_SCHEMA_MSG);
 
-    SqoopOptions sqoopOptions = getSqoopOptions(getConf());
+    Configuration conf = getConf();
+    conf.set(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE);
+    SqoopOptions sqoopOptions = getSqoopOptions(conf);
     sqoopOptions.setThrowOnError(true);
-    Sqoop sqoop = new Sqoop(new ImportTool(), getConf(), sqoopOptions);
+    Sqoop sqoop = new Sqoop(new ImportTool(), conf, sqoopOptions);
     sqoop.run(getArgv(false, extraArgs));
 
   }
@@ -436,7 +440,7 @@ public class TestHiveImport extends ImportJobTestCase {
     String [] types = getTypes();
     String [] vals = { "'test'", "42", "'somestring'" };
     String [] extraArgs = {"--as-parquetfile"};
-    String [] args = getArgv(false, extraArgs);
+    String [] args = getArgv(true, extraArgs);
     ImportTool tool = new ImportTool();
 
     runImportTest(TABLE_NAME, types, vals, "", args, tool);
