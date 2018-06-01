@@ -35,4 +35,5 @@ public interface ParquetImportJobConfigurator {
 
   Class<? extends OutputFormat> getOutputFormatClass();
 
+  boolean isHiveImportNeeded();
 }
