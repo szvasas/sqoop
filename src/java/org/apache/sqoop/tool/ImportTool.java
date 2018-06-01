@@ -544,10 +544,10 @@ public class ImportTool extends BaseSqoopTool {
     if (options.doHiveImport()) {
       // For Parquet file, the import action will create hive table directly via
       // kite. So there is no need to do hive import as a post step again.
-      if (options.getFileLayout() != SqoopOptions.FileLayout.ParquetFile) {
+      //if (options.getFileLayout() != SqoopOptions.FileLayout.ParquetFile) {
         HiveClient hiveClient = hiveClientFactory.createHiveClient(options, manager);
         hiveClient.importTable();
-      }
+      //}
     }
 
     saveIncrementalState(options);
