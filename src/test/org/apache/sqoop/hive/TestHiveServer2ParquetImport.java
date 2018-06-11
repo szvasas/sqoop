@@ -26,7 +26,9 @@ import org.apache.sqoop.testutil.HiveServer2TestUtil;
 import org.apache.sqoop.testutil.ImportJobTestCase;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -40,6 +42,15 @@ import static org.junit.Assert.assertThat;
 
 public class TestHiveServer2ParquetImport extends ImportJobTestCase {
 
+  private static final String[] TEST_COLUMN_TYPES = {"VARCHAR(32)", "INTEGER", "CHAR(64)"};
+
+  private static final List<Object> TEST_COLUMN_VALUES = Arrays.<Object>asList("test", 42, "somestring");
+
+  private static final List<Object> TEST_COLUMN_VALUES_LINE2 = Arrays.<Object>asList("test2", 4242, "somestring2");
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+
   private HiveMiniCluster hiveMiniCluster;
 
   private HiveServer2TestUtil hiveServer2TestUtil;
@@ -51,6 +62,8 @@ public class TestHiveServer2ParquetImport extends ImportJobTestCase {
     hiveMiniCluster = new HiveMiniCluster(new NoAuthenticationConfiguration());
     hiveMiniCluster.start();
     hiveServer2TestUtil = new HiveServer2TestUtil(hiveMiniCluster.getUrl());
+
+    createTableWithColTypes(TEST_COLUMN_TYPES, toStringArray(TEST_COLUMN_VALUES));
   }
 
   @Override
@@ -62,47 +75,30 @@ public class TestHiveServer2ParquetImport extends ImportJobTestCase {
 
   @Test
   public void testNormalHiveImportAsParquet() throws Exception {
-    List<Object> columnValues = Arrays.<Object>asList("test", 42, "somestring");
-
-    String[] types = {"VARCHAR(32)", "INTEGER", "CHAR(64)"};
-    createTableWithColTypes(types, toStringArray(columnValues));
-
     String[] args = commonArgs().build();
 
     runImport(args);
 
     List<List<Object>> rows = hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
-    assertThat(rows, hasItems(columnValues));
+    assertThat(rows, hasItems(TEST_COLUMN_VALUES));
   }
 
   @Test
   public void testAppendHiveImportAsParquet() throws Exception {
-    List<Object> firstLine = Arrays.<Object>asList("test", 42, "somestring");
-    List<Object> appendedLine = Arrays.<Object>asList("test2", 4242, "somestring2");
-
-    String[] types = {"VARCHAR(32)", "INTEGER", "CHAR(64)"};
-    createTableWithColTypes(types, toStringArray(firstLine));
-
     String[] args = commonArgs().build();
 
     runImport(args);
 
-    insertIntoTable(types, toStringArray(appendedLine));
+    insertIntoTable(TEST_COLUMN_TYPES, toStringArray(TEST_COLUMN_VALUES_LINE2));
 
     runImport(args);
 
     List<List<Object>> rows = hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
-    assertThat(rows, hasItems(firstLine, appendedLine));
+    assertThat(rows, hasItems(TEST_COLUMN_VALUES, TEST_COLUMN_VALUES_LINE2));
   }
 
   @Test
   public void testCreateOverwriteHiveImportAsParquet() throws Exception {
-    List<Object> firstLine = Arrays.<Object>asList("test", 42, "somestring");
-    List<Object> overwriteLine = Arrays.<Object>asList("test2", 4242, "somestring2");
-
-    String[] types = {"VARCHAR(32)", "INTEGER", "CHAR(64)"};
-    createTableWithColTypes(types, toStringArray(firstLine));
-
     String[] args = commonArgs()
         .withOption("hive-overwrite")
         .build();
@@ -110,52 +106,48 @@ public class TestHiveServer2ParquetImport extends ImportJobTestCase {
     runImport(args);
 
     dropTableIfExists(getTableName());
-    createTableWithColTypes(types, toStringArray(overwriteLine));
+    createTableWithColTypes(TEST_COLUMN_TYPES, toStringArray(TEST_COLUMN_VALUES_LINE2));
 
     runImport(args);
 
     List<List<Object>> rows = hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
-    assertEquals(asList(overwriteLine), rows);
+    assertEquals(asList(TEST_COLUMN_VALUES_LINE2), rows);
   }
 
-  @Test(expected = IOException.class)
+  @Test
   public void testCreateHiveImportAsParquet() throws Exception {
-    List<Object> firstLine = Arrays.<Object>asList("test", 42, "somestring");
-
-    String[] types = {"VARCHAR(32)", "INTEGER", "CHAR(64)"};
-    createTableWithColTypes(types, toStringArray(firstLine));
-
     String[] args = commonArgs()
         .withOption("create-hive-table")
         .build();
 
     runImport(args);
+
+    expectedException.expect(IOException.class);
     runImport(args);
   }
 
   @Test
   public void testHiveImportAsParquetWhenTableExistsWithIncompatibleSchema() throws Exception {
-    List<Object> firstLine = Arrays.<Object>asList("test", 42, "somestring");
-    List<Object> overwriteLine = Arrays.<Object>asList(100, 200, 300);
-
-    String[] types = {"VARCHAR(32)", "INTEGER", "CHAR(64)"};
-    String[] types2 = {"INTEGER", "INTEGER", "INTEGER"};
-    createTableWithColTypes(types, toStringArray(firstLine));
+    String hiveTableName = "hiveImportAsParquetWhenTableExistsWithIncompatibleSchema";
+    String incompatibleSchemaTableName = "incompatibleSchemaTable";
+    String[] incompatibleSchemaTableTypes = {"INTEGER", "INTEGER", "INTEGER"};
+    List<Object> incompatibleSchemaTableData = Arrays.<Object>asList(100, 200, 300);
 
     String[] args = commonArgs()
-        .withOption("hive-table", "mytest")
+        .withOption("hive-table", hiveTableName)
         .build();
 
     runImport(args);
 
-    dropTableIfExists(getTableName());
-    setCurTableName("newtable");
-    createTableWithColTypes(types2, toStringArray(overwriteLine));
+    setCurTableName(incompatibleSchemaTableName);
+    createTableWithColTypes(incompatibleSchemaTableTypes, toStringArray(incompatibleSchemaTableData));
 
-    String[] args2 = commonArgs()
-        .withOption("hive-table", "mytest")
+    // Recreate the argument array to pick up the new current table name.
+    args = commonArgs()
+        .withOption("hive-table", hiveTableName)
         .build();
-    runImport(args2);
+
+    runImport(args);
   }
 
   private ArgumentArrayBuilder commonArgs() {
