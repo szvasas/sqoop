@@ -28,6 +28,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -73,7 +74,7 @@ public class TestHiveServer2ParquetImport extends ImportJobTestCase {
     List<List<Object>> rows = hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
     assertThat(rows, hasItems(columnValues));
   }
-  
+
   @Test
   public void testAppendHiveImportAsParquet() throws Exception {
     List<Object> firstLine = Arrays.<Object>asList("test", 42, "somestring");
@@ -117,6 +118,21 @@ public class TestHiveServer2ParquetImport extends ImportJobTestCase {
     assertEquals(asList(overwriteLine), rows);
   }
 
+  @Test(expected = IOException.class)
+  public void testCreateHiveImportAsParquet() throws Exception {
+    List<Object> firstLine = Arrays.<Object>asList("test", 42, "somestring");
+
+    String[] types = {"VARCHAR(32)", "INTEGER", "CHAR(64)"};
+    createTableWithColTypes(types, toStringArray(firstLine));
+
+    String[] args = commonArgs()
+        .withOption("create-hive-table")
+        .build();
+
+    runImport(args);
+    runImport(args);
+  }
+
   private ArgumentArrayBuilder commonArgs() {
     return new ArgumentArrayBuilder()
         .withProperty(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, "hadoop")
@@ -128,7 +144,7 @@ public class TestHiveServer2ParquetImport extends ImportJobTestCase {
         .withOption("as-parquetfile")
         .withOption("delete-target-dir");
   }
-  
+
   private String[] toStringArray(List<Object> columnValues) {
     String[] result = new String[columnValues.size()];
 

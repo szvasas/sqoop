@@ -19,6 +19,8 @@
 package org.apache.sqoop.tool;
 
 import static java.lang.String.format;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -1575,7 +1577,8 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
     // Hive import and create hive table not compatible for ParquetFile format
     if (options.doHiveImport()
         && options.doFailIfHiveTableExists()
-        && options.getFileLayout() == SqoopOptions.FileLayout.ParquetFile) {
+        && options.getFileLayout() == SqoopOptions.FileLayout.ParquetFile
+        && PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE.equals(options.getConf().get(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY))) {
       throw new InvalidOptionsException("Hive import and create hive table is not compatible with "
         + "importing into ParquetFile format.");
       }
