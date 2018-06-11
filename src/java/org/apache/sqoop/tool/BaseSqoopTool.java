@@ -1888,7 +1888,6 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
 
   protected void validateHS2Options(SqoopOptions options) throws SqoopOptions.InvalidOptionsException {
     final String withoutTemplate = "The %s option cannot be used without the %s option.";
-    final String withTemplate = "The %s option cannot be used with the %s option.";
 
     if (isSet(options.getHs2Url()) && !options.doHiveImport()) {
       throw new InvalidOptionsException(format(withoutTemplate, HS2_URL_ARG, HIVE_IMPORT_ARG));
@@ -1900,10 +1899,6 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
 
     if (isSet(options.getHs2Keytab()) && !isSet(options.getHs2User())) {
       throw  new InvalidOptionsException(format(withoutTemplate, HS2_KEYTAB_ARG, HS2_USER_ARG));
-    }
-
-    if (isSet(options.getHs2Url()) && (options.getFileLayout() == SqoopOptions.FileLayout.ParquetFile)) {
-      throw  new InvalidOptionsException(format(withTemplate, HS2_URL_ARG, FMT_PARQUETFILE_ARG));
     }
 
   }
