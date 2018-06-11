@@ -462,11 +462,13 @@ public class TestHiveImport extends ImportJobTestCase {
     setNumCols(3);
     String [] extraArgs = {"--as-parquetfile", "--create-hive-table"};
     ImportTool tool = new ImportTool();
+    Configuration conf = getConf();
+    conf.set(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE);
 
     thrown.expect(InvalidOptionsException.class);
     thrown.reportMissingExceptionWithMessage("Expected InvalidOptionsException during Hive table creation with " +
         "--as-parquetfile");
-    tool.validateOptions(tool.parseArguments(getArgv(false, extraArgs), null,
+    tool.validateOptions(tool.parseArguments(getArgv(false, extraArgs), conf,
         null, true));
   }
 
