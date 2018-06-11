@@ -133,6 +133,31 @@ public class TestHiveServer2ParquetImport extends ImportJobTestCase {
     runImport(args);
   }
 
+  @Test
+  public void testHiveImportAsParquetWhenTableExistsWithIncompatibleSchema() throws Exception {
+    List<Object> firstLine = Arrays.<Object>asList("test", 42, "somestring");
+    List<Object> overwriteLine = Arrays.<Object>asList(100, 200, 300);
+
+    String[] types = {"VARCHAR(32)", "INTEGER", "CHAR(64)"};
+    String[] types2 = {"INTEGER", "INTEGER", "INTEGER"};
+    createTableWithColTypes(types, toStringArray(firstLine));
+
+    String[] args = commonArgs()
+        .withOption("hive-table", "mytest")
+        .build();
+
+    runImport(args);
+
+    dropTableIfExists(getTableName());
+    setCurTableName("newtable");
+    createTableWithColTypes(types2, toStringArray(overwriteLine));
+
+    String[] args2 = commonArgs()
+        .withOption("hive-table", "mytest")
+        .build();
+    runImport(args2);
+  }
+
   private ArgumentArrayBuilder commonArgs() {
     return new ArgumentArrayBuilder()
         .withProperty(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, "hadoop")
