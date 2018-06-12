@@ -68,12 +68,12 @@ public class TestHiveServer2ParquetImport {
 
     @BeforeClass
     public static void beforeClass() {
-      TestHiveServer2ParquetImport.beforeClass();
+      TestHiveServer2ParquetImport.startHiveMiniCluster();
     }
 
     @AfterClass
     public static void afterClass() {
-      TestHiveServer2ParquetImport.afterClass();
+      TestHiveServer2ParquetImport.stopHiveMiniCluster();
     }
 
     private final String compressionCodec;
@@ -110,12 +110,12 @@ public class TestHiveServer2ParquetImport {
 
     @BeforeClass
     public static void beforeClass() {
-      TestHiveServer2ParquetImport.beforeClass();
+      TestHiveServer2ParquetImport.startHiveMiniCluster();
     }
 
     @AfterClass
     public static void afterClass() {
-      TestHiveServer2ParquetImport.afterClass();
+      TestHiveServer2ParquetImport.stopHiveMiniCluster();
     }
 
     @Override
@@ -232,13 +232,13 @@ public class TestHiveServer2ParquetImport {
     return result;
   }
 
-  public static void beforeClass() {
+  public static void startHiveMiniCluster() {
     hiveMiniCluster = new HiveMiniCluster(new NoAuthenticationConfiguration());
     hiveMiniCluster.start();
     hiveServer2TestUtil = new HiveServer2TestUtil(hiveMiniCluster.getUrl());
   }
 
-  public static void afterClass() {
+  public static void stopHiveMiniCluster() {
     hiveMiniCluster.stop();
   }
 
