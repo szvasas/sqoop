@@ -409,7 +409,7 @@ public class TestHiveImport extends ImportJobTestCase {
     thrown.expectMessage(KiteParquetUtils.INCOMPATIBLE_AVRO_SCHEMA_MSG + KiteParquetUtils.HIVE_INCOMPATIBLE_AVRO_SCHEMA_MSG);
 
     Configuration conf = getConf();
-    conf.set(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE);
+    
     SqoopOptions sqoopOptions = getSqoopOptions(conf);
     sqoopOptions.setThrowOnError(true);
     Sqoop sqoop = new Sqoop(new ImportTool(), conf, sqoopOptions);
@@ -462,13 +462,11 @@ public class TestHiveImport extends ImportJobTestCase {
     setNumCols(3);
     String [] extraArgs = {"--as-parquetfile", "--create-hive-table"};
     ImportTool tool = new ImportTool();
-    Configuration conf = getConf();
-    conf.set(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE);
 
     thrown.expect(InvalidOptionsException.class);
     thrown.reportMissingExceptionWithMessage("Expected InvalidOptionsException during Hive table creation with " +
         "--as-parquetfile");
-    tool.validateOptions(tool.parseArguments(getArgv(false, extraArgs), conf,
+    tool.validateOptions(tool.parseArguments(getArgv(false, extraArgs), getConf(),
         null, true));
   }
 
@@ -738,4 +736,10 @@ public class TestHiveImport extends ImportJobTestCase {
         getCreateTableArgv(false, moreArgs1), new CreateHiveTableTool());
   }
 
+  @Override
+  protected Configuration getConf() {
+    Configuration conf = super.getConf();
+    conf.set(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE);
+    return conf;
+  }
 }
