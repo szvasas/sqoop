@@ -25,7 +25,9 @@ import org.apache.sqoop.testutil.ArgumentArrayBuilder;
 import org.apache.sqoop.testutil.HiveServer2TestUtil;
 import org.apache.sqoop.testutil.ImportJobTestCase;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -34,6 +36,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -62,21 +65,30 @@ public class TestHiveServer2ParquetImport extends ImportJobTestCase {
 
   private final String compressionCodec;
 
-  private HiveMiniCluster hiveMiniCluster;
+  private static HiveMiniCluster hiveMiniCluster;
 
-  private HiveServer2TestUtil hiveServer2TestUtil;
+  private static HiveServer2TestUtil hiveServer2TestUtil;
 
   public TestHiveServer2ParquetImport(String compressionCodec) {
     this.compressionCodec = compressionCodec;
+  }
+
+  @BeforeClass
+  public static void beforeClass() {
+    hiveMiniCluster = new HiveMiniCluster(new NoAuthenticationConfiguration());
+    hiveMiniCluster.start();
+    hiveServer2TestUtil = new HiveServer2TestUtil(hiveMiniCluster.getUrl());
+  }
+
+  @AfterClass
+  public static void afterClass() {
+    hiveMiniCluster.stop();
   }
 
   @Override
   @Before
   public void setUp() {
     super.setUp();
-    hiveMiniCluster = new HiveMiniCluster(new NoAuthenticationConfiguration());
-    hiveMiniCluster.start();
-    hiveServer2TestUtil = new HiveServer2TestUtil(hiveMiniCluster.getUrl());
 
     createTableWithColTypes(TEST_COLUMN_TYPES, toStringArray(TEST_COLUMN_VALUES));
   }
@@ -84,8 +96,13 @@ public class TestHiveServer2ParquetImport extends ImportJobTestCase {
   @Override
   @After
   public void tearDown() {
+    try {
+      dropTableIfExists(getTableName());
+    } catch (SQLException e) {
+      throw new RuntimeException();
+    }
+
     super.tearDown();
-    hiveMiniCluster.stop();
   }
 
   @Test
@@ -145,7 +162,6 @@ public class TestHiveServer2ParquetImport extends ImportJobTestCase {
   @Test
   public void testHiveImportAsParquetWhenTableExistsWithIncompatibleSchema() throws Exception {
     String hiveTableName = "hiveImportAsParquetWhenTableExistsWithIncompatibleSchema";
-    String incompatibleSchemaTableName = "incompatibleSchemaTable";
     String[] incompatibleSchemaTableTypes = {"INTEGER", "INTEGER", "INTEGER"};
     List<Object> incompatibleSchemaTableData = Arrays.<Object>asList(100, 200, 300);
 
@@ -155,10 +171,11 @@ public class TestHiveServer2ParquetImport extends ImportJobTestCase {
 
     runImport(args);
 
-    setCurTableName(incompatibleSchemaTableName);
+    // We make sure we create a new table in the test RDBMS.
+    incrementTableNum();
     createTableWithColTypes(incompatibleSchemaTableTypes, toStringArray(incompatibleSchemaTableData));
 
-    // Recreate the argument array to pick up the new current table name.
+    // Recreate the argument array to pick up the new RDBMS table name.
     args = commonArgs()
         .withOption("hive-table", hiveTableName)
         .build();
