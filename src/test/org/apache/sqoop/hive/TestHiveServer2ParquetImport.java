@@ -29,6 +29,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -40,7 +43,13 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+@RunWith(Parameterized.class)
 public class TestHiveServer2ParquetImport extends ImportJobTestCase {
+
+  @Parameters(name = "compressionCodec = {0}")
+  public static Iterable<? extends Object> authenticationParameters() {
+    return Arrays.asList("snappy", "gzip");
+  }
 
   private static final String[] TEST_COLUMN_TYPES = {"VARCHAR(32)", "INTEGER", "CHAR(64)"};
 
@@ -51,9 +60,15 @@ public class TestHiveServer2ParquetImport extends ImportJobTestCase {
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
+  private final String compressionCodec;
+
   private HiveMiniCluster hiveMiniCluster;
 
   private HiveServer2TestUtil hiveServer2TestUtil;
+
+  public TestHiveServer2ParquetImport(String compressionCodec) {
+    this.compressionCodec = compressionCodec;
+  }
 
   @Override
   @Before
@@ -115,6 +130,7 @@ public class TestHiveServer2ParquetImport extends ImportJobTestCase {
   }
 
   @Test
+  // TODO: this gives a bit different error message than the Kite one, it should be fixed.
   public void testCreateHiveImportAsParquet() throws Exception {
     String[] args = commonArgs()
         .withOption("create-hive-table")
@@ -159,7 +175,8 @@ public class TestHiveServer2ParquetImport extends ImportJobTestCase {
         .withOption("hs2-url", hiveMiniCluster.getUrl())
         .withOption("split-by", getColName(1))
         .withOption("as-parquetfile")
-        .withOption("delete-target-dir");
+        .withOption("delete-target-dir")
+        .withOption("compression-codec", compressionCodec);
   }
 
   private String[] toStringArray(List<Object> columnValues) {
