@@ -20,23 +20,29 @@ package org.apache.sqoop.hive;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
 
+import org.apache.avro.Schema;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.sqoop.avro.AvroUtil;
 import org.apache.sqoop.io.CodecMap;
 
 import org.apache.sqoop.SqoopOptions;
 import org.apache.sqoop.manager.ConnManager;
 import org.apache.sqoop.util.FileSystemUtil;
+
+import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_AVRO_SCHEMA_KEY;
 
 /**
  * Creates (Hive-specific) SQL DDL statements to create tables to hold data
@@ -108,6 +114,7 @@ public class TableDefWriter {
     }
 
     String [] colNames = getColumnNames();
+    Map<String, Schema.Type> columnNameToAvroType = getColumnNameToAvroTypeMapping(colNames);
     StringBuilder sb = new StringBuilder();
     if (options.doFailIfHiveTableExists()) {
       if (isHiveExternalTableSet) {
@@ -159,21 +166,17 @@ public class TableDefWriter {
       first = false;
 
       Integer colType = columnTypes.get(col);
-      String hiveColType = userMapping.getProperty(col);
-      if (hiveColType == null) {
-        hiveColType = connManager.toHiveType(inputTableName, col, colType);
-      }
-      if (null == hiveColType) {
-        throw new IOException("Hive does not support the SQL type for column "
-            + col);
+      String hiveColType;
+      if (options.getFileLayout() == SqoopOptions.FileLayout.TextFile) {
+        hiveColType = getHiveColumnTypeForTextTable(userMapping, col, colType);
+      } else if (options.getFileLayout() == SqoopOptions.FileLayout.ParquetFile) {
+        hiveColType = HiveTypes.toHiveType(columnNameToAvroType.get(col));
+      } else {
+        throw new RuntimeException("File format is not supported for Hive tables.");
       }
 
       sb.append('`').append(col).append("` ").append(hiveColType);
 
-      if (HiveTypes.isHiveTypeImprovised(colType)) {
-        LOG.warn(
-            "Column " + col + " had to be cast to a less precise type in Hive");
-      }
     }
 
     sb.append(") ");
@@ -216,6 +219,51 @@ public class TableDefWriter {
 
     LOG.debug("Create statement: " + sb.toString());
     return sb.toString();
+  }
+
+  private Map<String, Schema.Type> getColumnNameToAvroTypeMapping(String[] colNames) {
+    if (options.getFileLayout() != SqoopOptions.FileLayout.ParquetFile) {
+      return Collections.emptyMap();
+    }
+    Map<String, Schema.Type> result = new HashMap<>();
+    Schema avroSchema = getAvroSchema();
+    // TODO: does this work correctly if we have only 1 column?
+    for (Schema.Field field : avroSchema.getFields()) {
+      result.put(field.getProp("columnName"), getNonNullAvroType(field.schema()));
+    }
+
+    return result;
+  }
+
+  private Schema.Type getNonNullAvroType(Schema schema) {
+    if (schema.getType() != Schema.Type.UNION) {
+      return schema.getType();
+    }
+
+    for (Schema subSchema : schema.getTypes()) {
+      if (subSchema.getType() != Schema.Type.NULL) {
+        return subSchema.getType();
+      }
+    }
+
+    return null;
+  }
+  
+  private String getHiveColumnTypeForTextTable(Properties userMapping, String columnName, Integer columnType) throws IOException {
+    String hiveColType = userMapping.getProperty(columnName);
+    if (hiveColType == null) {
+      hiveColType = connManager.toHiveType(inputTableName, columnName, columnType);
+    }
+    if (null == hiveColType) {
+      throw new IOException("Hive does not support the SQL type for column "
+          + columnName);
+    }
+
+    if (HiveTypes.isHiveTypeImprovised(columnType)) {
+      LOG.warn(
+          "Column " + columnName + " had to be cast to a less precise type in Hive");
+    }
+    return hiveColType;
   }
 
   /**
@@ -323,6 +371,11 @@ public class TableDefWriter {
 
   boolean isCommentsEnabled() {
     return commentsEnabled;
+  }
+
+  Schema getAvroSchema() {
+    String schemaString = options.getConf().get(SQOOP_PARQUET_AVRO_SCHEMA_KEY);
+    return AvroUtil.parseAvroSchema(schemaString);
   }
 }
 
