@@ -68,12 +68,12 @@ public class TestHiveServer2ParquetImport {
 
     @BeforeClass
     public static void beforeClass() {
-      TestHiveServer2ParquetImport.startHiveMiniCluster();
+      startHiveMiniCluster();
     }
 
     @AfterClass
     public static void afterClass() {
-      TestHiveServer2ParquetImport.stopHiveMiniCluster();
+      stopHiveMiniCluster();
     }
 
     private final String compressionCodec;
@@ -110,12 +110,12 @@ public class TestHiveServer2ParquetImport {
 
     @BeforeClass
     public static void beforeClass() {
-      TestHiveServer2ParquetImport.startHiveMiniCluster();
+      startHiveMiniCluster();
     }
 
     @AfterClass
     public static void afterClass() {
-      TestHiveServer2ParquetImport.stopHiveMiniCluster();
+      stopHiveMiniCluster();
     }
 
     @Override
