@@ -26,18 +26,23 @@ public final class ParquetJobConfiguratorFactoryProvider {
 
   public static final String PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY = "sqoop.parquet.job.implementation";
 
+  public static final String PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP = "hadoop";
+
   public static final String PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE = "kite";
 
   private ParquetJobConfiguratorFactoryProvider() {
     throw new AssertionError("This class is meant for static use only.");
   }
 
+  // TODO [szvasas]: add logging
   public static ParquetJobConfiguratorFactory createParquetJobConfiguratorFactory(Configuration configuration) {
     String implementation = configuration.get(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY);
-    if (PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE.equalsIgnoreCase(implementation)) {
+    if (PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP.equalsIgnoreCase(implementation)) {
+      return new HadoopParquetJobConfiguratorFactory();
+    } else if (PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE.equalsIgnoreCase(implementation)) {
       return new KiteParquetJobConfiguratorFactory();
     } else {
-      return new HadoopParquetJobConfiguratorFactory();
+      throw new RuntimeException("Parquet job configurator implementation is set. Please make sure you set " + PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY + ".");
     }
   }
 

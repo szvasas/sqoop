@@ -51,7 +51,10 @@ import org.apache.sqoop.tool.SqoopTool;
 import org.apache.sqoop.util.RandomHash;
 import org.apache.sqoop.util.StoredAsProperty;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.sqoop.Sqoop.SQOOP_RETHROW_PROPERTY;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE;
 import static org.apache.sqoop.orm.ClassWriter.toJavaIdentifier;
 
 /**
@@ -1152,6 +1155,10 @@ public class SqoopOptions implements Cloneable {
 
     // set escape column mapping to true
     this.escapeColumnMappingEnabled = true;
+
+    if (isBlank(getConf().get(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY))) {
+      getConf().set(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE);
+    }
   }
 
   /**
