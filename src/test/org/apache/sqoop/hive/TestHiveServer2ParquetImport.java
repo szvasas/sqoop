@@ -40,6 +40,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP;
 import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.junit.Assert.assertEquals;
@@ -208,7 +209,7 @@ public class TestHiveServer2ParquetImport {
 
   private static ArgumentArrayBuilder commonArgs(String connectString, String tableName) {
     return new ArgumentArrayBuilder()
-        .withProperty(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, "hadoop")
+        .withProperty(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP)
         .withOption("connect", connectString)
         .withOption("table", tableName)
         .withOption("hive-import")
