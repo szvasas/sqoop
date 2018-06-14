@@ -52,6 +52,9 @@ import org.apache.sqoop.util.ParquetReader;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE;
 import static org.junit.Assert.fail;
 
 /**
@@ -80,6 +83,8 @@ public class TestMerge extends BaseSqoopTestCase {
       Arrays.asList(new Integer(1), new Integer(43)),
       Arrays.asList(new Integer(3), new Integer(313)));
 
+  private String parquetJobConfiguratorImplementation = StringUtils.EMPTY; 
+
   @Before
   public void setUp() {
     super.setUp();
@@ -103,6 +108,7 @@ public class TestMerge extends BaseSqoopTestCase {
       conf.set(CommonArgs.FS_DEFAULT_NAME, CommonArgs.LOCAL_FS);
     }
     conf.set("mapred.job.tracker", "local");
+    conf.set(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, parquetJobConfiguratorImplementation);
     return conf;
   }
 
@@ -157,7 +163,14 @@ public class TestMerge extends BaseSqoopTestCase {
   }
 
   @Test
-  public void testParquetFileMerge() throws Exception {
+  public void testParquetFileMergeHadoop() throws Exception {
+    parquetJobConfiguratorImplementation = PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP;
+    runMergeTest(SqoopOptions.FileLayout.ParquetFile);
+  }
+  
+  @Test
+  public void testParquetFileMergeKite() throws Exception {
+    parquetJobConfiguratorImplementation = PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE;
     runMergeTest(SqoopOptions.FileLayout.ParquetFile);
   }
 
