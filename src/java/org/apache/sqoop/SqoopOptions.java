@@ -1102,9 +1102,9 @@ public class SqoopOptions implements Cloneable {
     this.fetchSize = null;
 
     if (null == baseConfiguration) {
-      this.conf = new Configuration();
+      this.setConf(new Configuration());
     } else {
-      this.conf = baseConfiguration;
+      this.setConf(baseConfiguration);
     }
 
     this.extraArgs = null;
@@ -1155,10 +1155,6 @@ public class SqoopOptions implements Cloneable {
 
     // set escape column mapping to true
     this.escapeColumnMappingEnabled = true;
-
-    if (isBlank(getConf().get(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY))) {
-      getConf().set(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE);
-    }
   }
 
   /**
@@ -2126,6 +2122,7 @@ public class SqoopOptions implements Cloneable {
 
   public void setConf(Configuration config) {
     this.conf = config;
+    ensureDefaultConfigurations(this.conf);
   }
 
   /**
@@ -2932,5 +2929,13 @@ public class SqoopOptions implements Cloneable {
     this.hs2Keytab = hs2Keytab;
   }
 
+  private void ensureDefaultConfigurations(Configuration config) {
+    if (config == null) {
+      return;
+    }
+    if (isBlank(config.get(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY))) {
+      config.set(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE);
+    }
+  }
 }
 
