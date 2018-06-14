@@ -352,6 +352,9 @@ public final class AvroUtil {
 
   public static Schema getAvroSchemaFromParquetFile(Path path, Configuration conf) throws IOException {
     Path fileToTest = getFileToTest(path, conf);
+    if (fileToTest == null) {
+      return null;
+    }
     ParquetMetadata parquetMetadata = ParquetFileReader.readFooter(conf, fileToTest, ParquetMetadataConverter.NO_FILTER);
 
     MessageType parquetSchema = parquetMetadata.getFileMetaData().getSchema();

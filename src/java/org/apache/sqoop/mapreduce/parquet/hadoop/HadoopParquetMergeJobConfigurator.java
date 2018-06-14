@@ -32,6 +32,7 @@ import parquet.avro.AvroParquetInputFormat;
 
 import java.io.IOException;
 
+import static org.apache.sqoop.avro.AvroUtil.getAvroSchemaFromParquetFile;
 import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_AVRO_SCHEMA_KEY;
 
 public class HadoopParquetMergeJobConfigurator implements ParquetMergeJobConfigurator {
@@ -61,20 +62,38 @@ public class HadoopParquetMergeJobConfigurator implements ParquetMergeJobConfigu
       job.setReducerClass(HadoopMergeParquetReducer.class);
       job.setOutputValueClass(GenericRecord.class);
 
-      Schema oldPathAvroSchema = AvroUtil.getAvroSchemaFromParquetFile(oldPath, conf);
-      Schema newPathAvroSchema = AvroUtil.getAvroSchemaFromParquetFile(newPath, conf);
+      Schema avroSchema = loadAvroSchema(conf, oldPath);
 
-      // TODO: schema comparison?
-      // TODO: compression codec?
+      validateNewPathAvroSchema(getAvroSchemaFromParquetFile(newPath, conf), avroSchema);
+      
       job.setInputFormatClass(exportJobConfigurator.getInputFormatClass());
-      AvroParquetInputFormat.setAvroReadSchema(job, oldPathAvroSchema);
+      AvroParquetInputFormat.setAvroReadSchema(job, avroSchema);
 
-      conf.set(SQOOP_PARQUET_AVRO_SCHEMA_KEY, oldPathAvroSchema.toString());
-      importJobConfigurator.configureAvroSchema(job, oldPathAvroSchema);
+      conf.set(SQOOP_PARQUET_AVRO_SCHEMA_KEY, avroSchema.toString());
+      importJobConfigurator.configureAvroSchema(job, avroSchema);
+      importJobConfigurator.configureOutputCodec(job);
       job.setOutputFormatClass(importJobConfigurator.getOutputFormatClass());
     } catch (Exception cnfe) {
       throw new IOException(cnfe);
     }
+  }
+
+  private Schema loadAvroSchema(Configuration conf, Path path) throws IOException {
+    Schema avroSchema = getAvroSchemaFromParquetFile(path, conf);
+
+    if (avroSchema == null) {
+      throw new RuntimeException("Could not load Avro schema from path: " + path);
+    }
+
+    return avroSchema;
+  }
+
+  private void validateNewPathAvroSchema(Schema newPathAvroSchema, Schema avroSchema) {
+    if (newPathAvroSchema == null) {
+      return;
+    }
+    
+    // TODO: use org.apache.avro.SchemaValidator here
   }
 
 }
