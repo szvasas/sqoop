@@ -19,19 +19,22 @@
 package org.apache.sqoop.mapreduce.parquet.hadoop;
 
 import org.apache.avro.Schema;
+import org.apache.avro.SchemaValidationException;
+import org.apache.avro.SchemaValidator;
+import org.apache.avro.SchemaValidatorBuilder;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.sqoop.avro.AvroUtil;
 import org.apache.sqoop.mapreduce.MergeParquetMapper;
 import org.apache.sqoop.mapreduce.parquet.ParquetMergeJobConfigurator;
 import parquet.avro.AvroParquetInputFormat;
 
 import java.io.IOException;
 
+import static java.util.Collections.singleton;
 import static org.apache.sqoop.avro.AvroUtil.getAvroSchemaFromParquetFile;
 import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_AVRO_SCHEMA_KEY;
 
@@ -65,7 +68,7 @@ public class HadoopParquetMergeJobConfigurator implements ParquetMergeJobConfigu
       Schema avroSchema = loadAvroSchema(conf, oldPath);
 
       validateNewPathAvroSchema(getAvroSchemaFromParquetFile(newPath, conf), avroSchema);
-      
+
       job.setInputFormatClass(exportJobConfigurator.getInputFormatClass());
       AvroParquetInputFormat.setAvroReadSchema(job, avroSchema);
 
@@ -90,10 +93,15 @@ public class HadoopParquetMergeJobConfigurator implements ParquetMergeJobConfigu
 
   private void validateNewPathAvroSchema(Schema newPathAvroSchema, Schema avroSchema) {
     if (newPathAvroSchema == null) {
+      // TODO: can this be null?
       return;
     }
-    
-    // TODO: use org.apache.avro.SchemaValidator here
+    SchemaValidator schemaValidator = new SchemaValidatorBuilder().validateAll();
+    try {
+      schemaValidator.validate(newPathAvroSchema, singleton(avroSchema));
+    } catch (SchemaValidationException e) {
+      throw new RuntimeException("Cannot merge files, the Avro schemas are not compatible.", e);
+    }
   }
 
 }
