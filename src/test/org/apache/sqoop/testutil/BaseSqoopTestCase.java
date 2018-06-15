@@ -627,4 +627,14 @@ public abstract class BaseSqoopTestCase {
 
     return ObjectArrays.concat(entries, moreEntries, String.class);
   }
+
+  protected void clearTable(String tableName) throws SQLException {
+    String truncateCommand = "DELETE FROM " + tableName;
+    Connection conn = getManager().getConnection();
+    try (PreparedStatement statement = conn.prepareStatement(truncateCommand)){
+      statement.executeUpdate();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }
