@@ -1,7 +1,6 @@
 package org.apache.sqoop;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.fs.Path;
 import org.apache.sqoop.testutil.ArgumentArrayBuilder;
 import org.apache.sqoop.testutil.ImportJobTestCase;
 import org.junit.Test;
@@ -48,7 +47,7 @@ public class TestParquetMerge extends ImportJobTestCase {
 
   @Test
   public void testVanillaMerge() throws Exception {
-    String[] args = commonArgs(getConnectString(), getTableName(), getWarehouseDir() + OLD_PATH).build();
+    String[] args = importArgs(getConnectString(), getTableName(), getWarehouseDir() + OLD_PATH).build();
     runImport(args);
 
     clearTable(getTableName());
@@ -57,13 +56,24 @@ public class TestParquetMerge extends ImportJobTestCase {
       insertIntoTable(TEST_COLUMN_TYPES, toStringArray(record));
     }
 
-    args = commonArgs(getConnectString(), getTableName(), getWarehouseDir() + NEW_PATH).build();
+    args = importArgs(getConnectString(), getTableName(), getWarehouseDir() + NEW_PATH).build();
     runImport(args);
 
 
   }
 
-  private static ArgumentArrayBuilder commonArgs(String connectString, String tableName, String targetDir) {
+  private static ArgumentArrayBuilder mergeArgs(String connectString, String tableName, String targetDir) {
+    return new ArgumentArrayBuilder()
+        .withProperty(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP)
+        .withOption("connect", connectString)
+        .withOption("table", tableName)
+        .withOption("num-mappers", "1")
+        .withOption("target-dir", targetDir)
+        .withOption("as-parquetfile")
+        .withOption("delete-target-dir");
+  }
+  
+  private static ArgumentArrayBuilder importArgs(String connectString, String tableName, String targetDir) {
     return new ArgumentArrayBuilder()
         .withProperty(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP)
         .withOption("connect", connectString)
