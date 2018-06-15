@@ -93,7 +93,6 @@ public class HadoopParquetMergeJobConfigurator implements ParquetMergeJobConfigu
 
   private void validateNewPathAvroSchema(Schema newPathAvroSchema, Schema avroSchema) {
     if (newPathAvroSchema == null) {
-      // TODO: can this be null?
       return;
     }
     SchemaValidator schemaValidator = new SchemaValidatorBuilder().mutualReadStrategy().validateAll();

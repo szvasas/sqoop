@@ -20,6 +20,7 @@ package org.apache.sqoop;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.sqoop.avro.AvroUtil;
 import org.apache.sqoop.testutil.ArgumentArrayBuilder;
 import org.apache.sqoop.testutil.ImportJobTestCase;
 import org.apache.sqoop.tool.ImportTool;
@@ -27,6 +28,7 @@ import org.apache.sqoop.util.ParquetReader;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import parquet.hadoop.metadata.CompressionCodecName;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -140,6 +142,23 @@ public class TestParquetIncrementalImportMerge extends ImportJobTestCase {
 
     expectedException.expectMessage("Cannot merge files, the Avro schemas are not compatible.");
     Sqoop.runSqoop(sqoop, args);
+  }
+
+  @Test
+  public void testMergedFilesHaveCorrectCodec() throws Exception {
+    String[] args = importArgs(getConnectString(), getTableName(), getTablePath().toString())
+        .withOption("compression-codec", "snappy")
+        .build();
+    runImport(args);
+
+    args = incrementalImportArgs(getConnectString(), getTableName(), getTablePath().toString(), getColName(3), getColName(0), INITIAL_RECORDS_TIMESTAMP)
+        .withOption("compression-codec", "gzip")
+        .build();
+
+    runImport(args);
+
+    CompressionCodecName compressionCodec = AvroUtil.getCompressionCodecFromParquetFile(getTablePath(), getConf());
+    assertEquals(CompressionCodecName.GZIP, compressionCodec);
   }
 
   private static ArgumentArrayBuilder importArgs(String connectString, String tableName, String targetDir) {
