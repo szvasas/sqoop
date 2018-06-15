@@ -96,7 +96,7 @@ public class HadoopParquetMergeJobConfigurator implements ParquetMergeJobConfigu
       // TODO: can this be null?
       return;
     }
-    SchemaValidator schemaValidator = new SchemaValidatorBuilder().validateAll();
+    SchemaValidator schemaValidator = new SchemaValidatorBuilder().mutualReadStrategy().validateAll();
     try {
       schemaValidator.validate(newPathAvroSchema, singleton(avroSchema));
     } catch (SchemaValidationException e) {
