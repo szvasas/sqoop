@@ -43,7 +43,6 @@ import org.apache.sqoop.orm.ClassWriter;
 import parquet.avro.AvroSchemaConverter;
 import parquet.format.converter.ParquetMetadataConverter;
 import parquet.hadoop.ParquetFileReader;
-import parquet.hadoop.metadata.CompressionCodecName;
 import parquet.hadoop.metadata.ParquetMetadata;
 import parquet.schema.MessageType;
 
@@ -352,31 +351,14 @@ public final class AvroUtil {
   }
 
   public static Schema getAvroSchemaFromParquetFile(Path path, Configuration conf) throws IOException {
-    ParquetMetadata parquetMetadata = getParquetMetadataFromFile(path, conf);
-    if (parquetMetadata == null) {
-      return null;
-    }
-
-    MessageType parquetSchema = parquetMetadata.getFileMetaData().getSchema();
-    AvroSchemaConverter avroSchemaConverter = new AvroSchemaConverter();
-    return avroSchemaConverter.convert(parquetSchema);
-  }
-
-  public static CompressionCodecName getCompressionCodecFromParquetFile(Path path, Configuration conf) throws IOException {
-    ParquetMetadata parquetMetadata = getParquetMetadataFromFile(path, conf);
-    if (parquetMetadata == null) {
-      return null;
-    }
-
-    return parquetMetadata.getBlocks().get(0).getColumns().get(0).getCodec();
-  }
-
-  public static ParquetMetadata getParquetMetadataFromFile(Path path, Configuration conf) throws IOException {
     Path fileToTest = getFileToTest(path, conf);
     if (fileToTest == null) {
       return null;
     }
+    ParquetMetadata parquetMetadata = ParquetFileReader.readFooter(conf, fileToTest, ParquetMetadataConverter.NO_FILTER);
 
-    return ParquetFileReader.readFooter(conf, fileToTest, ParquetMetadataConverter.NO_FILTER);
+    MessageType parquetSchema = parquetMetadata.getFileMetaData().getSchema();
+    AvroSchemaConverter avroSchemaConverter = new AvroSchemaConverter();
+    return avroSchemaConverter.convert(parquetSchema);
   }
 }

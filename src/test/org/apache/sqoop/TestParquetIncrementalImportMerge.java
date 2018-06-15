@@ -157,7 +157,7 @@ public class TestParquetIncrementalImportMerge extends ImportJobTestCase {
 
     runImport(args);
 
-    CompressionCodecName compressionCodec = AvroUtil.getCompressionCodecFromParquetFile(getTablePath(), getConf());
+    CompressionCodecName compressionCodec = new ParquetReader(getTablePath()).getCodec();
     assertEquals(CompressionCodecName.GZIP, compressionCodec);
   }
 

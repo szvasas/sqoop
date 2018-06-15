@@ -20,15 +20,25 @@ package org.apache.sqoop.util;
 
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import parquet.avro.AvroParquetReader;
+import parquet.hadoop.Footer;
+import parquet.hadoop.ParquetFileReader;
+import parquet.hadoop.metadata.BlockMetaData;
+import parquet.hadoop.metadata.ColumnChunkMetaData;
+import parquet.hadoop.metadata.CompressionCodecName;
+import parquet.hadoop.util.HiddenFileFilter;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.apache.sqoop.util.FileSystemUtil.isFile;
@@ -93,6 +103,31 @@ public class ParquetReader implements AutoCloseable {
     }
 
     return result;
+  }
+
+  public CompressionCodecName getCodec() throws Exception {
+    FileSystem fs = pathToRead.getFileSystem(configuration);
+    List<FileStatus> statuses = Arrays.asList(fs.listStatus(pathToRead, HiddenFileFilter.INSTANCE));
+    List<Footer> footers = ParquetFileReader.readAllFootersInParallelUsingSummaryFiles(configuration, statuses, false);
+    Iterator<Footer> footersIterator = footers.iterator();
+    if (footersIterator.hasNext()) {
+      Footer footer = footersIterator.next();
+
+      Iterator<BlockMetaData> blockMetaDataIterator = footer.getParquetMetadata().getBlocks().iterator();
+      if (blockMetaDataIterator.hasNext()) {
+        BlockMetaData blockMetaData = blockMetaDataIterator.next();
+
+        Iterator<ColumnChunkMetaData> columnChunkMetaDataIterator = blockMetaData.getColumns().iterator();
+
+        if (columnChunkMetaDataIterator.hasNext()) {
+          ColumnChunkMetaData columnChunkMetaData = columnChunkMetaDataIterator.next();
+
+          return columnChunkMetaData.getCodec();
+        }
+      }
+    }
+
+    return null;
   }
 
   private String convertToCsv(GenericRecord record) {
