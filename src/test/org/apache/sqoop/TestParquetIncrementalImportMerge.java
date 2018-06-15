@@ -20,7 +20,6 @@ package org.apache.sqoop;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.sqoop.avro.AvroUtil;
 import org.apache.sqoop.testutil.ArgumentArrayBuilder;
 import org.apache.sqoop.testutil.ImportJobTestCase;
 import org.apache.sqoop.tool.ImportTool;
@@ -32,6 +31,7 @@ import parquet.hadoop.metadata.CompressionCodecName;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -51,16 +51,16 @@ public class TestParquetIncrementalImportMerge extends ImportJobTestCase {
 
   private static final String NEW_RECORDS_TIMESTAMP = "2018-06-14 16:00:00.000";
 
-  private static final List<List<?>> INITIAL_RECORDS = asList(
-      asList(2006, "Germany", "Italy", INITIAL_RECORDS_TIMESTAMP),
-      asList(2014, "Brazil", "Hungary", INITIAL_RECORDS_TIMESTAMP)
+  private static final List<List<Object>> INITIAL_RECORDS = Arrays.<List<Object>>asList(
+      Arrays.<Object>asList(2006, "Germany", "Italy", INITIAL_RECORDS_TIMESTAMP),
+      Arrays.<Object>asList(2014, "Brazil", "Hungary", INITIAL_RECORDS_TIMESTAMP)
   );
 
-  private static final List<?> ALTERNATIVE_INITIAL_RECORD = asList(1, 2, 3, INITIAL_RECORDS_TIMESTAMP);
+  private static final List<Object> ALTERNATIVE_INITIAL_RECORD = Arrays.<Object>asList(1, 2, 3, INITIAL_RECORDS_TIMESTAMP);
 
-  private static final List<List<?>> NEW_RECORDS = asList(
-      asList(2010, "South Africa", "Spain", NEW_RECORDS_TIMESTAMP),
-      asList(2014, "Brazil", "Germany", NEW_RECORDS_TIMESTAMP)
+  private static final List<List<Object>> NEW_RECORDS = Arrays.<List<Object>>asList(
+      Arrays.<Object>asList(2010, "South Africa", "Spain", NEW_RECORDS_TIMESTAMP),
+      Arrays.<Object>asList(2014, "Brazil", "Germany", NEW_RECORDS_TIMESTAMP)
   );
 
   private static final List<String> EXPECTED_MERGED_RECORDS = asList(
