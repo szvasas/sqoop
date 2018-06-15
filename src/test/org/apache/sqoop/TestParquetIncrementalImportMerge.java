@@ -19,10 +19,14 @@
 package org.apache.sqoop;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.sqoop.testutil.ArgumentArrayBuilder;
 import org.apache.sqoop.testutil.ImportJobTestCase;
+import org.apache.sqoop.tool.ImportTool;
 import org.apache.sqoop.util.ParquetReader;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,6 +34,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.sort;
+import static org.apache.sqoop.Sqoop.SQOOP_RETHROW_PROPERTY;
 import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP;
 import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
 import static org.junit.Assert.assertEquals;
@@ -38,25 +43,37 @@ public class TestParquetIncrementalImportMerge extends ImportJobTestCase {
 
   private static final String[] TEST_COLUMN_TYPES = {"INTEGER", "VARCHAR(32)", "CHAR(64)", "TIMESTAMP"};
 
+  private static final String[] ALTERNATIVE_TEST_COLUMN_TYPES = {"INTEGER", "INTEGER", "INTEGER", "TIMESTAMP"};
+
   private static final String INITIAL_RECORDS_TIMESTAMP = "2018-06-14 15:00:00.000";
 
   private static final String NEW_RECORDS_TIMESTAMP = "2018-06-14 16:00:00.000";
 
   private static final List<List<?>> INITIAL_RECORDS = asList(
-      asList(2014, "Brazil", "Hungary", INITIAL_RECORDS_TIMESTAMP),
-      asList(2006, "Germany", "Italy", INITIAL_RECORDS_TIMESTAMP)
+      asList(2006, "Germany", "Italy", INITIAL_RECORDS_TIMESTAMP),
+      asList(2014, "Brazil", "Hungary", INITIAL_RECORDS_TIMESTAMP)
   );
+
+  private static final List<?> ALTERNATIVE_INITIAL_RECORD = asList(1, 2, 3, INITIAL_RECORDS_TIMESTAMP);
 
   private static final List<List<?>> NEW_RECORDS = asList(
-      asList(2014, "Brazil", "Germany", NEW_RECORDS_TIMESTAMP),
-      asList(2010, "South Africa", "Spain", NEW_RECORDS_TIMESTAMP)
+      asList(2010, "South Africa", "Spain", NEW_RECORDS_TIMESTAMP),
+      asList(2014, "Brazil", "Germany", NEW_RECORDS_TIMESTAMP)
   );
 
-  private static final List<String> EXPECTED_RECORDS = asList(
+  private static final List<String> EXPECTED_MERGED_RECORDS = asList(
       "2006,Germany,Italy," + timeFromString(INITIAL_RECORDS_TIMESTAMP),
       "2010,South Africa,Spain," + timeFromString(NEW_RECORDS_TIMESTAMP),
       "2014,Brazil,Germany," + timeFromString(NEW_RECORDS_TIMESTAMP)
   );
+
+  private static final List<String> EXPECTED_INITIAL_RECORDS = asList(
+      "2006,Germany,Italy," + timeFromString(INITIAL_RECORDS_TIMESTAMP),
+      "2014,Brazil,Hungary," + timeFromString(INITIAL_RECORDS_TIMESTAMP)
+  );
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Override
   public void setUp() {
@@ -70,7 +87,7 @@ public class TestParquetIncrementalImportMerge extends ImportJobTestCase {
 
   @Test
   public void testVanillaMerge() throws Exception {
-    String[] args = importArgs(getConnectString(), getTableName(), getWarehouseDir()).build();
+    String[] args = importArgs(getConnectString(), getTableName(), getTablePath().toString()).build();
     runImport(args);
 
     clearTable(getTableName());
@@ -79,28 +96,65 @@ public class TestParquetIncrementalImportMerge extends ImportJobTestCase {
       insertIntoTable(TEST_COLUMN_TYPES, toStringArray(record));
     }
 
-    args = incrementalImportArgs(getConnectString(), getTableName(), getWarehouseDir(), getColName(3), getColName(0), INITIAL_RECORDS_TIMESTAMP).build();
+    args = incrementalImportArgs(getConnectString(), getTableName(), getTablePath().toString(), getColName(3), getColName(0), INITIAL_RECORDS_TIMESTAMP).build();
 
     runImport(args);
 
     List<String> result = new ParquetReader(getTablePath()).readAllInCsv();
     sort(result);
-    
-    assertEquals(EXPECTED_RECORDS, result);
+
+    assertEquals(EXPECTED_MERGED_RECORDS, result);
   }
 
-  private static ArgumentArrayBuilder importArgs(String connectString, String tableName, String warehouseDir) {
+  @Test
+  public void testMergeWhenTheIncrementalImportDoesNotImportAnyRows() throws Exception {
+    String[] args = importArgs(getConnectString(), getTableName(), getTablePath().toString()).build();
+    runImport(args);
+
+    clearTable(getTableName());
+
+    args = incrementalImportArgs(getConnectString(), getTableName(), getTablePath().toString(), getColName(3), getColName(0), INITIAL_RECORDS_TIMESTAMP).build();
+
+    runImport(args);
+
+    List<String> result = new ParquetReader(getTablePath()).readAllInCsv();
+    sort(result);
+
+    assertEquals(EXPECTED_INITIAL_RECORDS, result);
+  }
+
+  @Test
+  public void testMergeWithIncompatibleSchemas() throws Exception {
+    System.setProperty(SQOOP_RETHROW_PROPERTY, "true");
+    String targetDir = getWarehouseDir() + "/testMergeWithIncompatibleSchemas";
+    String[] args = importArgs(getConnectString(), getTableName(), targetDir).build();
+    runImport(args);
+
+    incrementTableNum();
+    createTableWithColTypes(ALTERNATIVE_TEST_COLUMN_TYPES, toStringArray(ALTERNATIVE_INITIAL_RECORD));
+
+    args = incrementalImportArgs(getConnectString(), getTableName(), targetDir, getColName(3), getColName(0), INITIAL_RECORDS_TIMESTAMP).build();
+
+    SqoopOptions opts = getSqoopOptions(getConf());
+    Sqoop sqoop = new Sqoop(new ImportTool(), getConf(), opts);
+
+    expectedException.expectMessage("Cannot merge files, the Avro schemas are not compatible.");
+    Sqoop.runSqoop(sqoop, args);
+  }
+
+  private static ArgumentArrayBuilder importArgs(String connectString, String tableName, String targetDir) {
     return new ArgumentArrayBuilder()
         .withProperty(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP)
         .withOption("connect", connectString)
         .withOption("table", tableName)
         .withOption("num-mappers", "1")
-        .withOption("warehouse-dir", warehouseDir)
-        .withOption("as-parquetfile");
+        .withOption("target-dir", targetDir)
+        .withOption("as-parquetfile")
+        .withOption("throw-on-error");
   }
 
-  private static ArgumentArrayBuilder incrementalImportArgs(String connectString, String tableName, String warehouseDir, String checkColumn, String mergeKey, String lastValue) {
-    return importArgs(connectString, tableName, warehouseDir)
+  private static ArgumentArrayBuilder incrementalImportArgs(String connectString, String tableName, String targetDir, String checkColumn, String mergeKey, String lastValue) {
+    return importArgs(connectString, tableName, targetDir)
         .withOption("incremental", "lastmodified")
         .withOption("check-column", checkColumn)
         .withOption("merge-key", mergeKey)
@@ -128,5 +182,12 @@ public class TestParquetIncrementalImportMerge extends ImportJobTestCase {
     }
 
     return result;
+  }
+
+  @Override
+  protected SqoopOptions getSqoopOptions(Configuration conf) {
+    SqoopOptions sqoopOptions = super.getSqoopOptions(conf);
+    sqoopOptions.setThrowOnError(true);
+    return sqoopOptions;
   }
 }
