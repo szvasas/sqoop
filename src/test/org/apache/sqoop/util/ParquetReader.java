@@ -34,13 +34,13 @@ import parquet.hadoop.util.HiddenFileFilter;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static org.apache.sqoop.util.FileSystemUtil.isFile;
 import static org.apache.sqoop.util.FileSystemUtil.listFiles;
 
@@ -105,10 +105,9 @@ public class ParquetReader implements AutoCloseable {
     return result;
   }
 
-  public CompressionCodecName getCodec() throws Exception {
-    FileSystem fs = pathToRead.getFileSystem(configuration);
-    List<FileStatus> statuses = Arrays.asList(fs.listStatus(pathToRead, HiddenFileFilter.INSTANCE));
-    List<Footer> footers = ParquetFileReader.readAllFootersInParallelUsingSummaryFiles(configuration, statuses, false);
+  public CompressionCodecName getCodec() {
+    List<Footer> footers = getFooters();
+
     Iterator<Footer> footersIterator = footers.iterator();
     if (footersIterator.hasNext()) {
       Footer footer = footersIterator.next();
@@ -128,6 +127,18 @@ public class ParquetReader implements AutoCloseable {
     }
 
     return null;
+  }
+
+  private List<Footer> getFooters() {
+    final List<Footer> footers;
+    try {
+      FileSystem fs = pathToRead.getFileSystem(configuration);
+      List<FileStatus> statuses = asList(fs.listStatus(pathToRead, HiddenFileFilter.INSTANCE));
+      footers = ParquetFileReader.readAllFootersInParallelUsingSummaryFiles(configuration, statuses, false);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return footers;
   }
 
   private String convertToCsv(GenericRecord record) {
