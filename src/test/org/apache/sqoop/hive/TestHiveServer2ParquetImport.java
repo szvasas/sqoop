@@ -242,5 +242,4 @@ public class TestHiveServer2ParquetImport {
   public static void stopHiveMiniCluster() {
     hiveMiniCluster.stop();
   }
-
 }

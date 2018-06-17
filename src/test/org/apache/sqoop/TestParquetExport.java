@@ -65,7 +65,7 @@ import static parquet.hadoop.metadata.CompressionCodecName.SNAPPY;
 public class TestParquetExport extends ExportJobTestCase {
 
   @Parameterized.Parameters(name = "parquetImplementation = {0}")
-  public static Iterable<? extends Object> authenticationParameters() {
+  public static Iterable<? extends Object> parquetImplementationParameters() {
     return Arrays.asList(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP);
   }
 

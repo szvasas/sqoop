@@ -70,7 +70,7 @@ public class TestParquetImport extends ImportJobTestCase {
       .getLog(TestParquetImport.class.getName());
 
   @Parameters(name = "parquetImplementation = {0}")
-  public static Iterable<? extends Object> authenticationParameters() {
+  public static Iterable<? extends Object> parquetImplementationParameters() {
     return Arrays.asList(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP);
   }
 

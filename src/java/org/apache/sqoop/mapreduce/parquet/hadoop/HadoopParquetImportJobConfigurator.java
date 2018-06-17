@@ -33,7 +33,6 @@ import java.io.IOException;
 
 import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_OUTPUT_CODEC_KEY;
 
-
 public class HadoopParquetImportJobConfigurator implements ParquetImportJobConfigurator {
 
   @Override
