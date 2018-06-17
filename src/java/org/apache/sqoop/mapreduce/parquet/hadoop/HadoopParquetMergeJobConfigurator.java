@@ -34,6 +34,7 @@ import parquet.avro.AvroParquetInputFormat;
 
 import java.io.IOException;
 
+import static java.lang.String.format;
 import static java.util.Collections.singleton;
 import static org.apache.sqoop.avro.AvroUtil.getAvroSchemaFromParquetFile;
 import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_AVRO_SCHEMA_KEY;
@@ -88,12 +89,19 @@ public class HadoopParquetMergeJobConfigurator implements ParquetMergeJobConfigu
       throw new RuntimeException("Could not load Avro schema from path: " + path);
     }
 
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Avro schema loaded: " + avroSchema);
+    }
+
     return avroSchema;
   }
 
   private void validateNewPathAvroSchema(Schema newPathAvroSchema, Schema avroSchema) {
     if (newPathAvroSchema == null) {
       return;
+    }
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(format("Validation Avro schema %s against %s", newPathAvroSchema.toString(), avroSchema.toString()));
     }
     SchemaValidator schemaValidator = new SchemaValidatorBuilder().mutualReadStrategy().validateAll();
     try {

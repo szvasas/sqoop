@@ -19,6 +19,8 @@
 package org.apache.sqoop.mapreduce.parquet.hadoop;
 
 import org.apache.avro.Schema;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -34,6 +36,8 @@ import java.io.IOException;
 import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_OUTPUT_CODEC_KEY;
 
 public class HadoopParquetImportJobConfigurator implements ParquetImportJobConfigurator {
+
+  private static final Log LOG = LogFactory.getLog(HadoopParquetImportJobConfigurator.class.getName());
 
   @Override
   public void configureMapper(Job job, Schema schema, SqoopOptions options, String tableName, Path destination) throws IOException {
@@ -59,11 +63,15 @@ public class HadoopParquetImportJobConfigurator implements ParquetImportJobConfi
   void configureOutputCodec(Job job) {
     String outputCodec = job.getConfiguration().get(SQOOP_PARQUET_OUTPUT_CODEC_KEY);
     if (outputCodec != null) {
+      LOG.info("Using output codec: " + outputCodec);
       ParquetOutputFormat.setCompression(job, CompressionCodecName.fromConf(outputCodec));
     }
   }
 
   void configureAvroSchema(Job job, Schema schema) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Using Avro schema: " + schema);
+    }
     AvroParquetOutputFormat.setSchema(job, schema);
   }
 }

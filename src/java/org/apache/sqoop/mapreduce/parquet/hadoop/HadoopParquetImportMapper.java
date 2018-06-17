@@ -20,6 +20,8 @@ package org.apache.sqoop.mapreduce.parquet.hadoop;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -30,6 +32,8 @@ import org.apache.sqoop.mapreduce.ParquetImportMapper;
 import java.io.IOException;
 
 public class HadoopParquetImportMapper extends ParquetImportMapper<NullWritable, GenericRecord> {
+
+  private static final Log LOG = LogFactory.getLog(HadoopParquetImportMapper.class.getName());
 
   /**
    * The key the get the configuration value set by
@@ -45,6 +49,7 @@ public class HadoopParquetImportMapper extends ParquetImportMapper<NullWritable,
   @Override
   protected Schema getAvroSchema(Configuration configuration) {
     String schemaString = configuration.get(HADOOP_PARQUET_AVRO_SCHEMA_KEY);
+    LOG.debug("Found Avro schema: " + schemaString);
     return AvroUtil.parseAvroSchema(schemaString);
   }
 

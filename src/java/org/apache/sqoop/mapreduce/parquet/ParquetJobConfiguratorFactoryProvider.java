@@ -18,9 +18,13 @@
 
 package org.apache.sqoop.mapreduce.parquet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.sqoop.mapreduce.parquet.hadoop.HadoopParquetJobConfiguratorFactory;
 import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetJobConfiguratorFactory;
+
+import static java.lang.String.format;
 
 public final class ParquetJobConfiguratorFactoryProvider {
 
@@ -30,20 +34,26 @@ public final class ParquetJobConfiguratorFactoryProvider {
 
   public static final String PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE = "kite";
 
+  private static final Log LOG = LogFactory.getLog(ParquetJobConfiguratorFactoryProvider.class.getName());
+
   private ParquetJobConfiguratorFactoryProvider() {
     throw new AssertionError("This class is meant for static use only.");
   }
 
-  // TODO [szvasas]: add logging
   public static ParquetJobConfiguratorFactory createParquetJobConfiguratorFactory(Configuration configuration) {
-    String implementation = configuration.get(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY);
+    final String implementation = configuration.get(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY);
+    final ParquetJobConfiguratorFactory jobConfiguratorFactory;
     if (PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP.equalsIgnoreCase(implementation)) {
-      return new HadoopParquetJobConfiguratorFactory();
+      jobConfiguratorFactory = new HadoopParquetJobConfiguratorFactory();
     } else if (PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE.equalsIgnoreCase(implementation)) {
-      return new KiteParquetJobConfiguratorFactory();
+      jobConfiguratorFactory = new KiteParquetJobConfiguratorFactory();
     } else {
       throw new RuntimeException("Parquet job configurator implementation is set. Please make sure you set " + PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY + ".");
     }
+
+    LOG.info(format("Configured %s: %s", PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, implementation));
+    LOG.debug(format("Using ParquetJobConfiguratorFactory class: %s", jobConfiguratorFactory.getClass().getName()));
+    return jobConfiguratorFactory;
   }
 
 }
