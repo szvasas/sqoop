@@ -105,6 +105,13 @@ public class ParquetReader implements AutoCloseable {
     return result;
   }
 
+  public List<String> readAllInCsvSorted() {
+    List<String> result = readAllInCsv();
+    Collections.sort(result);
+
+    return result;
+  }
+
   public CompressionCodecName getCodec() {
     List<Footer> footers = getFooters();
 
