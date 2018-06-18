@@ -409,7 +409,7 @@ public class TestHiveImport extends ImportJobTestCase {
     thrown.expectMessage(KiteParquetUtils.INCOMPATIBLE_AVRO_SCHEMA_MSG + KiteParquetUtils.HIVE_INCOMPATIBLE_AVRO_SCHEMA_MSG);
 
     Configuration conf = getConf();
-    
+
     SqoopOptions sqoopOptions = getSqoopOptions(conf);
     sqoopOptions.setThrowOnError(true);
     Sqoop sqoop = new Sqoop(new ImportTool(), conf, sqoopOptions);

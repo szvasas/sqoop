@@ -83,7 +83,7 @@ public class TestMerge extends BaseSqoopTestCase {
       Arrays.asList(new Integer(1), new Integer(43)),
       Arrays.asList(new Integer(3), new Integer(313)));
 
-  private String parquetJobConfiguratorImplementation = StringUtils.EMPTY; 
+  private String parquetJobConfiguratorImplementation = StringUtils.EMPTY;
 
   @Before
   public void setUp() {
@@ -167,7 +167,7 @@ public class TestMerge extends BaseSqoopTestCase {
     parquetJobConfiguratorImplementation = PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP;
     runMergeTest(SqoopOptions.FileLayout.ParquetFile);
   }
-  
+
   @Test
   public void testParquetFileMergeKite() throws Exception {
     parquetJobConfiguratorImplementation = PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE;
