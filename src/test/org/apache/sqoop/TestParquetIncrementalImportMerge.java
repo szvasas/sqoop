@@ -81,15 +81,14 @@ public class TestParquetIncrementalImportMerge extends ImportJobTestCase {
   }
 
   @Test
-  public void testVanillaMerge() throws Exception {
-    String[] args = importArgs(getConnectString(), getTableName(), getTablePath().toString()).build();
+  public void testSimpleMerge() throws Exception {
+    String[] args = initialImportArgs(getConnectString(), getTableName(), getTablePath().toString()).build();
     runImport(args);
 
     clearTable(getTableName());
 
     insertRecordsIntoTable(TEST_COLUMN_TYPES, NEW_RECORDS);
     args = incrementalImportArgs(getConnectString(), getTableName(), getTablePath().toString(), getColName(3), getColName(0), INITIAL_RECORDS_TIMESTAMP).build();
-
     runImport(args);
 
     List<String> result = new ParquetReader(getTablePath()).readAllInCsvSorted();
@@ -99,13 +98,12 @@ public class TestParquetIncrementalImportMerge extends ImportJobTestCase {
 
   @Test
   public void testMergeWhenTheIncrementalImportDoesNotImportAnyRows() throws Exception {
-    String[] args = importArgs(getConnectString(), getTableName(), getTablePath().toString()).build();
+    String[] args = initialImportArgs(getConnectString(), getTableName(), getTablePath().toString()).build();
     runImport(args);
 
     clearTable(getTableName());
 
     args = incrementalImportArgs(getConnectString(), getTableName(), getTablePath().toString(), getColName(3), getColName(0), INITIAL_RECORDS_TIMESTAMP).build();
-
     runImport(args);
 
     List<String> result = new ParquetReader(getTablePath()).readAllInCsvSorted();
@@ -116,7 +114,7 @@ public class TestParquetIncrementalImportMerge extends ImportJobTestCase {
   @Test
   public void testMergeWithIncompatibleSchemas() throws Exception {
     String targetDir = getWarehouseDir() + "/testMergeWithIncompatibleSchemas";
-    String[] args = importArgs(getConnectString(), getTableName(), targetDir).build();
+    String[] args = initialImportArgs(getConnectString(), getTableName(), targetDir).build();
     runImport(args);
 
     incrementTableNum();
@@ -130,7 +128,7 @@ public class TestParquetIncrementalImportMerge extends ImportJobTestCase {
 
   @Test
   public void testMergedFilesHaveCorrectCodec() throws Exception {
-    String[] args = importArgs(getConnectString(), getTableName(), getTablePath().toString())
+    String[] args = initialImportArgs(getConnectString(), getTableName(), getTablePath().toString())
         .withOption("compression-codec", "snappy")
         .build();
     runImport(args);
@@ -138,14 +136,13 @@ public class TestParquetIncrementalImportMerge extends ImportJobTestCase {
     args = incrementalImportArgs(getConnectString(), getTableName(), getTablePath().toString(), getColName(3), getColName(0), INITIAL_RECORDS_TIMESTAMP)
         .withOption("compression-codec", "gzip")
         .build();
-
     runImport(args);
 
     CompressionCodecName compressionCodec = new ParquetReader(getTablePath()).getCodec();
     assertEquals(GZIP, compressionCodec);
   }
 
-  private static ArgumentArrayBuilder importArgs(String connectString, String tableName, String targetDir) {
+  private ArgumentArrayBuilder initialImportArgs(String connectString, String tableName, String targetDir) {
     return new ArgumentArrayBuilder()
         .withProperty(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP)
         .withOption("connect", connectString)
@@ -155,8 +152,8 @@ public class TestParquetIncrementalImportMerge extends ImportJobTestCase {
         .withOption("as-parquetfile");
   }
 
-  private static ArgumentArrayBuilder incrementalImportArgs(String connectString, String tableName, String targetDir, String checkColumn, String mergeKey, String lastValue) {
-    return importArgs(connectString, tableName, targetDir)
+  private ArgumentArrayBuilder incrementalImportArgs(String connectString, String tableName, String targetDir, String checkColumn, String mergeKey, String lastValue) {
+    return initialImportArgs(connectString, tableName, targetDir)
         .withOption("incremental", "lastmodified")
         .withOption("check-column", checkColumn)
         .withOption("merge-key", mergeKey)
