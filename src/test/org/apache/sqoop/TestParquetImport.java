@@ -149,6 +149,11 @@ public class TestParquetImport extends ImportJobTestCase {
     runParquetImportTest("deflate", "gzip");
   }
 
+  /**
+   * This test case is added to document that the deflate codec is not supported with 
+   * the Hadoop Parquet implementation so Sqoop throws an exception when it is specified. 
+   * @throws IOException
+   */
   @Test(expected = IOException.class)
   public void testHadoopDeflateCompression() throws IOException {
     assumeFalse(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE.equals(parquetImplementation));

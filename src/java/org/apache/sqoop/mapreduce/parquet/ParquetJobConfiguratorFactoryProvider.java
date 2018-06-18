@@ -48,7 +48,8 @@ public final class ParquetJobConfiguratorFactoryProvider {
     } else if (PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE.equalsIgnoreCase(implementation)) {
       jobConfiguratorFactory = new KiteParquetJobConfiguratorFactory();
     } else {
-      throw new RuntimeException("Parquet job configurator implementation is set. Please make sure you set " + PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY + ".");
+      throw new RuntimeException(format("%s is not set or it is incorrect. Supported values are: %s, %s", PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY,
+          PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP));
     }
 
     LOG.info(format("Configured %s: %s", PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, implementation));
