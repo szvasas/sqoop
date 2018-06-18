@@ -55,11 +55,6 @@ public class HadoopParquetImportJobConfigurator implements ParquetImportJobConfi
     return AvroParquetOutputFormat.class;
   }
 
-  @Override
-  public boolean isHiveImportNeeded() {
-    return true;
-  }
-
   void configureOutputCodec(Job job) {
     String outputCodec = job.getConfiguration().get(SQOOP_PARQUET_OUTPUT_CODEC_KEY);
     if (outputCodec != null) {

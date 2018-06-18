@@ -19,8 +19,6 @@
 package org.apache.sqoop.tool;
 
 import static java.lang.String.format;
-import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
-import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -1577,8 +1575,7 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
     // Hive import and create hive table not compatible for ParquetFile format
     if (options.doHiveImport()
         && options.doFailIfHiveTableExists()
-        && options.getFileLayout() == SqoopOptions.FileLayout.ParquetFile
-        && PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE.equals(options.getConf().get(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY))) {
+        && options.getFileLayout() == SqoopOptions.FileLayout.ParquetFile) {
       throw new InvalidOptionsException("Hive import and create hive table is not compatible with "
         + "importing into ParquetFile format.");
       }
@@ -1891,6 +1888,7 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
 
   protected void validateHS2Options(SqoopOptions options) throws SqoopOptions.InvalidOptionsException {
     final String withoutTemplate = "The %s option cannot be used without the %s option.";
+    final String withTemplate = "The %s option cannot be used with the %s option.";
 
     if (isSet(options.getHs2Url()) && !options.doHiveImport()) {
       throw new InvalidOptionsException(format(withoutTemplate, HS2_URL_ARG, HIVE_IMPORT_ARG));
@@ -1902,6 +1900,10 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
 
     if (isSet(options.getHs2Keytab()) && !isSet(options.getHs2User())) {
       throw  new InvalidOptionsException(format(withoutTemplate, HS2_KEYTAB_ARG, HS2_USER_ARG));
+    }
+
+    if (isSet(options.getHs2Url()) && (options.getFileLayout() == SqoopOptions.FileLayout.ParquetFile)) {
+      throw  new InvalidOptionsException(format(withTemplate, HS2_URL_ARG, FMT_PARQUETFILE_ARG));
     }
 
   }

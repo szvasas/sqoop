@@ -75,7 +75,6 @@ public class TestHiveServer2TextImport extends ImportJobTestCase {
         .withOption("hive-import")
         .withOption("hs2-url", hiveMiniCluster.getUrl())
         .withOption("split-by", getColName(1))
-        .withOption("delete-target-dir")
         .build();
 
     runImport(args);

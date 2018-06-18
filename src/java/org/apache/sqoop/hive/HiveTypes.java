@@ -20,7 +20,6 @@ package org.apache.sqoop.hive;
 
 import java.sql.Types;
 
-import org.apache.avro.Schema;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -71,31 +70,6 @@ public final class HiveTypes {
         // TODO(aaron): Support BINARY, VARBINARY, LONGVARBINARY, DISTINCT,
         // BLOB, ARRAY, STRUCT, REF, JAVA_OBJECT.
         return null;
-      }
-  }
-
-  public static String toHiveType(Schema.Type avroType) {
-      switch (avroType) {
-        case BOOLEAN:
-          return "BOOLEAN";
-        case INT:
-          return "INT";
-        case LONG:
-          return "BIGINT";
-        case FLOAT:
-          return "FLOAT";
-        case DOUBLE:
-          return "DOUBLE";
-        case STRING:
-          return "STRING";
-        case ENUM:
-          return "STRING";
-        case BYTES:
-          return "BINARY";
-        case FIXED:
-          return "BINARY";
-        default:
-          return null;
       }
   }
 
