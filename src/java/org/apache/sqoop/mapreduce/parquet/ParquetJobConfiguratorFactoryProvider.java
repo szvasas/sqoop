@@ -25,6 +25,8 @@ import org.apache.sqoop.mapreduce.parquet.hadoop.HadoopParquetJobConfiguratorFac
 import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetJobConfiguratorFactory;
 
 import static java.lang.String.format;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorImplementation.HADOOP;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorImplementation.KITE;
 
 public final class ParquetJobConfiguratorFactoryProvider {
 
@@ -40,16 +42,13 @@ public final class ParquetJobConfiguratorFactoryProvider {
     throw new AssertionError("This class is meant for static use only.");
   }
 
-  public static ParquetJobConfiguratorFactory createParquetJobConfiguratorFactory(Configuration configuration) {
-    final String implementation = configuration.get(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY);
-    final ParquetJobConfiguratorFactory jobConfiguratorFactory;
-    if (PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP.equalsIgnoreCase(implementation)) {
+  public static ParquetJobConfiguratorFactory createParquetJobConfiguratorFactory(ParquetJobConfiguratorImplementation implementation) {
+    ParquetJobConfiguratorFactory jobConfiguratorFactory = null;
+
+    if (implementation == HADOOP) {
       jobConfiguratorFactory = new HadoopParquetJobConfiguratorFactory();
-    } else if (PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE.equalsIgnoreCase(implementation)) {
+    } else if (implementation == KITE) {
       jobConfiguratorFactory = new KiteParquetJobConfiguratorFactory();
-    } else {
-      throw new RuntimeException(format("%s is not set or it is incorrect. Supported values are: %s, %s", PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY,
-          PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP));
     }
 
     LOG.info(format("Configured %s: %s", PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, implementation));

@@ -869,7 +869,7 @@ public abstract class ConnManager {
   }
 
   public ParquetJobConfiguratorFactory getParquetJobConfigurator() {
-    return ParquetJobConfiguratorFactoryProvider.createParquetJobConfiguratorFactory(options.getConf());
+    return ParquetJobConfiguratorFactoryProvider.createParquetJobConfiguratorFactory(options.getParquetConfiguratorImplementation());
   }
 }
 

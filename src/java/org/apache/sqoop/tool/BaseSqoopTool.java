@@ -19,6 +19,11 @@
 package org.apache.sqoop.tool;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorImplementation.HADOOP;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorImplementation.KITE;
+import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorImplementation.valueOf;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -1145,6 +1150,8 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
       out.setEscapeMappingColumnNamesEnabled(Boolean.parseBoolean(in.getOptionValue(
           ESCAPE_MAPPING_COLUMN_NAMES_ENABLED)));
     }
+
+    applyParquetJobConfigurationImplementation(in, out);
   }
 
   private void applyCredentialsOptions(CommandLine in, SqoopOptions out)
@@ -1908,7 +1915,23 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
 
   }
 
-  public ParquetJobConfiguratorFactory getParquetJobConfigurator(Configuration configuration) {
-    return ParquetJobConfiguratorFactoryProvider.createParquetJobConfiguratorFactory(configuration);
+  private void applyParquetJobConfigurationImplementation(CommandLine in, SqoopOptions out) throws InvalidOptionsException {
+    //TODO szvasas: handle in
+
+    String configProperty = out.getConf().get(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY);
+
+    if (isBlank(configProperty)) {
+      out.setParquetConfiguratorImplementation(KITE);
+    } else {
+      try {
+        out.setParquetConfiguratorImplementation(valueOf(configProperty.toUpperCase()));
+      } catch (IllegalArgumentException e) {
+        throw new InvalidOptionsException(format("%s is not set or it is incorrect. Supported values are: %s, %s", KITE, HADOOP));
+      }
+    }
+  }
+  
+  public ParquetJobConfiguratorFactory getParquetJobConfigurator(SqoopOptions sqoopOptions) {
+    return ParquetJobConfiguratorFactoryProvider.createParquetJobConfiguratorFactory(sqoopOptions.getParquetConfiguratorImplementation());
   }
 }
