@@ -1916,7 +1916,6 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
 
   }
 
-  // TODO vasas: Test this!
   private void applyParquetJobConfigurationImplementation(CommandLine in, SqoopOptions out) throws InvalidOptionsException {
     String optionValue = in.getOptionValue(PARQUET_CONFIGURATOR_IMPLEMENTATION);
     String propertyValue = out.getConf().get(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY);
@@ -1933,7 +1932,7 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
       out.setParquetConfiguratorImplementation(parquetConfiguratorImplementation);
       LOG.debug("Parquet job configurator implementation set: " + parquetConfiguratorImplementation);
     } catch (IllegalArgumentException e) {
-      throw new InvalidOptionsException(format("%s is not set or it is incorrect. Supported values are: %s, %s", KITE, HADOOP));
+      throw new InvalidOptionsException(format("Invalid Parquet job configurator implementation is set: %s. Supported values are: %s, %s", valueToUse, KITE, HADOOP));
     }
   }
 
