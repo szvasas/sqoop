@@ -32,8 +32,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP;
-import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
 import static org.junit.Assert.assertEquals;
 import static parquet.hadoop.metadata.CompressionCodecName.GZIP;
 
@@ -144,7 +142,7 @@ public class TestParquetIncrementalImportMerge extends ImportJobTestCase {
 
   private ArgumentArrayBuilder initialImportArgs(String connectString, String tableName, String targetDir) {
     return new ArgumentArrayBuilder()
-        .withProperty(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP)
+        .withProperty("parquetjob.configurator.implementation", "hadoop")
         .withOption("connect", connectString)
         .withOption("table", tableName)
         .withOption("num-mappers", "1")

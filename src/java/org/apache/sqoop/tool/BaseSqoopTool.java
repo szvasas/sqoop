@@ -20,7 +20,7 @@ package org.apache.sqoop.tool;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
+import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
 import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorImplementation.HADOOP;
 import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorImplementation.KITE;
 import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorImplementation.valueOf;
@@ -44,7 +44,7 @@ import org.apache.hadoop.util.StringUtils;
 import org.apache.sqoop.manager.SupportedManagers;
 import org.apache.sqoop.mapreduce.hcat.SqoopHCatUtilities;
 import org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactory;
-import org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider;
+import org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorImplementation;
 import org.apache.sqoop.util.CredentialsUtil;
 import org.apache.sqoop.util.LoggingUtils;
 import org.apache.sqoop.util.password.CredentialProviderHelper;
@@ -188,6 +188,7 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
   public static final String THROW_ON_ERROR_ARG = "throw-on-error";
   public static final String ORACLE_ESCAPING_DISABLED = "oracle-escaping-disabled";
   public static final String ESCAPE_MAPPING_COLUMN_NAMES_ENABLED = "escape-mapping-column-names";
+  public static final String PARQUET_CONFIGURATOR_IMPLEMENTATION = "parquet-configurator-implementation";
 
   // Arguments for validation.
   public static final String VALIDATE_ARG = "validate";
@@ -1915,23 +1916,28 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
 
   }
 
+  // TODO vasas: Test this!
   private void applyParquetJobConfigurationImplementation(CommandLine in, SqoopOptions out) throws InvalidOptionsException {
-    //TODO szvasas: handle in
+    String optionValue = in.getOptionValue(PARQUET_CONFIGURATOR_IMPLEMENTATION);
+    String propertyValue = out.getConf().get(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY);
 
-    String configProperty = out.getConf().get(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY);
+    String valueToUse = isBlank(optionValue) ? propertyValue : optionValue;
 
-    if (isBlank(configProperty)) {
-      out.setParquetConfiguratorImplementation(KITE);
-    } else {
-      try {
-        out.setParquetConfiguratorImplementation(valueOf(configProperty.toUpperCase()));
-      } catch (IllegalArgumentException e) {
-        throw new InvalidOptionsException(format("%s is not set or it is incorrect. Supported values are: %s, %s", KITE, HADOOP));
-      }
+    if (isBlank(valueToUse)) {
+      LOG.debug("Parquet job configurator implementation is not set, using default value: " + out.getParquetConfiguratorImplementation());
+      return;
+    }
+
+    try {
+      ParquetJobConfiguratorImplementation parquetConfiguratorImplementation = valueOf(valueToUse.toUpperCase());
+      out.setParquetConfiguratorImplementation(parquetConfiguratorImplementation);
+      LOG.debug("Parquet job configurator implementation set: " + parquetConfiguratorImplementation);
+    } catch (IllegalArgumentException e) {
+      throw new InvalidOptionsException(format("%s is not set or it is incorrect. Supported values are: %s, %s", KITE, HADOOP));
     }
   }
-  
+
   public ParquetJobConfiguratorFactory getParquetJobConfigurator(SqoopOptions sqoopOptions) {
-    return ParquetJobConfiguratorFactoryProvider.createParquetJobConfiguratorFactory(sqoopOptions.getParquetConfiguratorImplementation());
+    return sqoopOptions.getParquetConfiguratorImplementation().createFactory();
   }
 }

@@ -48,9 +48,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP;
-import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
-import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static parquet.hadoop.ParquetWriter.DEFAULT_BLOCK_SIZE;
@@ -66,7 +63,7 @@ public class TestParquetExport extends ExportJobTestCase {
 
   @Parameterized.Parameters(name = "parquetImplementation = {0}")
   public static Iterable<? extends Object> parquetImplementationParameters() {
-    return Arrays.asList(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP);
+    return Arrays.asList("kite", "hadoop");
   }
 
   @Rule
@@ -499,7 +496,7 @@ public class TestParquetExport extends ExportJobTestCase {
   @Override
   protected Configuration getConf() {
     Configuration conf = super.getConf();
-    conf.set(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, parquetImplementation);
+    conf.set("parquetjob.configurator.implementation", parquetImplementation);
     return conf;
   }
 }
