@@ -30,6 +30,9 @@ import java.io.IOException;
 
 import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_AVRO_SCHEMA_KEY;
 
+/**
+ * An implementation of {@link ParquetImportMapper} which depends on the Kite Dataset API.
+ */
 public class KiteParquetImportMapper extends ParquetImportMapper<GenericRecord, Void> {
 
   @Override

@@ -21,6 +21,10 @@ package org.apache.sqoop.mapreduce.parquet;
 import org.apache.sqoop.mapreduce.parquet.hadoop.HadoopParquetJobConfiguratorFactory;
 import org.apache.sqoop.mapreduce.parquet.kite.KiteParquetJobConfiguratorFactory;
 
+/**
+ * An enum containing all the implementations available for {@link ParquetJobConfiguratorFactory}.
+ * The enumeration constants are also used to instantiate concrete {@link ParquetJobConfiguratorFactory} objects.
+ */
 public enum ParquetJobConfiguratorImplementation {
   KITE(KiteParquetJobConfiguratorFactory.class), HADOOP(HadoopParquetJobConfiguratorFactory.class);
 

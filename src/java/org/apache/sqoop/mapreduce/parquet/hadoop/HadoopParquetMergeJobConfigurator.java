@@ -39,6 +39,9 @@ import static java.util.Collections.singleton;
 import static org.apache.sqoop.avro.AvroUtil.getAvroSchemaFromParquetFile;
 import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_AVRO_SCHEMA_KEY;
 
+/**
+ * An implementation of {@link ParquetMergeJobConfigurator} which depends on the Hadoop Parquet library.
+ */
 public class HadoopParquetMergeJobConfigurator implements ParquetMergeJobConfigurator {
 
   public static final Log LOG = LogFactory.getLog(HadoopParquetMergeJobConfigurator.class.getName());

@@ -35,6 +35,9 @@ import java.io.IOException;
 
 import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_OUTPUT_CODEC_KEY;
 
+/**
+ * An implementation of {@link ParquetImportJobConfigurator} which depends on the Hadoop Parquet library.
+ */
 public class HadoopParquetImportJobConfigurator implements ParquetImportJobConfigurator {
 
   private static final Log LOG = LogFactory.getLog(HadoopParquetImportJobConfigurator.class.getName());

@@ -27,6 +27,9 @@ import parquet.avro.AvroParquetInputFormat;
 
 import java.io.IOException;
 
+/**
+ * An implementation of {@link ParquetExportJobConfigurator} which depends on the Hadoop Parquet library.
+ */
 public class HadoopParquetExportJobConfigurator implements ParquetExportJobConfigurator {
 
   @Override
