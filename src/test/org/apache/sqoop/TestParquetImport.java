@@ -62,7 +62,7 @@ public class TestParquetImport extends ImportJobTestCase {
   private static String PARQUET_CONFIGURATOR_IMPLEMENTATION_KITE = "kite";
 
   private static String PARQUET_CONFIGURATOR_IMPLEMENTATION_HADOOP = "hadoop";
-  
+
   @Parameters(name = "parquetImplementation = {0}")
   public static Iterable<? extends Object> parquetImplementationParameters() {
     return Arrays.asList(PARQUET_CONFIGURATOR_IMPLEMENTATION_KITE, PARQUET_CONFIGURATOR_IMPLEMENTATION_HADOOP);
@@ -150,8 +150,8 @@ public class TestParquetImport extends ImportJobTestCase {
   }
 
   /**
-   * This test case is added to document that the deflate codec is not supported with 
-   * the Hadoop Parquet implementation so Sqoop throws an exception when it is specified. 
+   * This test case is added to document that the deflate codec is not supported with
+   * the Hadoop Parquet implementation so Sqoop throws an exception when it is specified.
    * @throws IOException
    */
   @Test(expected = IOException.class)
