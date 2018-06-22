@@ -459,7 +459,7 @@ public class SqoopOptions implements Cloneable {
 
   @StoredAsProperty("hs2.keytab")
   private String hs2Keytab;
-  
+
   @StoredAsProperty("parquet.configurator.implementation")
   private ParquetJobConfiguratorImplementation parquetConfiguratorImplementation;
 
