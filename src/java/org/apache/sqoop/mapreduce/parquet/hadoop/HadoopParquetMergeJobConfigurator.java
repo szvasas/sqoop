@@ -99,7 +99,12 @@ public class HadoopParquetMergeJobConfigurator implements ParquetMergeJobConfigu
     return avroSchema;
   }
 
+  /**
+   * This method ensures that the Avro schema in the new path is compatible with the Avro schema in the old path.
+   */
   private void validateNewPathAvroSchema(Schema newPathAvroSchema, Schema avroSchema) {
+    // If the new path is an empty directory (e.g. in case of a sqoop merge command) then the newPathAvroSchema will
+    // be null. In that case we just want to proceed without real validation.
     if (newPathAvroSchema == null) {
       return;
     }

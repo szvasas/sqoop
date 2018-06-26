@@ -1932,7 +1932,7 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
       out.setParquetConfiguratorImplementation(parquetConfiguratorImplementation);
       LOG.debug("Parquet job configurator implementation set: " + parquetConfiguratorImplementation);
     } catch (IllegalArgumentException e) {
-      throw new InvalidOptionsException(format("Invalid Parquet job configurator implementation is set: %s. Supported values are: %s, %s", valueToUse, KITE, HADOOP));
+      throw new InvalidOptionsException(format("Invalid Parquet job configurator implementation is set: %s. Supported values are: %s", valueToUse, Arrays.toString(ParquetJobConfiguratorImplementation.values())));
     }
   }
 
