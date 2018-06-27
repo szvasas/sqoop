@@ -39,6 +39,9 @@ import static java.util.Collections.singleton;
 import static org.apache.sqoop.avro.AvroUtil.getAvroSchemaFromParquetFile;
 import static org.apache.sqoop.mapreduce.parquet.ParquetConstants.SQOOP_PARQUET_AVRO_SCHEMA_KEY;
 
+/**
+ * An implementation of {@link ParquetMergeJobConfigurator} which depends on the Hadoop Parquet library.
+ */
 public class HadoopParquetMergeJobConfigurator implements ParquetMergeJobConfigurator {
 
   public static final Log LOG = LogFactory.getLog(HadoopParquetMergeJobConfigurator.class.getName());
@@ -96,7 +99,12 @@ public class HadoopParquetMergeJobConfigurator implements ParquetMergeJobConfigu
     return avroSchema;
   }
 
+  /**
+   * This method ensures that the Avro schema in the new path is compatible with the Avro schema in the old path.
+   */
   private void validateNewPathAvroSchema(Schema newPathAvroSchema, Schema avroSchema) {
+    // If the new path is an empty directory (e.g. in case of a sqoop merge command) then the newPathAvroSchema will
+    // be null. In that case we just want to proceed without real validation.
     if (newPathAvroSchema == null) {
       return;
     }

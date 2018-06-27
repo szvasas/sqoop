@@ -23,6 +23,9 @@ import org.apache.sqoop.mapreduce.parquet.ParquetImportJobConfigurator;
 import org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactory;
 import org.apache.sqoop.mapreduce.parquet.ParquetMergeJobConfigurator;
 
+/**
+ * A concrete factory implementation which produces configurator objects using the Kite Dataset API.
+ */
 public class KiteParquetJobConfiguratorFactory implements ParquetJobConfiguratorFactory {
 
   @Override

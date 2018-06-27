@@ -31,6 +31,9 @@ import org.apache.sqoop.mapreduce.ParquetImportMapper;
 
 import java.io.IOException;
 
+/**
+ * An implementation of {@link ParquetImportMapper} which depends on the Hadoop Parquet library.
+ */
 public class HadoopParquetImportMapper extends ParquetImportMapper<NullWritable, GenericRecord> {
 
   private static final Log LOG = LogFactory.getLog(HadoopParquetImportMapper.class.getName());

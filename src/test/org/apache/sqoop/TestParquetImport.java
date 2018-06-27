@@ -43,15 +43,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.apache.sqoop.avro.AvroUtil.getAvroSchemaFromParquetFile;
-import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP;
-import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
-import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 /**
@@ -63,9 +60,13 @@ public class TestParquetImport extends ImportJobTestCase {
   public static final Log LOG = LogFactory
       .getLog(TestParquetImport.class.getName());
 
+  private static String PARQUET_CONFIGURATOR_IMPLEMENTATION_KITE = "kite";
+
+  private static String PARQUET_CONFIGURATOR_IMPLEMENTATION_HADOOP = "hadoop";
+
   @Parameters(name = "parquetImplementation = {0}")
   public static Iterable<? extends Object> parquetImplementationParameters() {
-    return Arrays.asList(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP);
+    return Arrays.asList(PARQUET_CONFIGURATOR_IMPLEMENTATION_KITE, PARQUET_CONFIGURATOR_IMPLEMENTATION_HADOOP);
   }
 
   private final String parquetImplementation;
@@ -137,7 +138,7 @@ public class TestParquetImport extends ImportJobTestCase {
 
   @Test
   public void testHadoopGzipCompression() throws IOException {
-    assumeFalse(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE.equals(parquetImplementation));
+    assumeTrue(PARQUET_CONFIGURATOR_IMPLEMENTATION_HADOOP.equals(parquetImplementation));
     runParquetImportTest("gzip");
   }
 
@@ -149,9 +150,14 @@ public class TestParquetImport extends ImportJobTestCase {
     runParquetImportTest("deflate", "gzip");
   }
 
+  /**
+   * This test case is added to document that the deflate codec is not supported with
+   * the Hadoop Parquet implementation so Sqoop throws an exception when it is specified.
+   * @throws IOException
+   */
   @Test(expected = IOException.class)
   public void testHadoopDeflateCompression() throws IOException {
-    assumeFalse(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE.equals(parquetImplementation));
+    assumeTrue(PARQUET_CONFIGURATOR_IMPLEMENTATION_HADOOP.equals(parquetImplementation));
     runParquetImportTest("deflate");
   }
 
@@ -333,7 +339,7 @@ public class TestParquetImport extends ImportJobTestCase {
   @Override
   protected Configuration getConf() {
     Configuration conf = super.getConf();
-    conf.set(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, parquetImplementation);
+    conf.set("parquetjob.configurator.implementation", parquetImplementation);
     return conf;
   }
 }

@@ -24,6 +24,9 @@ import org.apache.sqoop.mapreduce.MergeParquetReducer;
 
 import java.io.IOException;
 
+/**
+ * An implementation of {@link MergeParquetReducer} which depends on the Kite Dataset API.
+ */
 public class KiteMergeParquetReducer extends MergeParquetReducer<GenericRecord, NullWritable> {
 
   @Override

@@ -66,7 +66,7 @@ public class TestParquetExport extends ExportJobTestCase {
 
   @Parameterized.Parameters(name = "parquetImplementation = {0}")
   public static Iterable<? extends Object> parquetImplementationParameters() {
-    return Arrays.asList(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_HADOOP);
+    return Arrays.asList("kite", "hadoop");
   }
 
   @Rule
@@ -499,7 +499,7 @@ public class TestParquetExport extends ExportJobTestCase {
   @Override
   protected Configuration getConf() {
     Configuration conf = super.getConf();
-    conf.set(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, parquetImplementation);
+    conf.set("parquetjob.configurator.implementation", parquetImplementation);
     return conf;
   }
 }
