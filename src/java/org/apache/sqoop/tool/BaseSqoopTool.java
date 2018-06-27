@@ -1583,7 +1583,7 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
     if (options.doHiveImport()
         && options.doFailIfHiveTableExists()
         && options.getFileLayout() == SqoopOptions.FileLayout.ParquetFile
-        && KITE.name().equals(options.getConf().get(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY))) {
+        && options.getParquetConfiguratorImplementation() == KITE) {
       throw new InvalidOptionsException("Hive import and create hive table is not compatible with "
         + "importing into ParquetFile format.");
       }
