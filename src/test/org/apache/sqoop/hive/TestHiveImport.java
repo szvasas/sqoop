@@ -55,8 +55,6 @@ import org.junit.rules.ExpectedException;
 
 import static java.lang.String.format;
 import static java.util.Collections.sort;
-import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
-import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -115,7 +113,7 @@ public class TestHiveImport extends ImportJobTestCase {
     ArrayList<String> args = new ArrayList<String>();
 
     if (includeHadoopFlags) {
-      args.add(format("-D%s=%s", PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE));
+      args.add(format("-D%s=%s", "parquetjob.configurator.implementation", "kite"));
     }
 
     if (null != moreArgs) {
@@ -739,7 +737,7 @@ public class TestHiveImport extends ImportJobTestCase {
   @Override
   protected Configuration getConf() {
     Configuration conf = super.getConf();
-    conf.set(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE);
+    conf.set("parquetjob.configurator.implementation", "kite");
     return conf;
   }
 }

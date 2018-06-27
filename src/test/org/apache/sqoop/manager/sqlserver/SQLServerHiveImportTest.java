@@ -33,8 +33,6 @@ import org.junit.After;
 import org.junit.Before;
 
 import static java.lang.String.format;
-import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY;
-import static org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorFactoryProvider.PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE;
 import static org.junit.Assert.fail;
 
 /**
@@ -146,7 +144,7 @@ public class SQLServerHiveImportTest extends TestHiveImport {
     ArrayList<String> args = new ArrayList<String>();
     System.out.println("Overridden getArgv is called..");
     if (includeHadoopFlags) {
-      args.add(format("-D%s=%s", PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE));
+      args.add(format("-D%s=%s", "parquetjob.configurator.implementation", "kite"));
     }
 
     if (null != moreArgs) {

@@ -144,7 +144,7 @@ public class TestParquetImport extends ImportJobTestCase {
 
   @Test
   public void testKiteDeflateCompression() throws IOException {
-    assumeTrue(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KITE.equals(parquetImplementation));
+    assumeTrue(PARQUET_CONFIGURATOR_IMPLEMENTATION_KITE.equals(parquetImplementation));
     // The current Kite-based Parquet writing implementation uses GZIP compression codec when Deflate is specified.
     // See: org.kitesdk.data.spi.filesystem.ParquetAppender.getCompressionCodecName()
     runParquetImportTest("deflate", "gzip");
