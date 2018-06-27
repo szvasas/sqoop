@@ -109,7 +109,6 @@ public class TestMerge extends BaseSqoopTestCase {
       conf.set(CommonArgs.FS_DEFAULT_NAME, CommonArgs.LOCAL_FS);
     }
     conf.set("mapred.job.tracker", "local");
-    conf.set(PARQUET_JOB_CONFIGURATOR_IMPLEMENTATION_KEY, parquetJobConfiguratorImplementation);
     return conf;
   }
 

@@ -2126,7 +2126,6 @@ public class SqoopOptions implements Cloneable {
 
   public void setConf(Configuration config) {
     this.conf = config;
-    ensureDefaultConfigurations(this.conf);
   }
 
   /**

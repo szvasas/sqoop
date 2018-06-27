@@ -1199,7 +1199,7 @@ public class ImportTool extends BaseSqoopTool {
       return true;
     }
 
-    ParquetJobConfiguratorFactory parquetJobConfigurator = getParquetJobConfigurator(options.getConf());
+    ParquetJobConfiguratorFactory parquetJobConfigurator = getParquetJobConfigurator(options);
     return parquetJobConfigurator.createParquetImportJobConfigurator().isHiveImportNeeded();
   }
 }
