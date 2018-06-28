@@ -39,7 +39,7 @@ public class HadoopParquetImportMapper extends ParquetImportMapper<NullWritable,
   private static final Log LOG = LogFactory.getLog(HadoopParquetImportMapper.class.getName());
 
   /**
-   * The key the get the configuration value set by
+   * The key to get the configuration value set by
    * parquet.avro.AvroParquetOutputFormat#setSchema(org.apache.hadoop.mapreduce.Job, org.apache.avro.Schema)
    */
   private static final String HADOOP_PARQUET_AVRO_SCHEMA_KEY = "parquet.avro.schema";
