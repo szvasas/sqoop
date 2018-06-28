@@ -38,7 +38,6 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.sqoop.manager.SupportedManagers;
 import org.apache.sqoop.mapreduce.hcat.SqoopHCatUtilities;
@@ -1907,6 +1906,8 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
 
     if (isSet(options.getHs2Keytab()) && !isSet(options.getHs2User())) {
       throw  new InvalidOptionsException(format(withoutTemplate, HS2_KEYTAB_ARG, HS2_USER_ARG));
+    }
+
     }
 
   }
