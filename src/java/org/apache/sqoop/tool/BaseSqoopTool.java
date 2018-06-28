@@ -1907,9 +1907,6 @@ public abstract class BaseSqoopTool extends org.apache.sqoop.tool.SqoopTool {
     if (isSet(options.getHs2Keytab()) && !isSet(options.getHs2User())) {
       throw  new InvalidOptionsException(format(withoutTemplate, HS2_KEYTAB_ARG, HS2_USER_ARG));
     }
-
-    }
-
   }
 
   private void applyParquetJobConfigurationImplementation(CommandLine in, SqoopOptions out) throws InvalidOptionsException {

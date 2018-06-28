@@ -598,17 +598,6 @@ public abstract class BaseSqoopTestCase {
     }
   }
 
-  protected void createTableWithColTypes(String [] colTypes, List<Object> record) {
-    createTableWithColTypes(colTypes, toStringArray(record));
-  }
-
-  protected void createTableWithRecords(String [] colTypes, List<List<Object>> records) {
-    createTableWithColTypes(colTypes, records.get(0));
-    for (int i = 1; i < records.size(); i++) {
-      insertIntoTable(colTypes, records.get(i));
-    }
-  }
-
   /**
    * Create a table with a single column and put a data element in it.
    * @param colType the type of the column to create
