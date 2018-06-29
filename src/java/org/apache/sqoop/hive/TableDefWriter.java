@@ -114,7 +114,7 @@ public class TableDefWriter {
     }
 
     String [] colNames = getColumnNames();
-    Map<String, Schema.Type> columnNameToAvroType = getColumnNameToAvroTypeMapping(colNames);
+    Map<String, Schema.Type> columnNameToAvroType = getColumnNameToAvroTypeMapping();
     StringBuilder sb = new StringBuilder();
     if (options.doFailIfHiveTableExists()) {
       if (isHiveExternalTableSet) {
@@ -221,7 +221,7 @@ public class TableDefWriter {
     return sb.toString();
   }
 
-  private Map<String, Schema.Type> getColumnNameToAvroTypeMapping(String[] colNames) {
+  private Map<String, Schema.Type> getColumnNameToAvroTypeMapping() {
     if (options.getFileLayout() != SqoopOptions.FileLayout.ParquetFile) {
       return Collections.emptyMap();
     }

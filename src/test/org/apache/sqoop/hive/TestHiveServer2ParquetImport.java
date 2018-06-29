@@ -86,7 +86,7 @@ public class TestHiveServer2ParquetImport {
     public void setUp() {
       super.setUp();
 
-      createTableWithColTypes(TEST_COLUMN_TYPES, toStringArray(TEST_COLUMN_VALUES));
+      createTableWithColTypes(TEST_COLUMN_TYPES, TEST_COLUMN_VALUES);
     }
 
     @Test
@@ -122,7 +122,7 @@ public class TestHiveServer2ParquetImport {
     public void setUp() {
       super.setUp();
 
-      createTableWithColTypes(TEST_COLUMN_TYPES, toStringArray(TEST_COLUMN_VALUES));
+      createTableWithColTypes(TEST_COLUMN_TYPES, TEST_COLUMN_VALUES);
     }
 
     @Test
@@ -141,7 +141,7 @@ public class TestHiveServer2ParquetImport {
 
       runImport(args);
 
-      insertIntoTable(TEST_COLUMN_TYPES, toStringArray(TEST_COLUMN_VALUES_LINE2));
+      insertIntoTable(TEST_COLUMN_TYPES, TEST_COLUMN_VALUES_LINE2);
 
       runImport(args);
 
@@ -158,7 +158,7 @@ public class TestHiveServer2ParquetImport {
       runImport(args);
 
       dropTableIfExists(getTableName());
-      createTableWithColTypes(TEST_COLUMN_TYPES, toStringArray(TEST_COLUMN_VALUES_LINE2));
+      createTableWithColTypes(TEST_COLUMN_TYPES, TEST_COLUMN_VALUES_LINE2);
 
       runImport(args);
 
@@ -166,8 +166,10 @@ public class TestHiveServer2ParquetImport {
       assertEquals(asList(TEST_COLUMN_VALUES_LINE2), rows);
     }
 
+    /**
+     * --create-hive-table option is now supported with the Hadoop Parquet writer implementation.
+     * */
     @Test
-    // TODO: this gives a bit different error message than the Kite one, it should be fixed.
     public void testCreateHiveImportAsParquet() throws Exception {
       String[] args = commonArgs(getConnectString(), getTableName())
           .withOption("create-hive-table")
@@ -175,10 +177,15 @@ public class TestHiveServer2ParquetImport {
 
       runImport(args);
 
-      expectedException.expect(IOException.class);
-      runImport(args);
+      expectedException.expectMessage("Error executing Hive import.");
+      runImportThrowingException(args);
     }
 
+    /**
+     * This scenario works fine since the Hadoop Parquet writer implementation does not
+     * check the Parquet schema of the existing files. The exception will be thrown
+     * by Hive when it tries to read the files with different schema.
+     */
     @Test
     public void testHiveImportAsParquetWhenTableExistsWithIncompatibleSchema() throws Exception {
       String hiveTableName = "hiveImportAsParquetWhenTableExistsWithIncompatibleSchema";
@@ -193,7 +200,7 @@ public class TestHiveServer2ParquetImport {
 
       // We make sure we create a new table in the test RDBMS.
       incrementTableNum();
-      createTableWithColTypes(incompatibleSchemaTableTypes, toStringArray(incompatibleSchemaTableData));
+      createTableWithColTypes(incompatibleSchemaTableTypes, incompatibleSchemaTableData);
 
       // Recreate the argument array to pick up the new RDBMS table name.
       args = commonArgs(getConnectString(), getTableName())
@@ -215,20 +222,6 @@ public class TestHiveServer2ParquetImport {
         .withOption("num-mappers", "1")
         .withOption("as-parquetfile")
         .withOption("delete-target-dir");
-  }
-
-  private static String[] toStringArray(List<Object> columnValues) {
-    String[] result = new String[columnValues.size()];
-
-    for (int i = 0; i < columnValues.size(); i++) {
-      if (columnValues.get(i) instanceof String) {
-        result[i] = StringUtils.wrap((String) columnValues.get(i), '\'');
-      } else {
-        result[i] = columnValues.get(i).toString();
-      }
-    }
-
-    return result;
   }
 
   public static void startHiveMiniCluster() {
