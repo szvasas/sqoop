@@ -18,7 +18,6 @@
 
 package org.apache.sqoop.hive;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.sqoop.hive.minicluster.HiveMiniCluster;
 import org.apache.sqoop.hive.minicluster.NoAuthenticationConfiguration;
 import org.apache.sqoop.testutil.ArgumentArrayBuilder;
@@ -35,7 +34,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
