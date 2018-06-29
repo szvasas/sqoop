@@ -18,6 +18,8 @@
 
 package org.apache.sqoop.hive;
 
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.sqoop.hive.minicluster.HiveMiniCluster;
 import org.apache.sqoop.hive.minicluster.NoAuthenticationConfiguration;
 import org.apache.sqoop.testutil.ArgumentArrayBuilder;
@@ -38,14 +40,23 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static java.util.Arrays.deepEquals;
+import static org.apache.sqoop.testutil.BaseSqoopTestCase.timeFromString;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(Enclosed.class)
 public class TestHiveServer2ParquetImport {
 
   private static final String[] TEST_COLUMN_TYPES = {"VARCHAR(32)", "INTEGER", "CHAR(64)"};
+
+  private static final String[] TEST_COLUMN_ALL_TYPES = {"INTEGER", "BIGINT", "DOUBLE", "DECIMAL(10, 2)", "BOOLEAN", "TIMESTAMP", "BINARY"};
+
+  private static final List<Object> TEST_COLUMN_ALL_TYPES_VALUES = Arrays.<Object>asList(10, 12345678910123L, 12.34, 456842.45, "TRUE", "2018-06-14 15:00:00.000", "abcdef");
+
+  private static final Object[] EXPECTED_TEST_COLUMN_ALL_TYPES_VALUES = {10, 12345678910123L, 12.34, "456842.45", true, timeFromString("2018-06-14 15:00:00.000"), decodeHex("abcdef")};
 
   private static final List<Object> TEST_COLUMN_VALUES = Arrays.<Object>asList("test", 42, "somestring");
 
@@ -88,6 +99,7 @@ public class TestHiveServer2ParquetImport {
     }
 
     @Test
+    // TODO: shall we explicitly check compression codec from the file?
     public void testHiveImportAsParquetWithCompressionCodec() throws Exception {
       String[] args = commonArgs(getConnectString(), getTableName())
           .withOption("compression-codec", compressionCodec)
@@ -134,6 +146,19 @@ public class TestHiveServer2ParquetImport {
     }
 
     @Test
+    public void testAllDataTypesHiveImportAsParquet() throws Exception {
+      setCurTableName("all_datatypes_table");
+      createTableWithColTypes(TEST_COLUMN_ALL_TYPES, TEST_COLUMN_ALL_TYPES_VALUES);
+      String[] args = commonArgs(getConnectString(), getTableName()).build();
+
+      runImport(args);
+
+      // The result contains a byte[] so we have to use Arrays.deepEquals() to assert.
+      Object[] firstRow = hiveServer2TestUtil.loadRawRowsFromTable(getTableName()).iterator().next().toArray();
+      assertTrue(deepEquals(EXPECTED_TEST_COLUMN_ALL_TYPES_VALUES, firstRow));
+    }
+
+    @Test
     public void testAppendHiveImportAsParquet() throws Exception {
       String[] args = commonArgs(getConnectString(), getTableName()).build();
 
@@ -166,7 +191,7 @@ public class TestHiveServer2ParquetImport {
 
     /**
      * --create-hive-table option is now supported with the Hadoop Parquet writer implementation.
-     * */
+     */
     @Test
     public void testCreateHiveImportAsParquet() throws Exception {
       String[] args = commonArgs(getConnectString(), getTableName())
@@ -230,5 +255,13 @@ public class TestHiveServer2ParquetImport {
 
   public static void stopHiveMiniCluster() {
     hiveMiniCluster.stop();
+  }
+
+  private static byte[] decodeHex(String hexString) {
+    try {
+      return Hex.decodeHex(hexString.toCharArray());
+    } catch (DecoderException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
