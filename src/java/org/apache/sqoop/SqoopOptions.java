@@ -1104,9 +1104,9 @@ public class SqoopOptions implements Cloneable {
     this.fetchSize = null;
 
     if (null == baseConfiguration) {
-      this.setConf(new Configuration());
+      this.conf = new Configuration();
     } else {
-      this.setConf(baseConfiguration);
+      this.conf = baseConfiguration;
     }
 
     this.extraArgs = null;

@@ -87,11 +87,9 @@ public final class HiveTypes {
         case DOUBLE:
           return "DOUBLE";
         case STRING:
-          return "STRING";
         case ENUM:
           return "STRING";
         case BYTES:
-          return "BINARY";
         case FIXED:
           return "BINARY";
         default:

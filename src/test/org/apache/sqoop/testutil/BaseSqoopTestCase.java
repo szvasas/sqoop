@@ -586,7 +586,7 @@ public abstract class BaseSqoopTestCase {
     }
     createTableWithColTypesAndNames(colNames, colTypes, vals);
   }
-  
+
   protected void createTableWithColTypes(String [] colTypes, List<Object> record) {
     createTableWithColTypes(colTypes, toStringArray(record));
   }
