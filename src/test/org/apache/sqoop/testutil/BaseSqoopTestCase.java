@@ -324,6 +324,10 @@ public abstract class BaseSqoopTestCase {
     createTableWithColTypesAndNames(getTableName(), colNames, colTypes, vals);
   }
 
+  protected void createTableWithColTypesAndNames(String[] colNames, String[] colTypes, List<Object> record) {
+    createTableWithColTypesAndNames(getTableName(), colNames, colTypes, toStringArray(record));
+  }
+
   /**
    * Create a table with a set of columns with their names and add a row of values.
    * @param newTableName The name of the new table
@@ -439,6 +443,10 @@ public abstract class BaseSqoopTestCase {
     for (List<Object> record : records) {
       insertIntoTable(colTypes, record);
     }
+  }
+
+  protected void insertIntoTable(String[] columns, String[] colTypes, List<Object> record) {
+    insertIntoTable(columns, colTypes, toStringArray(record));
   }
 
   protected void insertIntoTable(String[] columns, String[] colTypes, String[] vals) {

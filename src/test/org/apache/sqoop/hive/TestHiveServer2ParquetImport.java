@@ -50,6 +50,8 @@ import static org.junit.Assert.assertTrue;
 @RunWith(Enclosed.class)
 public class TestHiveServer2ParquetImport {
 
+  private static final String[] TEST_COLUMN_NAMES = {"C1_VARCHAR", "C2#INTEGER", "C3_CHAR"};
+
   private static final String[] TEST_COLUMN_TYPES = {"VARCHAR(32)", "INTEGER", "CHAR(64)"};
 
   private static final String[] TEST_COLUMN_ALL_TYPES = {"INTEGER", "BIGINT", "DOUBLE", "DECIMAL(10, 2)", "BOOLEAN", "TIMESTAMP", "BINARY", "VARCHAR(100)", "CHAR(100)"};
@@ -95,7 +97,7 @@ public class TestHiveServer2ParquetImport {
     public void setUp() {
       super.setUp();
 
-      createTableWithColTypes(TEST_COLUMN_TYPES, TEST_COLUMN_VALUES);
+      createTableWithColTypesAndNames(TEST_COLUMN_NAMES, TEST_COLUMN_TYPES, TEST_COLUMN_VALUES);
     }
 
     @Test
@@ -132,7 +134,7 @@ public class TestHiveServer2ParquetImport {
     public void setUp() {
       super.setUp();
 
-      createTableWithColTypes(TEST_COLUMN_TYPES, TEST_COLUMN_VALUES);
+      createTableWithColTypesAndNames(TEST_COLUMN_NAMES, TEST_COLUMN_TYPES, TEST_COLUMN_VALUES);
     }
 
     @Test
@@ -164,7 +166,7 @@ public class TestHiveServer2ParquetImport {
 
       runImport(args);
 
-      insertIntoTable(TEST_COLUMN_TYPES, TEST_COLUMN_VALUES_LINE2);
+      insertIntoTable(TEST_COLUMN_NAMES, TEST_COLUMN_TYPES, TEST_COLUMN_VALUES_LINE2);
 
       runImport(args);
 
@@ -182,7 +184,7 @@ public class TestHiveServer2ParquetImport {
 
       // Recreate the test table to contain different test data.
       dropTableIfExists(getTableName());
-      createTableWithColTypes(TEST_COLUMN_TYPES, TEST_COLUMN_VALUES_LINE2);
+      createTableWithColTypesAndNames(TEST_COLUMN_NAMES, TEST_COLUMN_TYPES, TEST_COLUMN_VALUES_LINE2);
 
       runImport(args);
 

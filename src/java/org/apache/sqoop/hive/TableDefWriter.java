@@ -20,8 +20,10 @@ package org.apache.sqoop.hive;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Date;
 import java.text.DateFormat;
@@ -88,6 +90,9 @@ public class TableDefWriter {
    * Get the column names to import.
    */
   private String [] getColumnNames() {
+    if (options.getFileLayout() == SqoopOptions.FileLayout.ParquetFile) {
+      return getColumnNamesFromAvroSchema();
+    }
     String [] colNames = options.getColumns();
     if (null != colNames) {
       return colNames; // user-specified column names.
@@ -96,6 +101,17 @@ public class TableDefWriter {
     } else {
       return connManager.getColumnNamesForQuery(options.getSqlQuery());
     }
+  }
+
+  private String[] getColumnNamesFromAvroSchema() {
+    Schema avroSchema = getAvroSchema();
+    List<String> result = new ArrayList<>();
+
+    for (Schema.Field field : avroSchema.getFields()) {
+      result.add(field.name());
+    }
+
+    return result.toArray(new String[result.size()]);
   }
 
   /**
@@ -165,9 +181,9 @@ public class TableDefWriter {
 
       first = false;
 
-      Integer colType = columnTypes.get(col);
       String hiveColType;
       if (options.getFileLayout() == SqoopOptions.FileLayout.TextFile) {
+        Integer colType = columnTypes.get(col);
         hiveColType = getHiveColumnTypeForTextTable(userMapping, col, colType);
       } else if (options.getFileLayout() == SqoopOptions.FileLayout.ParquetFile) {
         hiveColType = HiveTypes.toHiveType(columnNameToAvroType.get(col));
@@ -227,9 +243,8 @@ public class TableDefWriter {
     }
     Map<String, Schema.Type> result = new HashMap<>();
     Schema avroSchema = getAvroSchema();
-    // TODO: does this work correctly if we have only 1 column?
     for (Schema.Field field : avroSchema.getFields()) {
-      result.put(field.getProp("columnName"), getNonNullAvroType(field.schema()));
+      result.put(field.name(), getNonNullAvroType(field.schema()));
     }
 
     return result;
