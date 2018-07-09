@@ -181,15 +181,7 @@ public class TableDefWriter {
 
       first = false;
 
-      String hiveColType;
-      if (options.getFileLayout() == SqoopOptions.FileLayout.TextFile) {
-        Integer colType = columnTypes.get(col);
-        hiveColType = getHiveColumnTypeForTextTable(userMapping, col, colType);
-      } else if (options.getFileLayout() == SqoopOptions.FileLayout.ParquetFile) {
-        hiveColType = HiveTypes.toHiveType(columnNameToAvroType.get(col));
-      } else {
-        throw new RuntimeException("File format is not supported for Hive tables.");
-      }
+      String hiveColType = getHiveColumnType(col, userMapping, columnTypes, columnNameToAvroType);
 
       sb.append('`').append(col).append("` ").append(hiveColType);
 
@@ -237,6 +229,22 @@ public class TableDefWriter {
     return sb.toString();
   }
 
+  private String getHiveColumnType(String columnName, Properties userMapping, Map<String, Integer> textFileTypeMapping, Map<String, Schema.Type> parquetFileTypeMapping) throws IOException {
+    String hiveColType = userMapping.getProperty(columnName);
+    if (hiveColType != null) {
+      return hiveColType;
+    }
+
+    if (options.getFileLayout() == SqoopOptions.FileLayout.TextFile) {
+      hiveColType = getHiveColumnTypeForTextTable(columnName, textFileTypeMapping.get(columnName));
+    } else if (options.getFileLayout() == SqoopOptions.FileLayout.ParquetFile) {
+      hiveColType = HiveTypes.toHiveType(parquetFileTypeMapping.get(columnName));
+    } else {
+      throw new RuntimeException("File format is not supported for Hive tables.");
+    }
+    return hiveColType;
+  }
+
   private Map<String, Schema.Type> getColumnNameToAvroTypeMapping() {
     if (options.getFileLayout() != SqoopOptions.FileLayout.ParquetFile) {
       return Collections.emptyMap();
@@ -264,11 +272,9 @@ public class TableDefWriter {
     return null;
   }
   
-  private String getHiveColumnTypeForTextTable(Properties userMapping, String columnName, Integer columnType) throws IOException {
-    String hiveColType = userMapping.getProperty(columnName);
-    if (hiveColType == null) {
-      hiveColType = connManager.toHiveType(inputTableName, columnName, columnType);
-    }
+  private String getHiveColumnTypeForTextTable(String columnName, Integer columnType) throws IOException {
+    String hiveColType = connManager.toHiveType(inputTableName, columnName, columnType);
+
     if (null == hiveColType) {
       throw new IOException("Hive does not support the SQL type for column "
           + columnName);

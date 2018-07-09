@@ -61,6 +61,8 @@ public class TestHiveServer2ParquetImport {
   private static final Object[] EXPECTED_TEST_COLUMN_ALL_TYPES_VALUES = {10, 12345678910123L, 12.34, "456842.45", true, timeFromString("2018-06-14 15:00:00.000"), decodeHex("abcdef"), "testVarchar", "testChar"};
 
   private static final List<Object> TEST_COLUMN_VALUES = Arrays.<Object>asList("test", 42, "somestring");
+  
+  private static final List<Object> TEST_COLUMN_VALUES_MAPPED = Arrays.<Object>asList("test", "42", "somestring");
 
   private static final List<Object> TEST_COLUMN_VALUES_LINE2 = Arrays.<Object>asList("test2", 4242, "somestring2");
 
@@ -145,6 +147,52 @@ public class TestHiveServer2ParquetImport {
 
       List<List<Object>> rows = hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
       assertThat(rows, hasItems(TEST_COLUMN_VALUES));
+    }
+
+    @Test
+    public void testHiveImportAsParquetWithMapColumnJavaAndOriginalColumnNameSucceeds() throws Exception {
+      String[] args = commonArgs(getConnectString(), getTableName())
+          .withOption("map-column-java", "C2#INTEGER=String")
+          .build();
+
+      runImport(args);
+
+      List<List<Object>> rows = hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
+      assertThat(rows, hasItems(TEST_COLUMN_VALUES_MAPPED));
+    }
+
+    @Test(expected = Exception.class)
+    public void testHiveImportAsParquetWithMapColumnJavaAndAvroIdentifierFails() throws Exception {
+      String[] args = commonArgs(getConnectString(), getTableName())
+          .withOption("map-column-java", "C2_INTEGER=String")
+          .build();
+
+      runImport(args);
+
+      List<List<Object>> rows = hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
+      assertThat(rows, hasItems(TEST_COLUMN_VALUES_MAPPED));
+    }
+
+    @Test(expected = Exception.class)
+    public void testHiveImportAsParquetWithMapColumnHiveAndAvroIdentifierFails() throws Exception {
+      String[] args = commonArgs(getConnectString(), getTableName())
+          .withOption("map-column-hive", "C2_INTEGER=STRING")
+          .build();
+
+      runImport(args);
+
+      List<List<Object>> rows = hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
+    }
+
+    @Test(expected = Exception.class)
+    public void testHiveImportAsParquetWithMapColumnHiveAndOriginalColumnNameFails() throws Exception {
+      String[] args = commonArgs(getConnectString(), getTableName())
+          .withOption("map-column-hive", "C2#INTEGER=STRING")
+          .build();
+
+      runImport(args);
+
+      List<List<Object>> rows = hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
     }
 
     @Test
