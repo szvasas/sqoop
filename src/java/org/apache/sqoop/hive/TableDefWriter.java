@@ -21,7 +21,6 @@ package org.apache.sqoop.hive;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +63,7 @@ public class TableDefWriter {
   private String inputTableName;
   private String outputTableName;
   private boolean commentsEnabled;
+  private Schema avroSchema;
 
   /**
    * Creates a new TableDefWriter to generate a Hive CREATE TABLE statement.
@@ -104,10 +104,9 @@ public class TableDefWriter {
   }
 
   private String[] getColumnNamesFromAvroSchema() {
-    Schema avroSchema = getAvroSchema();
     List<String> result = new ArrayList<>();
 
-    for (Schema.Field field : avroSchema.getFields()) {
+    for (Schema.Field field : getAvroSchema().getFields()) {
       result.add(field.name());
     }
 
@@ -130,7 +129,6 @@ public class TableDefWriter {
     }
 
     String [] colNames = getColumnNames();
-    Map<String, Schema.Type> columnNameToAvroType = getColumnNameToAvroTypeMapping();
     StringBuilder sb = new StringBuilder();
     if (options.doFailIfHiveTableExists()) {
       if (isHiveExternalTableSet) {
@@ -186,6 +184,7 @@ public class TableDefWriter {
         Integer colType = columnTypes.get(col);
         hiveColType = getHiveColumnTypeForTextTable(userMapping, col, colType);
       } else if (options.getFileLayout() == SqoopOptions.FileLayout.ParquetFile) {
+        Map<String, Schema.Type> columnNameToAvroType = getColumnNameToAvroTypeMapping();
         hiveColType = HiveTypes.toHiveType(columnNameToAvroType.get(col));
       } else {
         throw new RuntimeException("File format is not supported for Hive tables.");
@@ -238,9 +237,6 @@ public class TableDefWriter {
   }
 
   private Map<String, Schema.Type> getColumnNameToAvroTypeMapping() {
-    if (options.getFileLayout() != SqoopOptions.FileLayout.ParquetFile) {
-      return Collections.emptyMap();
-    }
     Map<String, Schema.Type> result = new HashMap<>();
     Schema avroSchema = getAvroSchema();
     for (Schema.Field field : avroSchema.getFields()) {
@@ -389,8 +385,12 @@ public class TableDefWriter {
   }
 
   Schema getAvroSchema() {
-    String schemaString = options.getConf().get(SQOOP_PARQUET_AVRO_SCHEMA_KEY);
-    return AvroUtil.parseAvroSchema(schemaString);
+    if (avroSchema == null) {
+      String schemaString = options.getConf().get(SQOOP_PARQUET_AVRO_SCHEMA_KEY);
+      avroSchema = AvroUtil.parseAvroSchema(schemaString); 
+    }
+
+    return avroSchema;
   }
 }
 

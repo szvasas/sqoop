@@ -50,7 +50,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(Enclosed.class)
 public class TestHiveServer2ParquetImport {
 
-  private static final String[] TEST_COLUMN_NAMES = {"C1_VARCHAR", "C2#INTEGER", "C3_CHAR"};
+  private static final String[] TEST_COLUMN_NAMES = {"C1_VARCHAR", "C2#INTEGER", "3C_CHAR"};
 
   private static final String[] TEST_COLUMN_TYPES = {"VARCHAR(32)", "INTEGER", "CHAR(64)"};
 
