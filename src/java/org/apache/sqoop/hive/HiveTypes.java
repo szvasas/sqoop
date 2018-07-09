@@ -29,6 +29,15 @@ import org.apache.commons.logging.LogFactory;
  */
 public final class HiveTypes {
 
+  private static final String HIVE_TYPE_TINYINT = "TINYINT";
+  private static final String HIVE_TYPE_INT = "INT";
+  private static final String HIVE_TYPE_BIGINT = "BIGINT";
+  private static final String HIVE_TYPE_FLOAT = "FLOAT";
+  private static final String HIVE_TYPE_DOUBLE = "DOUBLE";
+  private static final String HIVE_TYPE_STRING = "STRING";
+  private static final String HIVE_TYPE_BOOLEAN = "BOOLEAN";
+  private static final String HIVE_TYPE_BINARY = "BINARY";
+
   public static final Log LOG = LogFactory.getLog(HiveTypes.class.getName());
 
   private HiveTypes() { }
@@ -42,7 +51,7 @@ public final class HiveTypes {
       switch (sqlType) {
           case Types.INTEGER:
           case Types.SMALLINT:
-              return "INT";
+              return HIVE_TYPE_INT;
           case Types.VARCHAR:
           case Types.CHAR:
           case Types.LONGVARCHAR:
@@ -53,20 +62,20 @@ public final class HiveTypes {
           case Types.TIME:
           case Types.TIMESTAMP:
           case Types.CLOB:
-              return "STRING";
+              return HIVE_TYPE_STRING;
           case Types.NUMERIC:
           case Types.DECIMAL:
           case Types.FLOAT:
           case Types.DOUBLE:
           case Types.REAL:
-              return "DOUBLE";
+              return HIVE_TYPE_DOUBLE;
           case Types.BIT:
           case Types.BOOLEAN:
-              return "BOOLEAN";
+              return HIVE_TYPE_BOOLEAN;
           case Types.TINYINT:
-              return "TINYINT";
+              return HIVE_TYPE_TINYINT;
           case Types.BIGINT:
-              return "BIGINT";
+              return HIVE_TYPE_BIGINT;
           default:
         // TODO(aaron): Support BINARY, VARBINARY, LONGVARBINARY, DISTINCT,
         // BLOB, ARRAY, STRUCT, REF, JAVA_OBJECT.
@@ -77,21 +86,21 @@ public final class HiveTypes {
   public static String toHiveType(Schema.Type avroType) {
       switch (avroType) {
         case BOOLEAN:
-          return "BOOLEAN";
+          return HIVE_TYPE_BOOLEAN;
         case INT:
-          return "INT";
+          return HIVE_TYPE_INT;
         case LONG:
-          return "BIGINT";
+          return HIVE_TYPE_BIGINT;
         case FLOAT:
-          return "FLOAT";
+          return HIVE_TYPE_FLOAT;
         case DOUBLE:
-          return "DOUBLE";
+          return HIVE_TYPE_DOUBLE;
         case STRING:
         case ENUM:
-          return "STRING";
+          return HIVE_TYPE_STRING;
         case BYTES:
         case FIXED:
-          return "BINARY";
+          return HIVE_TYPE_BINARY;
         default:
           return null;
       }
