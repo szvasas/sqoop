@@ -180,6 +180,7 @@ public class TestHiveServer2ParquetImport {
 
       runImport(args);
 
+      // Recreate the test table to contain different test data.
       dropTableIfExists(getTableName());
       createTableWithColTypes(TEST_COLUMN_TYPES, TEST_COLUMN_VALUES_LINE2);
 
