@@ -21,6 +21,7 @@ package org.apache.sqoop.hive;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,6 +130,7 @@ public class TableDefWriter {
     }
 
     String [] colNames = getColumnNames();
+    Map<String, Schema.Type> columnNameToAvroType = getColumnNameToAvroTypeMapping();
     StringBuilder sb = new StringBuilder();
     if (options.doFailIfHiveTableExists()) {
       if (isHiveExternalTableSet) {
@@ -184,7 +186,6 @@ public class TableDefWriter {
         Integer colType = columnTypes.get(col);
         hiveColType = getHiveColumnTypeForTextTable(userMapping, col, colType);
       } else if (options.getFileLayout() == SqoopOptions.FileLayout.ParquetFile) {
-        Map<String, Schema.Type> columnNameToAvroType = getColumnNameToAvroTypeMapping();
         hiveColType = HiveTypes.toHiveType(columnNameToAvroType.get(col));
       } else {
         throw new RuntimeException("File format is not supported for Hive tables.");
@@ -237,6 +238,9 @@ public class TableDefWriter {
   }
 
   private Map<String, Schema.Type> getColumnNameToAvroTypeMapping() {
+    if (options.getFileLayout() != SqoopOptions.FileLayout.ParquetFile) {
+      return Collections.emptyMap();
+    }
     Map<String, Schema.Type> result = new HashMap<>();
     Schema avroSchema = getAvroSchema();
     for (Schema.Field field : avroSchema.getFields()) {
