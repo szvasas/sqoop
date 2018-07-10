@@ -20,12 +20,14 @@ package org.apache.sqoop.hive;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.hadoop.fs.Path;
 import org.apache.hive.service.cli.HiveSQLException;
 import org.apache.sqoop.hive.minicluster.HiveMiniCluster;
 import org.apache.sqoop.hive.minicluster.NoAuthenticationConfiguration;
 import org.apache.sqoop.testutil.ArgumentArrayBuilder;
 import org.apache.sqoop.testutil.HiveServer2TestUtil;
 import org.apache.sqoop.testutil.ImportJobTestCase;
+import org.apache.sqoop.util.ParquetReader;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -36,6 +38,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import parquet.hadoop.metadata.CompressionCodecName;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -106,8 +109,7 @@ public class TestHiveServer2ParquetImport {
     }
 
     @Test
-    // TODO: shall we explicitly check compression codec from the file?
-    public void testHiveImportAsParquetWithCompressionCodec() throws Exception {
+    public void testHiveImportAsParquetWithCompressionCodecCanBeLoaded() throws Exception {
       String[] args = commonArgs(getConnectString(), getTableName())
           .withOption("compression-codec", compressionCodec)
           .build();
@@ -116,6 +118,19 @@ public class TestHiveServer2ParquetImport {
 
       List<List<Object>> rows = hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
       assertThat(rows, hasItems(TEST_COLUMN_VALUES));
+    }
+
+    @Test
+    public void testImportedFilesHaveCorrectCodec() throws Exception {
+      Path tablePath = new Path(hiveMiniCluster.getTempFolderPath() + "/" + getTableName().toLowerCase());
+      String[] args = commonArgs(getConnectString(), getTableName())
+          .withOption("compression-codec", compressionCodec)
+          .build();
+
+      runImport(args);
+
+      CompressionCodecName codec = new ParquetReader(tablePath).getCodec();
+      assertEquals(compressionCodec, codec.name().toLowerCase());
     }
   }
 
