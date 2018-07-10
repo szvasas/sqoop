@@ -1194,7 +1194,7 @@ public class ImportTool extends BaseSqoopTool {
     if (!options.doHiveImport()) {
       return false;
     }
- 
+
     if (options.getFileLayout() != SqoopOptions.FileLayout.ParquetFile) {
       return true;
     }

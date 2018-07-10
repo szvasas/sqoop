@@ -391,7 +391,7 @@ public class TableDefWriter {
   Schema getAvroSchema() {
     if (avroSchema == null) {
       String schemaString = options.getConf().get(SQOOP_PARQUET_AVRO_SCHEMA_KEY);
-      avroSchema = AvroUtil.parseAvroSchema(schemaString); 
+      avroSchema = AvroUtil.parseAvroSchema(schemaString);
     }
 
     return avroSchema;
