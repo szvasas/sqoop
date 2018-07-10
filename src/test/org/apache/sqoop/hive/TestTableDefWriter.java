@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
  */
 public class TestTableDefWriter {
 
-  private static final String TEST_AVRO_SCHEMA = "{\"type\":\"record\",\"name\":\"IMPORT_TABLE_1\",\"doc\":\"Sqoop import of IMPORT_TABLE_1\",\"fields\":[{\"name\":\"C1_VARCHAR\",\"type\":[\"null\",\"string\"],\"default\":null,\"columnName\":\"C1_VARCHAR\",\"sqlType\":\"12\"},{\"name\":\"C2_INTEGER\",\"type\":[\"null\",\"int\"],\"default\":null,\"columnName\":\"C2#INTEGER\",\"sqlType\":\"4\"},{\"name\":\"_3C_CHAR\",\"type\":[\"null\",\"string\"],\"default\":null,\"columnName\":\"3C_CHAR\",\"sqlType\":\"1\"}],\"tableName\":\"IMPORT_TABLE_1\"}";
+  private static final String TEST_AVRO_SCHEMA = "{\"type\":\"record\",\"name\":\"IMPORT_TABLE_1\",\"fields\":[{\"name\":\"C1_VARCHAR\",\"type\":[\"null\",\"string\"]},{\"name\":\"C2_INTEGER\",\"type\":[\"null\",\"int\"]},{\"name\":\"_3C_CHAR\",\"type\":[\"null\",\"string\"]}]}";
 
   private static final String EXPECTED_CREATE_PARQUET_TABLE_STMNT = "CREATE TABLE IF NOT EXISTS `outputTable` ( `C1_VARCHAR` STRING, `C2_INTEGER` INT, `_3C_CHAR` STRING) STORED AS PARQUET";
 
