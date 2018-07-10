@@ -21,7 +21,6 @@ package org.apache.sqoop.hive;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.hadoop.fs.Path;
-import org.apache.hive.service.cli.HiveSQLException;
 import org.apache.sqoop.hive.minicluster.HiveMiniCluster;
 import org.apache.sqoop.hive.minicluster.NoAuthenticationConfiguration;
 import org.apache.sqoop.testutil.ArgumentArrayBuilder;
@@ -38,7 +37,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.hamcrest.core.IsInstanceOf;
 import parquet.hadoop.metadata.CompressionCodecName;
 
 import java.io.IOException;
@@ -199,23 +197,22 @@ public class TestHiveServer2ParquetImport {
     }
 
     /**
-     * This test case documents that the Avro identifier(C2_INTEGER)
-     * of a special column name(C2#INTEGER) must not be used in map-column-hive.
-     * The import itself will be successful but when the customer tries to read
-     * the imported data with Hive it will fail because the Hive column and the
-     * Parquet schema types will not be consistent.
+     * This test case documents that a mapping with the Avro identifier(C2_INTEGER)
+     * of a special column name(C2#INTEGER) is ignored in map-column-hive.
+     * The reason is that the column type of the Avro schema and the Hive table must
+     * be equal and if we would be able to override the Hive column type using map-column-hive
+     * the inconsistency would cause a Hive error during reading.
      */
     @Test
-    public void testHiveLoadAsParquetWithMapColumnHiveAndAvroIdentifierFails() throws Exception {
+    public void testHiveImportAsParquetWithMapColumnHiveAndAvroIdentifierIgnoresMapping() throws Exception {
       String[] args = commonArgs(getConnectString(), getTableName())
           .withOption("map-column-hive", "C2_INTEGER=STRING")
           .build();
 
       runImport(args);
 
-      expectedException.expectCause(IsInstanceOf.<Throwable>instanceOf(HiveSQLException.class));
-
-      hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
+      List<List<Object>> rows = hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
+      assertThat(rows, hasItems(TEST_COLUMN_VALUES));
     }
 
     /**
