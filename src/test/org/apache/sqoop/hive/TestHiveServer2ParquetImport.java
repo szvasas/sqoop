@@ -20,6 +20,7 @@ package org.apache.sqoop.hive;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.hive.service.cli.HiveSQLException;
 import org.apache.sqoop.hive.minicluster.HiveMiniCluster;
 import org.apache.sqoop.hive.minicluster.NoAuthenticationConfiguration;
 import org.apache.sqoop.testutil.ArgumentArrayBuilder;
@@ -36,6 +37,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,6 +45,7 @@ import static java.util.Arrays.asList;
 import static java.util.Arrays.deepEquals;
 import static org.apache.sqoop.testutil.BaseSqoopTestCase.timeFromString;
 import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -61,7 +64,7 @@ public class TestHiveServer2ParquetImport {
   private static final Object[] EXPECTED_TEST_COLUMN_ALL_TYPES_VALUES = {10, 12345678910123L, 12.34, "456842.45", true, timeFromString("2018-06-14 15:00:00.000"), decodeHex("abcdef"), "testVarchar", "testChar"};
 
   private static final List<Object> TEST_COLUMN_VALUES = Arrays.<Object>asList("test", 42, "somestring");
-  
+
   private static final List<Object> TEST_COLUMN_VALUES_MAPPED = Arrays.<Object>asList("test", "42", "somestring");
 
   private static final List<Object> TEST_COLUMN_VALUES_LINE2 = Arrays.<Object>asList("test2", 4242, "somestring2");
@@ -161,38 +164,63 @@ public class TestHiveServer2ParquetImport {
       assertThat(rows, hasItems(TEST_COLUMN_VALUES_MAPPED));
     }
 
-    @Test(expected = Exception.class)
+    /**
+     * This test case documents that the Avro identifier(C2_INTEGER)
+     * of a special column name(C2#INTEGER) cannot be used in map-column-java.
+     * The reason is that org.apache.sqoop.orm.AvroSchemaGenerator#toAvroType(java.lang.String, int)
+     * which maps the Avro schema type uses the original column name and
+     * not the Avro identifier but org.apache.sqoop.orm.ClassWriter#toJavaType(java.lang.String, int)
+     * can map the DAO class field types based on the Avro identifier too so there will be a discrepancy
+     * between the generated Avro schema types and the DAO class field types.
+     */
+    @Test
     public void testHiveImportAsParquetWithMapColumnJavaAndAvroIdentifierFails() throws Exception {
       String[] args = commonArgs(getConnectString(), getTableName())
           .withOption("map-column-java", "C2_INTEGER=String")
           .build();
 
+      expectedException.expect(IOException.class);
       runImport(args);
-
-      List<List<Object>> rows = hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
-      assertThat(rows, hasItems(TEST_COLUMN_VALUES_MAPPED));
     }
 
-    @Test(expected = Exception.class)
-    public void testHiveImportAsParquetWithMapColumnHiveAndAvroIdentifierFails() throws Exception {
+    /**
+     * This test case documents that the Avro identifier(C2_INTEGER)
+     * of a special column name(C2#INTEGER) must not be used in map-column-hive.
+     * The import itself will be successful but when the customer tries to read
+     * the imported data with Hive it will fail because the Hive column and the
+     * Parquet schema types will not be consistent.
+     */
+    @Test
+    public void testHiveLoadAsParquetWithMapColumnHiveAndAvroIdentifierFails() throws Exception {
       String[] args = commonArgs(getConnectString(), getTableName())
           .withOption("map-column-hive", "C2_INTEGER=STRING")
           .build();
 
       runImport(args);
 
-      List<List<Object>> rows = hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
+      expectedException.expectCause(instanceOf(HiveSQLException.class));
+
+      hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
     }
 
-    @Test(expected = Exception.class)
+    /**
+     * This test case documents that the special column name(C2#INTEGER)
+     * cannot be used in map-column-hive.
+     * The reason is that Sqoop uses the Avro identifier(C2_INTEGER) as Hive column
+     * name and there is a check in org.apache.sqoop.hive.TableDefWriter#getCreateTableStmt()
+     * which verifies that all the columns in map-column-hive are actually valid column names.
+     * Since C2_INTEGER is used instead of C2#INTEGER the check will fail on the latter.
+     */
+    @Test
     public void testHiveImportAsParquetWithMapColumnHiveAndOriginalColumnNameFails() throws Exception {
       String[] args = commonArgs(getConnectString(), getTableName())
           .withOption("map-column-hive", "C2#INTEGER=STRING")
           .build();
 
-      runImport(args);
+      expectedException.expect(IllegalArgumentException.class);
+      expectedException.expectMessage("No column by the name C2#INTEGERfound while importing data");
 
-      List<List<Object>> rows = hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
+      runImportThrowingException(args);
     }
 
     @Test
