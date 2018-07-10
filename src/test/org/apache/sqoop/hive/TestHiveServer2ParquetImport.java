@@ -38,6 +38,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.hamcrest.core.IsInstanceOf;
 import parquet.hadoop.metadata.CompressionCodecName;
 
 import java.io.IOException;
@@ -48,7 +49,6 @@ import static java.util.Arrays.asList;
 import static java.util.Arrays.deepEquals;
 import static org.apache.sqoop.testutil.BaseSqoopTestCase.timeFromString;
 import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -213,7 +213,7 @@ public class TestHiveServer2ParquetImport {
 
       runImport(args);
 
-      expectedException.expectCause(instanceOf(HiveSQLException.class));
+      expectedException.expectCause(IsInstanceOf.<Throwable>instanceOf(HiveSQLException.class));
 
       hiveServer2TestUtil.loadRawRowsFromTable(getTableName());
     }
