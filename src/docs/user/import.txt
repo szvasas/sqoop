@@ -449,7 +449,7 @@ Parquet support
 +++++++++++++++
 
 Sqoop has only one implementation now for importing data in Parquet format which is based on the Parquet Hadoop API.
-Note that the legacy Kite Dataset API based implementation is removed so users have to make sure that both 
+Note that the legacy Kite Dataset API based implementation is removed so users have to make sure that both
 +\--parquet-configurator-implementation+ option and +parquetjob.configurator.implementation+ property are unset or
 set to "hadoop".
 
