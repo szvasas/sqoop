@@ -463,6 +463,10 @@ $ sqoop import --connect jdbc:mysql://db.foo.com/corp --table EMPLOYEES --as-par
 $ sqoop import --connect jdbc:mysql://db.foo.com/corp --table EMPLOYEES --as-parquetfile --parquet-configurator-implementation hadoop
 ----
 
+If \+--parquet-configurator-implementation+ option is not present then Sqoop will check the value of \+parquetjob.configurator.implementation+
+property (which can be specified using -D in the Sqoop command or in the site.xml). If that value is also absent Sqoop will
+default to Kite Dataset API based implementation.
+
 The Kite Dataset API based implementation executes the import command on a different code
 path than the text import: it creates the Hive table based on the generated Avro schema by connecting to the Hive metastore.
 This can be a disadvantage since sometimes moving from the text file format to Parquet file format can lead to many
