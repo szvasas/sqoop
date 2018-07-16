@@ -158,7 +158,7 @@ public class TestMerge extends BaseSqoopTestCase {
   }
 
   @Test
-  public void testParquetFileMergeHadoop() throws Exception {
+  public void testParquetFileMerge() throws Exception {
     runMergeTest(SqoopOptions.FileLayout.ParquetFile);
   }
 
