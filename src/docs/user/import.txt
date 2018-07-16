@@ -467,14 +467,14 @@ The Kite Dataset API based implementation executes the import command on a diffe
 path than the text import: it creates the Hive table based on the generated Avro schema by connecting to the Hive metastore.
 This can be a disadvantage since sometimes moving from the text file format to Parquet file format can lead to many
 unexpected behavioral changes. Kite checks the Hive table schema before importing the data into it so if the user wants
-to import some data which has a schema incompatible with the Hive table's schema Sqoop will throw an error.
+to import some data which has a schema incompatible with the Hive table's schema Sqoop will throw an error. This implementation
+uses snappy codec for compression by default and apart from this it supports the bzip codec too.
 
 The Parquet Hadoop API based implementation builds the Hive CREATE TABLE statement and executes the
 LOAD DATA INPATH command just like the text import does. Unlike Kite it also supports connecting to HiveServer2 (using the +\--hs2-url+ option)
 so it provides better security features. This implementation does not check the Hive table's schema before importing so
 it is possible that the user can successfully import data into Hive but they get an error during a Hive read operation later.
-
-Both implementations support snappy and bzip codecs which can be set using the +\--compression-codec+ option.
+It does not use any compression by default but supports snappy and bzip codecs.
 
 Enabling Logical Types in Avro and Parquet import for numbers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
