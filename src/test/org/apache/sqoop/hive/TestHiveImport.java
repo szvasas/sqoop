@@ -23,14 +23,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.sqoop.util.ParquetReader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,7 +46,6 @@ import org.apache.sqoop.tool.SqoopTool;
 import org.apache.commons.cli.ParseException;
 import org.junit.rules.ExpectedException;
 
-import static java.util.Collections.sort;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -276,54 +273,6 @@ public class TestHiveImport extends ImportJobTestCase {
     String [] vals = { "'test'", "42", "'somestring'" };
     runImportTest(TABLE_NAME, types, vals, "normalImport.q",
         getArgv(false, null), new ImportTool());
-  }
-
-  /** Test that strings and ints are handled in the normal fashion as parquet
-   * file. */
-  @Test
-  public void testNormalHiveImportAsParquet() throws IOException {
-    final String TABLE_NAME = "normal_hive_import_as_parquet";
-    setCurTableName(TABLE_NAME);
-    setNumCols(3);
-    String [] types = getTypes();
-    String [] vals = { "'test'", "42", "'somestring'" };
-    String [] extraArgs = {"--as-parquetfile"};
-
-    runImportTest(TABLE_NAME, types, vals, "", getArgv(false, extraArgs),
-        new ImportTool());
-    verifyHiveDataset(new Object[][]{{"test", 42, "somestring"}});
-  }
-
-  private void verifyHiveDataset(Object[][] valsArray) {
-    List<String> expected = getExpectedLines(valsArray);
-    List<String> result = new ParquetReader(getTablePath()).readAllInCsv();
-
-    sort(expected);
-    sort(result);
-
-    assertEquals(expected, result);
-  }
-
-  private List<String> getExpectedLines(Object[][] valsArray) {
-    List<String> expectations = new ArrayList<>();
-    if (valsArray != null) {
-      for (Object[] vals : valsArray) {
-        expectations.add(toCsv(vals));
-      }
-    }
-    return expectations;
-  }
-
-  private String toCsv(Object[] vals) {
-    StringBuilder result = new StringBuilder();
-
-    for (Object val : vals) {
-      result.append(val).append(",");
-    }
-
-    result.deleteCharAt(result.length() - 1);
-
-    return result.toString();
   }
 
   /** Test that table is created in hive with no data import. */
