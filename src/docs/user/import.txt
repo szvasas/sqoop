@@ -480,6 +480,13 @@ so it provides better security features. This implementation does not check the 
 it is possible that the user can successfully import data into Hive but they get an error during a Hive read operation later.
 It does not use any compression by default but supports snappy and bzip codecs.
 
+The below example demonstrates how to use Sqoop to import into Hive in Parquet format using HiveServer2 and snappy codec:
+
+----
+$ sqoop import --connect jdbc:mysql://db.foo.com/corp --table EMPLOYEES --as-parquetfile --compression-codec snappy
+--parquet-configurator-implementation hadoop --hs2-url "jdbc:hive2://hs2.foo.com:10000" --hs2-keytab "/path/to/keytab"
+----
+
 Enabling Logical Types in Avro and Parquet import for numbers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
