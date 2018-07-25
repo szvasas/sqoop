@@ -87,7 +87,7 @@ public class MySqlColumnEscapeImportTest extends ImportJobTestCase {
     args.add(mySQLTestUtils.getUserName());
     mySQLTestUtils.addPasswordIfIsSet(args);
     args.add("--target-dir");
-    args.add(getTablePath().toString());
+    args.add(getWarehouseDir());
     args.add("--num-mappers");
     args.add("1");
     args.add("--table");
@@ -105,7 +105,8 @@ public class MySqlColumnEscapeImportTest extends ImportJobTestCase {
     String[] args = getArgv();
     runImport(args);
 
-    Path filePath = new Path(getTablePath(), "part-m-00000");
+    Path warehousePath = new Path(this.getWarehouseDir());
+    Path filePath = new Path(warehousePath, "part-m-00000");
     String output = Files.toString(new File(filePath.toString()), Charsets.UTF_8);
 
     assertEquals("hello, world", output.trim());
