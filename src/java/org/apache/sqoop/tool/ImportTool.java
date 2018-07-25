@@ -329,8 +329,15 @@ public class ImportTool extends BaseSqoopTool {
       }
       break;
     case DateLastModified:
-      validateIncrementalConstraints(options, context.getTableName());
-
+      if (shouldCheckExistingOutputDirectory(options)) {
+        Path outputPath = getOutputPath(options, context.getTableName(), false);
+        FileSystem fs = outputPath.getFileSystem(options.getConf());
+        if (fs.exists(outputPath)) {
+          throw new ImportException("--" + MERGE_KEY_ARG + " or " + "--" + APPEND_ARG
+            + " is required when using --" + this.INCREMENT_TYPE_ARG
+            + " lastmodified and the output directory exists.");
+        }
+      }
       checkColumnType = manager.getColumnTypes(options.getTableName(),
         options.getSqlQuery()).get(options.getIncrementalTestColumn());
       nextVal = manager.getCurrentDbTimestamp();
@@ -430,18 +437,6 @@ public class ImportTool extends BaseSqoopTool {
         (nextVal == null) ? null : nextVal.toString());
 
     return true;
-  }
-
-  private void validateIncrementalConstraints(SqoopOptions options, String tableName) throws IOException, ImportException {
-    if (options.getMergeKeyCol() == null && !options.isAppendMode() && options.getHBaseTable() == null) {
-      Path outputPath = getOutputPath(options, tableName, false);
-      FileSystem fs = outputPath.getFileSystem(options.getConf());
-      if (fs.exists(outputPath)) {
-        throw new ImportException("--" + MERGE_KEY_ARG + " or " + "--" + APPEND_ARG
-          + " is required when using --" + this.INCREMENT_TYPE_ARG
-          + " lastmodified and the output directory exists.");
-      }
-    }
   }
 
   /**
@@ -1192,6 +1187,14 @@ public class ImportTool extends BaseSqoopTool {
     validateHiveOptions(options);
     validateHCatalogOptions(options);
     validateAccumuloOptions(options);
+  }
+
+  private boolean shouldCheckExistingOutputDirectory(SqoopOptions options) {
+    return options.getMergeKeyCol() == null && !options.isAppendMode() && isHBaseImport(options);
+  }
+
+  private boolean isHBaseImport(SqoopOptions options) {
+    return options.getHBaseTable() == null;
   }
 
   private boolean isHiveImportNeeded(SqoopOptions options) {
