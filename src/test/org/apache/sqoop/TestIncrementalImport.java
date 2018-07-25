@@ -856,8 +856,8 @@ public class TestIncrementalImport  {
   }
 
   @Test
-  public void testFullLastModifiedImportExistingTableFails() throws Exception {
-    final String TABLE_NAME = "failWithExistingTable";
+  public void testLastModifiedImportWithExistingOutputDirectoryFails() throws Exception {
+    final String TABLE_NAME = "failWithExistingOutputDirectory";
 
     createDir(TABLE_NAME);
 

@@ -1189,12 +1189,12 @@ public class ImportTool extends BaseSqoopTool {
     validateAccumuloOptions(options);
   }
 
-  private boolean shouldCheckExistingOutputDirectory(SqoopOptions options) {
-    return options.getMergeKeyCol() == null && !options.isAppendMode() && isHBaseImport(options);
+  boolean shouldCheckExistingOutputDirectory(SqoopOptions options) {
+    return options.getMergeKeyCol() == null && !options.isAppendMode() && !isHBaseImport(options);
   }
 
   private boolean isHBaseImport(SqoopOptions options) {
-    return options.getHBaseTable() == null;
+    return options.getHBaseTable() != null;
   }
 
   private boolean isHiveImportNeeded(SqoopOptions options) {
