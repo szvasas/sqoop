@@ -128,7 +128,7 @@ public class TestImportTool {
   public void testShouldCheckExistingOutputDirectoryReturnsFalseForHBaseImport() {
     SqoopOptions sqoopOptions = mock(SqoopOptions.class);
     when(sqoopOptions.getHBaseTable()).thenReturn("hbasetable");
-    
+
     assertFalse(importTool.shouldCheckExistingOutputDirectory(sqoopOptions));
   }
 
