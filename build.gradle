@@ -88,6 +88,7 @@ def sqoopThirdPartyLib = System.getProperty("sqoop.thirdparty.lib.dir")
 
 dependencies {
     if (sqoopThirdPartyLib != null) runtime fileTree(dir: sqoopThirdPartyLib, include: '*.jar')
+    compile group: 'org.apache.hadoop', name: 'hadoop-aws', version: hadoopVersion
     compile group: 'org.apache.hadoop', name: 'hadoop-common', version: hadoopVersion
     compile group: 'org.apache.hadoop', name: 'hadoop-hdfs', version: hadoopVersion
     compile group: 'org.apache.hadoop', name: 'hadoop-mapreduce-client-common', version: hadoopVersion
@@ -106,7 +107,10 @@ dependencies {
     common group: 'org.apache.hbase', name: 'hbase-common', version: hbaseVersion
     common (group: 'org.apache.hive.hcatalog', name: 'hive-hcatalog-core', version: hcatalogVersion) {
         exclude  group: 'org.apache.avro', module: 'avro'
+        exclude  group: 'org.apache.hive', module: 'hive-exec'
     }
+    common group: 'org.apache.hive', name: 'hive-exec', version: hcatalogVersion, classifier: 'core'
+    common group: 'com.esotericsoftware', name: 'kryo-shaded', version: '3.0.3'
     common (group: 'org.apache.hive', name: 'hive-jdbc', version: hcatalogVersion) {
         exclude  group: 'org.apache.avro', module: 'avro'
     }
