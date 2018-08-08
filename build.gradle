@@ -110,7 +110,8 @@ dependencies {
         exclude  group: 'org.apache.hive', module: 'hive-exec'
     }
     common group: 'org.apache.hive', name: 'hive-exec', version: hcatalogVersion, classifier: 'core'
-    common group: 'com.esotericsoftware', name: 'kryo-shaded', version: '3.0.3'
+    // This is needed for hive-exec only.
+    common group: 'com.esotericsoftware.kryo', name: 'kryo', version: '2.22'
     common (group: 'org.apache.hive', name: 'hive-jdbc', version: hcatalogVersion) {
         exclude  group: 'org.apache.avro', module: 'avro'
     }
