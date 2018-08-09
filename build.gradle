@@ -110,7 +110,7 @@ dependencies {
         exclude  group: 'org.apache.hive', module: 'hive-exec'
     }
     common group: 'org.apache.hive', name: 'hive-exec', version: hcatalogVersion, classifier: 'core'
-    // This is needed for hive-exec only.
+    // Kryo is a dependency of hive-exec:core.
     common group: 'com.esotericsoftware.kryo', name: 'kryo', version: kryoVersion
     common (group: 'org.apache.hive', name: 'hive-jdbc', version: hcatalogVersion) {
         exclude  group: 'org.apache.avro', module: 'avro'
