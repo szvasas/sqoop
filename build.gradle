@@ -80,6 +80,7 @@ configurations.all {
     resolutionStrategy {
         force group: 'org.apache.avro', name: 'avro', version: avroVersion
         force group: 'org.apache.avro', name: 'avro-mapred', version: avroVersion
+        force group: 'com.google.guava', name: 'guava', version: guavaVersion
     }
     exclude group: 'org.apache.hadoop', module: 'avro'
 }
