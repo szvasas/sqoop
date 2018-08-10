@@ -150,6 +150,14 @@ task thirdPartyTest(type: Test) {
     systemProperty "ms.datatype.test.hdfsprefix" ,"file:///"
 }
 
+task customTest(type: Test) {
+    useJUnit {
+        includeCategories 'org.apache.sqoop.FastTest'
+    }
+    
+    forkEvery 1
+}
+
 task manualTest(type: Test) {
     description 'Run manual tests'
     include '**/*ManualTest.*'
@@ -402,5 +410,5 @@ publishing {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.5.1'
+    gradleVersion = '4.9'
 }

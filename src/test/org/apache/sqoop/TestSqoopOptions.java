@@ -42,6 +42,7 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 import org.apache.sqoop.SqoopOptions;
@@ -63,6 +64,7 @@ import static org.junit.Assert.fail;
 /**
  * Test aspects of the SqoopOptions class.
  */
+@Category(FastTest.class)
 public class TestSqoopOptions {
 
   private Properties originalSystemProperties;
