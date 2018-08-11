@@ -191,7 +191,7 @@ tasks.withType(Test) {
     minHeapSize = "512m"
     maxHeapSize = "5120m"
     jvmArgs '-Xmx5012m', "-da:org.apache.hadoop.hive.thrift.HadoopThriftAuthBridge"
-    forkEvery 1
+    forkEvery 0
 
     dependsOn buildFolder
 
