@@ -21,7 +21,6 @@ package org.apache.sqoop.db;
 import org.apache.sqoop.testutil.HsqldbTestServer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -30,7 +29,6 @@ import java.sql.Connection;
 
 import static org.junit.Assert.assertFalse;
 
-@Ignore
 public class TestDriverManagerJdbcConnectionFactory {
 
   private static final String HSQLDB_DRIVER_CLASS = "org.hsqldb.jdbcDriver";
