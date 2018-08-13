@@ -75,6 +75,10 @@ public class HsqldbTestServer {
   // to a database.
   private static final String HSQLDB_SCHEMA_NAME = "PUBLIC";
 
+  public static final String DEFAULT_HSQLDB_USER = "SA";
+
+  public static final String DEFAULT_HSQLDB_USER_PASSWORD = "";
+
   public static String getSchemaName() {
     return HSQLDB_SCHEMA_NAME;
   }
@@ -285,8 +289,8 @@ public class HsqldbTestServer {
     }
   }
 
-  public void changePasswordForUser(String username, String newPassword) throws SQLException {
-    try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+  public void changePasswordForUser(String username, String oldPassword, String newPassword) throws SQLException {
+    try (Connection connection = getConnection(username, oldPassword); Statement statement = connection.createStatement()) {
       statement.executeUpdate(String.format("ALTER USER %s SET PASSWORD %s", username, newPassword));
     }
   }
