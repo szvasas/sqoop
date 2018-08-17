@@ -159,7 +159,10 @@ public class HiveImport implements HiveClient {
     boolean debugMode = expectedScript != null;
     if (debugMode) {
       env.add("EXPECTED_SCRIPT=" + expectedScript);
-      env.add("TMPDIR=" + options.getTempDir());
+      String warehouseDir = options.getWarehouseDir();
+      if (warehouseDir != null) {
+        env.add("TMPDIR=" + warehouseDir);
+      }
     }
 
     // generate the HQL statements to run.
