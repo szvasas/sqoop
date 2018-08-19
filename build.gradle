@@ -150,12 +150,15 @@ task thirdPartyTest(type: Test) {
     systemProperty "ms.datatype.test.hdfsprefix" ,"file:///"
 }
 
-task customTest(type: Test) {
-    useJUnit {
-        includeCategories 'org.apache.sqoop.FastTest'
-    }
-    
-    forkEvery 1
+task allTest(type: Test) {
+    description 'Run ThirdParty tests - you need to specify -Dsqoop.thirdparty.lib.dir where the Third party driver jars reside (relative to the project directory)'
+    exclude '**/*ManualTest.*'
+    include '**/Test*.*'
+    include '**/*Test*.*'
+    systemProperty "ms.datatype.test.data.file.export" ,"DatatypeTestData-export-lite.txt"
+    systemProperty "ms.datatype.test.data.file.import" ,"DatatypeTestData-import-lite.txt"
+    systemProperty "ms.datatype.test.data.file.delim" ,","
+    systemProperty "ms.datatype.test.hdfsprefix" ,"file:///"
 }
 
 task manualTest(type: Test) {
