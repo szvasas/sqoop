@@ -83,6 +83,8 @@ public class HCatalogImportTest extends ImportJobTestCase {
   @Before
   public void setUp() {
     super.setUp();
+    TimeZone defaultTimeZone = TimeZone.getTimeZone(System.getProperty("user.timezone"));
+    TimeZone.setDefault(defaultTimeZone);
     try {
       utils.initUtils();
       extraTestArgs = new ArrayList<String>();
