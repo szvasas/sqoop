@@ -30,7 +30,6 @@ import org.apache.sqoop.infrastructure.kerberos.MiniKdcInfrastructureRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -45,7 +44,6 @@ import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-@Ignore
 public class TestHiveMiniCluster {
 
   @ClassRule

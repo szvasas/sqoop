@@ -20,12 +20,10 @@ package org.apache.sqoop.hbase;
 
 import org.apache.sqoop.infrastructure.kerberos.MiniKdcInfrastructureRule;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 
-@Ignore
 public class HBaseKerberizedConnectivityTest extends HBaseTestCase {
 
   private static final String HBASE_TABLE_NAME = "KerberosTest";

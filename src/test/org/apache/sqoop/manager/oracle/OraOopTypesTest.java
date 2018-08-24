@@ -24,7 +24,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import org.apache.sqoop.manager.oracle.util.OracleUtils;
 import org.junit.Test;
 
 public class OraOopTypesTest extends OraOopTestCase {
@@ -157,17 +156,5 @@ public class OraOopTypesTest extends OraOopTestCase {
       cleanupFolders();
       closeTestEnvConnection();
     }
-  }
-
-  protected String getConnectString() {
-    return OracleUtils.EE_CONNECT_STRING;
-  }
-
-  protected String getUsername() {
-    return OracleUtils.ORACLE_EE_USER_NAME;
-  }
-
-  protected String getPassword() {
-    return OracleUtils.ORACLE_EE_USER_PASS;
   }
 }

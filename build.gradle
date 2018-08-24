@@ -150,17 +150,6 @@ task thirdPartyTest(type: Test) {
     systemProperty "ms.datatype.test.hdfsprefix" ,"file:///"
 }
 
-task allTest(type: Test) {
-    description 'Run ThirdParty tests - you need to specify -Dsqoop.thirdparty.lib.dir where the Third party driver jars reside (relative to the project directory)'
-    exclude '**/*ManualTest.*'
-    include '**/Test*.*'
-    include '**/*Test*.*'
-    systemProperty "ms.datatype.test.data.file.export" ,"DatatypeTestData-export-lite.txt"
-    systemProperty "ms.datatype.test.data.file.import" ,"DatatypeTestData-import-lite.txt"
-    systemProperty "ms.datatype.test.data.file.delim" ,","
-    systemProperty "ms.datatype.test.hdfsprefix" ,"file:///"
-}
-
 task manualTest(type: Test) {
     description 'Run manual tests'
     include '**/*ManualTest.*'
@@ -175,7 +164,7 @@ task buildFolder {
 
 tasks.withType(Test) {
     testLogging {
-        events 'passed', 'skipped'
+        events 'started', 'passed', 'skipped'
     }
     workingDir = testBuildDirData
     project.mkdir(workingDir)
@@ -194,7 +183,7 @@ tasks.withType(Test) {
     minHeapSize = "512m"
     maxHeapSize = "5120m"
     jvmArgs '-Xmx5012m', "-da:org.apache.hadoop.hive.thrift.HadoopThriftAuthBridge"
-    forkEvery 0
+    forkEvery 1
 
     dependsOn buildFolder
 

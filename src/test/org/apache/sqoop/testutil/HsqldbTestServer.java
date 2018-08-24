@@ -75,10 +75,6 @@ public class HsqldbTestServer {
   // to a database.
   private static final String HSQLDB_SCHEMA_NAME = "PUBLIC";
 
-  public static final String DEFAULT_HSQLDB_USER = "SA";
-
-  public static final String DEFAULT_HSQLDB_USER_PASSWORD = "";
-
   public static String getSchemaName() {
     return HSQLDB_SCHEMA_NAME;
   }

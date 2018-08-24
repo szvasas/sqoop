@@ -215,7 +215,6 @@ public abstract class BaseSqoopTestCase {
   public void setUp() {
     // The assumption is that correct HADOOP configuration will have it set to
     // hdfs://namenode
-    SqoopOptions.clearNonceDir();
     resetDefaultTimeZone();
     setOnPhysicalCluster(
         !CommonArgs.LOCAL_FS.equals(System.getProperty(
