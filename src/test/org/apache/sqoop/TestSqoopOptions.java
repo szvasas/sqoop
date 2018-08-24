@@ -81,7 +81,7 @@ public class TestSqoopOptions {
 
   @Before
   public void setup() {
-    originalSystemProperties = System.getProperties();
+    originalSystemProperties = (Properties)System.getProperties().clone();
     excludedClassesFromClone.add(String.class);
     excludedClassesFromClone.add(Class.class);
     excludedClassesFromClone.add(Integer.class);

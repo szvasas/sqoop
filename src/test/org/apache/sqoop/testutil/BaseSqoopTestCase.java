@@ -222,6 +222,8 @@ public abstract class BaseSqoopTestCase {
             CommonArgs.FS_DEFAULT_NAME)));
     incrementTableNum();
 
+    SqoopOptions.clearNonceDir();
+
     if (!isLog4jConfigured) {
       BasicConfigurator.configure();
       isLog4jConfigured = true;
