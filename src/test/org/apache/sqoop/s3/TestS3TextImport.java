@@ -60,12 +60,13 @@ public class TestS3TextImport extends ImportJobTestCase {
     public void setup() throws IOException {
         S3TestUtils.runTestCaseOnlyIfS3CredentialsAreSet(s3CredentialGenerator);
         super.setUp();
-        s3Client = S3TestUtils.setupS3ImportTestCase(s3CredentialGenerator, this);
+        S3TestUtils.createTestTableFromInputData(this);
+        s3Client = S3TestUtils.setupS3ImportTestCase(s3CredentialGenerator);
     }
 
     @After
-    public void clearOutputDir() throws IOException {
-        S3TestUtils.clearTargetDir(s3Client);
+    public void cleanUpTargetDir() {
+        S3TestUtils.cleanUpDirectory(s3Client, S3TestUtils.getTargetDirPath());
         S3TestUtils.resetTargetDirName();
         super.tearDown();
     }
@@ -106,7 +107,7 @@ public class TestS3TextImport extends ImportJobTestCase {
     }
 
     @Test
-    public void testImportAsTextFile() throws IOException {
+    public void testS3ImportAsTextFile() throws IOException {
         ArgumentArrayBuilder builder = getArgumentArrayBuilder();
         builder.withOption("as-textfile");
         String[] args = builder.build();
@@ -115,24 +116,24 @@ public class TestS3TextImport extends ImportJobTestCase {
     }
 
     @Test
-    public void testImportAsTextFileWithDeleteTargetDirOptionWhenTargetDirAlreadyExists() throws IOException {
+    public void testS3ImportAsTextFileWithDeleteTargetDirOptionWhenTargetDirAlreadyExists() throws IOException {
         ArgumentArrayBuilder builder = getArgumentArrayBuilder();
         builder.withOption("as-textfile");
+        String[] args = builder.build();
+        runImport(args);
+
         builder.withOption("delete-target-dir");
-        String[] args = builder.build();
+        args = builder.build();
         runImport(args);
         TextFileTestUtils.verify(S3TestUtils.getExpectedTextOutput(), s3Client, S3TestUtils.getTargetDirPath());
-
-        runImport(args);
     }
 
     @Test
-    public void testImportAsTextFileWithoutDeleteTargetDirOptionWhenTargetDirAlreadyExists() throws IOException {
+    public void testS3ImportAsTextFileWithoutDeleteTargetDirOptionWhenTargetDirAlreadyExists() throws IOException {
         ArgumentArrayBuilder builder = getArgumentArrayBuilder();
         builder.withOption("as-textfile");
         String[] args = builder.build();
         runImport(args);
-        TextFileTestUtils.verify(S3TestUtils.getExpectedTextOutput(), s3Client, S3TestUtils.getTargetDirPath());
 
         thrown.expect(IOException.class);
         runImport(args);

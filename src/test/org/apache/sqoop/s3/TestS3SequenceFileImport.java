@@ -60,12 +60,13 @@ public class TestS3SequenceFileImport extends ImportJobTestCase {
     public void setup() throws IOException {
         S3TestUtils.runTestCaseOnlyIfS3CredentialsAreSet(s3CredentialGenerator);
         super.setUp();
-        s3Client = S3TestUtils.setupS3ImportTestCase(s3CredentialGenerator, this);
+        S3TestUtils.createTestTableFromInputData(this);
+        s3Client = S3TestUtils.setupS3ImportTestCase(s3CredentialGenerator);
     }
 
     @After
-    public void clearOutputDir() throws IOException {
-        S3TestUtils.clearTargetDir(s3Client);
+    public void cleanUpTargetDir() {
+        S3TestUtils.cleanUpDirectory(s3Client, S3TestUtils.getTargetDirPath());
         S3TestUtils.resetTargetDirName();
         super.tearDown();
     }
@@ -77,7 +78,7 @@ public class TestS3SequenceFileImport extends ImportJobTestCase {
 
 
     @Test
-    public void testImportAsSequenceFileWithoutDeleteTargetDirOptionWhenTargetDirDoesNotExist() throws Exception {
+    public void testS3ImportAsSequenceFileWithoutDeleteTargetDirOptionWhenTargetDirDoesNotExist() throws Exception {
         ArgumentArrayBuilder builder = getArgumentArrayBuilder();
         builder.withOption("as-sequencefile");
         String[] args = builder.build();
@@ -86,24 +87,25 @@ public class TestS3SequenceFileImport extends ImportJobTestCase {
     }
 
     @Test
-    public void testImportAsSequenceFileWithDeleteTargetDirOptionWhenTargetDirAlreadyExists() throws Exception {
+    public void testS3ImportAsSequenceFileWithDeleteTargetDirOptionWhenTargetDirAlreadyExists() throws Exception {
         ArgumentArrayBuilder builder = getArgumentArrayBuilder();
         builder.withOption("as-sequencefile");
+        String[] args = builder.build();
+        runImport(args);
+
         builder.withOption("delete-target-dir");
-        String[] args = builder.build();
+        args = builder.build();
         runImport(args);
         SequenceFileTestUtils.verify(this, S3TestUtils.getExpectedSequenceFileOutput(), s3Client, S3TestUtils.getTargetDirPath());
 
-        runImport(args);
     }
 
     @Test
-    public void testImportAsSequenceWithoutDeleteTargetDirOptionWhenTargetDirAlreadyExists() throws Exception {
+    public void testS3ImportAsSequenceWithoutDeleteTargetDirOptionWhenTargetDirAlreadyExists() throws Exception {
         ArgumentArrayBuilder builder = getArgumentArrayBuilder();
         builder.withOption("as-sequencefile");
         String[] args = builder.build();
         runImport(args);
-        SequenceFileTestUtils.verify(this, S3TestUtils.getExpectedSequenceFileOutput(), s3Client, S3TestUtils.getTargetDirPath());
 
         thrown.expect(IOException.class);
         runImport(args);

@@ -21,12 +21,14 @@ package org.apache.sqoop.s3;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.sqoop.testutil.ArgumentArrayBuilder;
-import org.apache.sqoop.testutil.AvroTestUtils;
 import org.apache.sqoop.testutil.DefaultS3CredentialGenerator;
 import org.apache.sqoop.testutil.ImportJobTestCase;
 import org.apache.sqoop.testutil.S3CredentialGenerator;
 import org.apache.sqoop.testutil.S3TestUtils;
+import org.apache.sqoop.util.FileSystemUtil;
+import org.apache.sqoop.util.ParquetReader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -35,11 +37,15 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
+import java.util.List;
 
-public class TestS3AvroImport extends ImportJobTestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class TestS3IncrementalAppendParquetImport extends ImportJobTestCase {
 
     public static final Log LOG = LogFactory.getLog(
-            TestS3AvroImport.class.getName());
+            TestS3IncrementalAppendParquetImport.class.getName());
 
     private static S3CredentialGenerator s3CredentialGenerator;
 
@@ -65,8 +71,9 @@ public class TestS3AvroImport extends ImportJobTestCase {
     }
 
     @After
-    public void cleanUpTargetDir() {
+    public void cleanUpOutputDirectories() {
         S3TestUtils.cleanUpDirectory(s3Client, S3TestUtils.getTargetDirPath());
+        S3TestUtils.cleanUpDirectory(s3Client, S3TestUtils.getTemporaryRootDirPath());
         S3TestUtils.resetTargetDirName();
         super.tearDown();
     }
@@ -76,37 +83,67 @@ public class TestS3AvroImport extends ImportJobTestCase {
         return builder;
     }
 
-
     @Test
-    public void testS3ImportAsAvroDataFileWithoutDeleteTargetDirOptionWhenTargetDirDoesNotExist() throws IOException {
+    public void testS3IncrementalAppendAsParquetFileWhenNoNewRowIsImported() throws Exception {
         ArgumentArrayBuilder builder = getArgumentArrayBuilder();
-        builder.withOption("as-avrodatafile");
-        String[] args = builder.build();
-        runImport(args);
-        AvroTestUtils.verify(S3TestUtils.getExpectedAvroOutput(), s3Client.getConf(), S3TestUtils.getTargetDirPath());
-    }
-
-    @Test
-    public void testS3ImportAsAvroDataFileWithDeleteTargetDirOptionWhenTargetDirAlreadyExists() throws IOException {
-        ArgumentArrayBuilder builder = getArgumentArrayBuilder();
-        builder.withOption("as-avrodatafile");
+        builder.withOption("as-parquetfile");
         String[] args = builder.build();
         runImport(args);
 
-        builder.withOption("delete-target-dir");
+        builder = S3TestUtils.addIncrementalAppendImportArgs(builder);
         args = builder.build();
         runImport(args);
-        AvroTestUtils.verify(S3TestUtils.getExpectedAvroOutput(), s3Client.getConf(), S3TestUtils.getTargetDirPath());
+
+        List<String> result = new ParquetReader(S3TestUtils.getTargetDirPath(), s3Client.getConf()).readAllInCsvSorted();
+
+        assertEquals(S3TestUtils.getExpectedParquetOutput(), result);
     }
 
     @Test
-    public void testS3ImportAsAvroDataFileWithoutDeleteTargetDirOptionWhenTargetDirAlreadyExists() throws IOException {
+    public void testS3IncrementalAppendAsParquetFile() throws Exception {
         ArgumentArrayBuilder builder = getArgumentArrayBuilder();
-        builder.withOption("as-avrodatafile");
+        builder.withOption("as-parquetfile");
         String[] args = builder.build();
         runImport(args);
 
-        thrown.expect(IOException.class);
+        S3TestUtils.insertInputDataIntoTable(this, S3TestUtils.getExtraInputData());
+
+        builder = S3TestUtils.addIncrementalAppendImportArgs(builder);
+        args = builder.build();
         runImport(args);
+
+        List<String> result = new ParquetReader(S3TestUtils.getTargetDirPath(), s3Client.getConf()).readAllInCsvSorted();
+
+        assertEquals(S3TestUtils.getExpectedParquetOutputAfterAppend(), result);
     }
+
+    @Test
+    public void testS3IncrementalAppendAsParquetFileWithMapreduceOutputBasenameProperty() throws Exception {
+        final String MAPREDUCE_OUTPUT_BASENAME_PROPERTY = "mapreduce.output.basename";
+        final String MAPREDUCE_OUTPUT_BASENAME = "custom";
+
+        ArgumentArrayBuilder builder = getArgumentArrayBuilder();
+        builder.withProperty(MAPREDUCE_OUTPUT_BASENAME_PROPERTY, MAPREDUCE_OUTPUT_BASENAME);
+        builder.withOption("as-parquetfile");
+        String[] args = builder.build();
+        runImport(args);
+
+        S3TestUtils.insertInputDataIntoTable(this, S3TestUtils.getExtraInputData());
+
+        builder = S3TestUtils.addIncrementalAppendImportArgs(builder);
+        args = builder.build();
+        runImport(args);
+
+        List<Path> outputFilesWithCustomName = FileSystemUtil.findFilesWithPathContainingPattern(S3TestUtils.getTargetDirPath(), s3Client.getConf(), MAPREDUCE_OUTPUT_BASENAME);
+        if (outputFilesWithCustomName.size() == 0) {
+            fail("No output file with custom name was created.");
+        }
+
+        List<String> result = new ParquetReader(S3TestUtils.getTargetDirPath(), s3Client.getConf()).readAllInCsvSorted();
+
+        assertEquals(S3TestUtils.getExpectedParquetOutputAfterAppend(), result);
+
+        System.clearProperty(MAPREDUCE_OUTPUT_BASENAME_PROPERTY);
+    }
+
 }
