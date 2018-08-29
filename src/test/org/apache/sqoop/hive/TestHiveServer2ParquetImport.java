@@ -27,6 +27,7 @@ import org.apache.sqoop.testcategories.sqooptest.IntegrationTest;
 import org.apache.sqoop.testutil.ArgumentArrayBuilder;
 import org.apache.sqoop.testutil.HiveServer2TestUtil;
 import org.apache.sqoop.testutil.ImportJobTestCase;
+import org.apache.sqoop.util.BlockJUnit4ClassRunnerWithParametersFactory;
 import org.apache.sqoop.util.ParquetReader;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -78,6 +79,7 @@ public class TestHiveServer2ParquetImport {
   private static HiveServer2TestUtil hiveServer2TestUtil;
 
   @RunWith(Parameterized.class)
+  @Parameterized.UseParametersRunnerFactory(BlockJUnit4ClassRunnerWithParametersFactory.class)
   public static class ParquetCompressionCodecTestCase extends ImportJobTestCase {
 
     @Parameters(name = "compressionCodec = {0}")

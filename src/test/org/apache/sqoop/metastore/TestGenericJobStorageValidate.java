@@ -19,6 +19,7 @@
 package org.apache.sqoop.metastore;
 
 import org.apache.sqoop.testcategories.sqooptest.UnitTest;
+import org.apache.sqoop.util.BlockJUnit4ClassRunnerWithParametersFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,6 +33,7 @@ import java.util.Arrays;
 
 @RunWith(Parameterized.class)
 @Category(UnitTest.class)
+@Parameterized.UseParametersRunnerFactory(BlockJUnit4ClassRunnerWithParametersFactory.class)
 public class TestGenericJobStorageValidate {
 
   @Parameters(name = "metastoreConnectionString = {0}, validationShouldFail = {1}")
