@@ -19,9 +19,11 @@
 package org.apache.sqoop.tool;
 
 import org.apache.sqoop.SqoopOptions;
+import org.apache.sqoop.testcategories.sqooptest.UnitTest;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -35,6 +37,7 @@ import static org.apache.sqoop.SqoopOptions.FileLayout.ParquetFile;
 import static org.apache.sqoop.SqoopOptions.FileLayout.TextFile;
 
 @RunWith(Parameterized.class)
+@Category(UnitTest.class)
 public class ImportToolValidateOptionsTest {
 
   @Parameters(name = "fileLayout = {0}, validationMessage = {1}")

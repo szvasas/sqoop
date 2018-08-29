@@ -31,6 +31,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.sqoop.accumulo.AccumuloUtil;
 import org.apache.sqoop.hbase.HBaseUtil;
+import org.apache.sqoop.testcategories.thirdpartytest.MainFrameTest;
 import org.apache.sqoop.tool.MainframeImportTool;
 import org.junit.After;
 import org.junit.Before;
@@ -41,6 +42,7 @@ import org.apache.sqoop.SqoopOptions;
 import org.apache.sqoop.metastore.JobData;
 import org.apache.sqoop.testutil.BaseSqoopTestCase;
 import org.apache.sqoop.util.ImportException;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -50,6 +52,7 @@ import static org.junit.Assert.fail;
 /**
  * Test methods of the generic SqlManager implementation.
  */
+@Category(MainFrameTest.class)
 public class TestMainframeManager extends BaseSqoopTestCase {
 
   private static final Log LOG = LogFactory.getLog(TestMainframeManager.class

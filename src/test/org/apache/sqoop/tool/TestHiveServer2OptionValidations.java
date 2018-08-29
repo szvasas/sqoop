@@ -19,9 +19,11 @@
 package org.apache.sqoop.tool;
 
 import org.apache.sqoop.SqoopOptions;
+import org.apache.sqoop.testcategories.sqooptest.UnitTest;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -39,6 +41,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @RunWith(Parameterized.class)
+@Category(UnitTest.class)
 public class TestHiveServer2OptionValidations {
 
   @Parameters(name = "sqoopTool = {0}")

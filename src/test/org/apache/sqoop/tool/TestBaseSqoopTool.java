@@ -21,9 +21,11 @@ package org.apache.sqoop.tool;
 import org.apache.commons.cli.CommandLine;
 import org.apache.sqoop.SqoopOptions;
 import org.apache.sqoop.mapreduce.parquet.ParquetJobConfiguratorImplementation;
+import org.apache.sqoop.testcategories.sqooptest.UnitTest;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
@@ -33,6 +35,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Category(UnitTest.class)
 public class TestBaseSqoopTool {
 
   @Rule
