@@ -136,12 +136,6 @@ dependencies {
     testCompile group: 'org.apache.zookeeper', name: 'zookeeper', version: zookeeperVersion, ext: 'jar'
 }
 
-task sqoopTest (type: Test){
-    description 'Run all Sqoop tests'
-    include ''
-    dependsOn 'unitTest', 'integrationPlainTest', 'kerberizedTest', 'thirdPartyTest'
-}
-
 task unitTest (type: Test) {
     description 'Run Unit Tests'
     useJUnit {
@@ -201,6 +195,20 @@ task kerberizedTest (type: Test){
     forkEvery 1
 }
 
+task sqoopTest (type: Test){
+    description 'Run all Sqoop tests'
+    include ''
+}
+
+test {
+    description 'Run tests that do not need exteral JDBC driver and/or a docker container. ' +
+            'This includes integration plain tests and unit tests'
+    include ''
+}
+
+test.finalizedBy(unitTest, integrationPlainTest)
+sqoopTest.finalizedBy(test, kerberizedTest, thirdPartyTest)
+
 task mySQLTest (type: Test) {
     description 'Run MySQL third-party tests'
     useJUnit {
@@ -208,16 +216,7 @@ task mySQLTest (type: Test) {
     }
 }
 
-task customTest (type: Test) {
-    include '**/TestSuite*'
-}
 
-test {
-    description 'Run tests that do not need exteral JDBC driver and/or a docker container. ' +
-            'This includes integration plain tests and unit tests'
-    include ''
-    dependsOn 'integrationPlainTest', 'unitTest'
-}
 
 def testBuildDir = "$buildDir/test/"
 def testBuildDirData ="$testBuildDir/data/"
