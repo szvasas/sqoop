@@ -138,9 +138,8 @@ dependencies {
 
 task sqoopTest (type: Test){
     description 'Run all Sqoop tests'
-    useJUnit{
-        includeCategories 'org.apache.sqoop.testcategories.sqooptest.SqoopTest'
-    }
+    include ''
+    dependsOn 'unitTest', 'integrationPlainTest', 'kerberizedTest', 'thirdPartyTest'
 }
 
 task unitTest (type: Test) {
@@ -209,6 +208,10 @@ task mySQLTest (type: Test) {
     }
 }
 
+task customTest (type: Test) {
+    include '**/TestSuite*'
+}
+
 test {
     description 'Run tests that do not need exteral JDBC driver and/or a docker container. ' +
             'This includes integration plain tests and unit tests'
@@ -244,7 +247,6 @@ tasks.withType(Test) {
     minHeapSize = "512m"
     maxHeapSize = "5120m"
     jvmArgs '-Xmx5012m', "-da:org.apache.hadoop.hive.thrift.HadoopThriftAuthBridge"
-    forkEvery 0
 
     dependsOn buildFolder
 

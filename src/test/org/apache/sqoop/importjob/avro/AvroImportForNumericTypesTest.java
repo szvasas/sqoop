@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.sqoop.SqoopOptions;
 import org.apache.sqoop.importjob.ImportJobTestConfiguration;
+import org.apache.sqoop.testcategories.thirdpartytest.ThirdPartyTest;
 import org.apache.sqoop.testutil.ArgumentArrayBuilder;
 import org.apache.sqoop.testutil.AvroTestUtils;
 import org.apache.sqoop.testutil.ImportJobTestCase;
@@ -42,6 +43,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -54,6 +56,7 @@ import java.util.List;
 
 @RunWith(Parameterized.class)
 @Parameterized.UseParametersRunnerFactory(BlockJUnit4ClassRunnerWithParametersFactory.class)
+@Category(ThirdPartyTest.class)
 /**
  * This test covers the behavior of the Avro import for fixed point decimal types, i.e. NUMBER, NUMERIC
  * and DECIMAL.
