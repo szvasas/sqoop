@@ -81,6 +81,13 @@ public class HiveMiniCluster {
     config.set(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_BIND_HOST.varname, getHostName());
     config.setInt(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_PORT.varname, getPort());
     config.set(HiveConf.ConfVars.METASTORECONNECTURLKEY.varname, getMetastoreConnectUrl());
+//    config.setBoolVar(HiveConf.ConfVars.METASTORE_AUTO_CREATE_ALL, true);
+//    config.setBoolVar(HiveConf.ConfVars.METASTORE_SCHEMA_VERIFICATION, false);
+//    config.setBoolVar(HiveConf.ConfVars.METASTORE_USE_THRIFT_SASL, false);
+//    config.set(HiveConf.ConfVars.HIVE_SUPPORT_CONCURRENCY.varname, "false");
+//    config.set(HiveConf.ConfVars.PREEXECHOOKS.varname, "");
+//    config.set(HiveConf.ConfVars.POSTEXECHOOKS.varname, "");
+    config.setInt(HiveConf.ConfVars.HIVE_SERVER2_WEBUI_PORT.varname, -1);
 
     for (Map.Entry<String, String> authConfig : authenticationConfiguration.getAuthenticationConfig().entrySet()) {
       config.set(authConfig.getKey(), authConfig.getValue());
