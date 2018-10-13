@@ -212,7 +212,14 @@ test {
 }
 test.finalizedBy(kerberizedTest)
 
-task sqoopTest (type: Test){
+task s3Test(type: Test) {
+    description 'Run S3 tests'
+    useJUnit {
+        includeCategories 'org.apache.sqoop.testcategories.thirdpartytest.S3Test'
+    }
+}
+
+task allTest (type: Test){
     description 'Run all Sqoop tests'
     useJUnit {
         includeCategories 'org.apache.sqoop.testcategories.sqooptest.UnitTest'
@@ -222,7 +229,7 @@ task sqoopTest (type: Test){
         excludeCategories 'org.apache.sqoop.testcategories.sqooptest.ManualTest'
     }
 }
-sqoopTest.finalizedBy(kerberizedTest)
+allTest.finalizedBy(kerberizedTest)
 
 def testBuildDir = "$buildDir/test/"
 def testBuildDirData ="$testBuildDir/data/"
