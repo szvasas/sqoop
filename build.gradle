@@ -154,43 +154,14 @@ dependencies {
 }
 
 task unitTest (type: Test) {
-    description 'Run unit tests'
+    description 'Run unit tests which do not need proprietary JDBC driver'
     useJUnit {
         includeCategories 'org.apache.sqoop.testcategories.sqooptest.UnitTest'
-        excludeCategories 'org.apache.sqoop.testcategories.KerberizedTest'
         excludeCategories 'org.apache.sqoop.testcategories.thirdpartytest.ThirdPartyTest'
     }
 }
 
-task allIntegrationTest (type: Test){
-    description 'Run all  integration tests'
-    useJUnit {
-        includeCategories 'org.apache.sqoop.testcategories.sqooptest.IntegrationTest'
-    }
-}
-
-task thirdPartyTest (type: Test) {
-    description 'Run Third-party Tests - you need to specify -Dsqoop.thirdparty.lib.dir where the Third party driver ' +
-            'jars reside (relative to the project directory)'
-    useJUnit {
-        includeCategories 'org.apache.sqoop.testcategories.thirdpartytest.ThirdPartyTest'
-        excludeCategories 'org.apache.sqoop.testcategories.sqooptest.ManualTest'
-        excludeCategories 'org.apache.sqoop.testcategories.KerberizedTest'
-    }
-    systemProperty "ms.datatype.test.data.file.export" ,"DatatypeTestData-export-lite.txt"
-    systemProperty "ms.datatype.test.data.file.import" ,"DatatypeTestData-import-lite.txt"
-    systemProperty "ms.datatype.test.data.file.delim" ,","
-    systemProperty "ms.datatype.test.hdfsprefix" ,"file:///"
-}
-
-task manualTest(type: Test) {
-    description 'Run manual tests'
-    useJUnit {
-        includeCategories 'org.apache.sqoop.testcategories.sqooptest.ManualTest'
-    }
-}
-
-task integrationPlainTest(type: Test) {
+task integrationTest(type: Test) {
     description 'Run integration tests which do not need a docker container or an external database'
     useJUnit {
         includeCategories 'org.apache.sqoop.testcategories.sqooptest.IntegrationTest'
@@ -214,18 +185,44 @@ task kerberizedTest (type: Test){
     forkEvery 1
 }
 
+task thirdPartyTest (type: Test) {
+    description 'Run Third-party Tests - you need to specify -Dsqoop.thirdparty.lib.dir where the Third party driver ' +
+            'jars reside (relative to the project directory)'
+    useJUnit {
+        includeCategories 'org.apache.sqoop.testcategories.thirdpartytest.ThirdPartyTest'
+        excludeCategories 'org.apache.sqoop.testcategories.sqooptest.ManualTest'
+        excludeCategories 'org.apache.sqoop.testcategories.KerberizedTest'
+    }
+    systemProperty "ms.datatype.test.data.file.export" ,"DatatypeTestData-export-lite.txt"
+    systemProperty "ms.datatype.test.data.file.import" ,"DatatypeTestData-import-lite.txt"
+    systemProperty "ms.datatype.test.data.file.delim" ,","
+    systemProperty "ms.datatype.test.hdfsprefix" ,"file:///"
+}
+
 test {
     description 'Run tests that do not need exteral JDBC driver and/or a docker container. ' +
-            'This includes integration plain tests and unit tests'
-    include ''
+            'This the same as running unitTest, integrationTest and kerberizedTest.'
+    useJUnit {
+        includeCategories 'org.apache.sqoop.testcategories.sqooptest.UnitTest'
+        includeCategories 'org.apache.sqoop.testcategories.sqooptest.IntegrationTest'
+        excludeCategories 'org.apache.sqoop.testcategories.KerberizedTest'
+        excludeCategories 'org.apache.sqoop.testcategories.thirdpartytest.ThirdPartyTest'
+        excludeCategories 'org.apache.sqoop.testcategories.sqooptest.ManualTest'
+    }
 }
-test.finalizedBy(integrationPlainTest, unitTest, kerberizedTest)
+test.finalizedBy(kerberizedTest)
 
 task sqoopTest (type: Test){
     description 'Run all Sqoop tests'
-    include ''
+    useJUnit {
+        includeCategories 'org.apache.sqoop.testcategories.sqooptest.UnitTest'
+        includeCategories 'org.apache.sqoop.testcategories.sqooptest.IntegrationTest'
+        includeCategories 'org.apache.sqoop.testcategories.thirdpartytest.ThirdPartyTest'
+        excludeCategories 'org.apache.sqoop.testcategories.KerberizedTest'
+        excludeCategories 'org.apache.sqoop.testcategories.sqooptest.ManualTest'
+    }
 }
-sqoopTest.finalizedBy(test, kerberizedTest, thirdPartyTest)
+sqoopTest.finalizedBy(kerberizedTest)
 
 def testBuildDir = "$buildDir/test/"
 def testBuildDirData ="$testBuildDir/data/"
