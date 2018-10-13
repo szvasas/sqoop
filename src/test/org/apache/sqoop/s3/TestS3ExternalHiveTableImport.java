@@ -28,6 +28,7 @@ import org.apache.sqoop.testutil.HiveServer2TestUtil;
 import org.apache.sqoop.testutil.ImportJobTestCase;
 import org.apache.sqoop.testutil.S3CredentialGenerator;
 import org.apache.sqoop.testutil.S3TestUtils;
+import org.apache.sqoop.util.BlockJUnit4ClassRunnerWithParametersFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -44,6 +45,7 @@ import static org.apache.sqoop.tool.BaseSqoopTool.FMT_TEXTFILE_ARG;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
+@Parameterized.UseParametersRunnerFactory(BlockJUnit4ClassRunnerWithParametersFactory.class)
 public class TestS3ExternalHiveTableImport extends ImportJobTestCase {
 
     @Parameterized.Parameters(name = "fileFormatArg = {0}, expectedResult = {1}")
