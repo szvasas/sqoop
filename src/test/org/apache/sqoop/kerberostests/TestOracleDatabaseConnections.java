@@ -1,6 +1,7 @@
 package org.apache.sqoop.kerberostests;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import com.sun.security.auth.module.Krb5LoginModule;
 import oracle.jdbc.internal.OracleConnection;
@@ -19,6 +20,7 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.File;
 import java.io.IOException;
+import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -51,6 +53,29 @@ public class TestOracleDatabaseConnections {
     KerberizedConnectionFactoryDecorator kerberizedConnectionFactory = new KerberizedConnectionFactoryDecorator(decorated, marcoAuthenticator);
 
     kerberizedConnectionFactory.createConnection();
+  }
+
+  @Test
+  public void testKerberosUtil() throws Exception {
+    try (Connection connection = privilegedCreateConnection();
+         PreparedStatement statement = connection.prepareStatement("select user from dual");
+         ResultSet rs = statement.executeQuery()
+    ) {
+      assertTrue("marco@EXAMPLE.COM", rs.next());
+    }
+  }
+
+  private Connection privilegedCreateConnection() throws PrivilegedActionException {
+    Properties prop = new Properties();
+    prop.setProperty(OracleConnection.CONNECTION_PROPERTY_THIN_NET_AUTHENTICATION_SERVICES, "( KERBEROS5 )");
+
+    DriverManagerJdbcConnectionFactory connectionFactory = new DriverManagerJdbcConnectionFactory("oracle.jdbc.driver.OracleDriver", ORACLE_CONNECTION_STRING, null, null, prop);
+
+    Subject subject = KerberosUtil.loginSubject();
+
+    return Subject.doAs(subject,
+        (PrivilegedExceptionAction<Connection>) () -> connectionFactory.createConnection()
+    );
   }
 
   private Configuration createKerberosConfiguration() {
