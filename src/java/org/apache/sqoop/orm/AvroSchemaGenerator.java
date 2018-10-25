@@ -82,8 +82,10 @@ public class AvroSchemaGenerator {
   public Schema generate(String schemaNameOverride) throws IOException {
     ClassWriter classWriter = new ClassWriter(options, connManager,
         tableName, null);
+    String tableRemark = classWriter.getTableRemark();
     Map<String, List<Integer>> columnInfo = classWriter.getColumnInfo();
     Map<String, Integer> columnTypes = classWriter.getColumnTypes();
+    Map<String, String> columnRemarks = classWriter.getColumnRemarks();
     String[] columnNames = classWriter.getColumnNames(columnTypes);
 
     List<Field> fields = new ArrayList<Field>();
@@ -94,7 +96,8 @@ public class AvroSchemaGenerator {
       Integer precision = columnInfoList.get(1);
       Integer scale = columnInfoList.get(2);
       Schema avroSchema = toAvroSchema(sqlType, columnName, precision, scale);
-      Field field = new Field(cleanedCol, avroSchema, null,  NullNode.getInstance());
+      String columnRemark = columnRemarks.get(columnName);
+      Field field = new Field(cleanedCol, avroSchema, columnRemark, NullNode.getInstance());
       field.addProp("columnName", columnName);
       field.addProp("sqlType", Integer.toString(sqlType));
       fields.add(field);
@@ -107,7 +110,7 @@ public class AvroSchemaGenerator {
         (shortClassName == null ? avroTableName : shortClassName);
     String avroNamespace = tableClassName.getPackageForTable();
 
-    String doc = "Sqoop import of " + avroTableName;
+    String doc = tableRemark == null ? "Sqoop import of " + avroTableName : tableRemark;
     Schema schema = Schema.createRecord(avroName, doc, avroNamespace, false);
     schema.setFields(fields);
     schema.addProp("tableName", avroTableName);
