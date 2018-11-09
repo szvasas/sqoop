@@ -253,8 +253,8 @@ tasks.withType(Test) {
     systemProperty "sqoop.throwOnError", ""
 
     minHeapSize = "512m"
-    maxHeapSize = "5120m"
-    jvmArgs '-Xmx5012m', "-da:org.apache.hadoop.hive.thrift.HadoopThriftAuthBridge"
+    maxHeapSize = "8G"
+    jvmArgs "-da:org.apache.hadoop.hive.thrift.HadoopThriftAuthBridge"
 
     dependsOn buildFolder
 
