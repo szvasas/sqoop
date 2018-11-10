@@ -240,7 +240,7 @@ task buildFolder {
 
 tasks.withType(Test) {
     testLogging {
-        events 'started', 'passed', 'skipped'
+        events 'passed', 'skipped'
     }
     workingDir = testBuildDirData
     project.mkdir(workingDir)
