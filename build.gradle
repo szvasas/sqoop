@@ -201,7 +201,7 @@ task thirdPartyTest (type: Test) {
 
 test {
     description 'Run tests that do not need external JDBC driver and/or a docker container. ' +
-            'This the same as running unitTest, integrationTest and kerberizedTest.'
+            'This is the same as running unitTest, integrationTest and kerberizedTest.'
     useJUnit {
         includeCategories 'org.apache.sqoop.testcategories.sqooptest.UnitTest'
         includeCategories 'org.apache.sqoop.testcategories.sqooptest.IntegrationTest'

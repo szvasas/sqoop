@@ -367,7 +367,8 @@ You can stop and remove the Docker containers using the following command:
 
 ===== Running the third party tests using docker containers
 
-You can execute the third party tests against the DBs running in Docker containers using the following command (replace <path_to_thirdparty_lib_directory> with the path you have the necessary JDBC drivers):
+You can execute the third party tests against the DBs running in Docker containers using the following command (replace <path_to_thirdparty_lib_directory> with the path you have the necessary JDBC drivers,
+<your-bucket-url> and <your-credential-generator-command> with the values described in the 'Amazon S3 tests' section):
 
 ----
 ant clean test -Dthirdparty=true -Dsqoop.thirdparty.lib.dir=<path_to_thirdparty_lib_directory> \
@@ -395,7 +396,9 @@ ant clean test -Dthirdparty=true -Dsqoop.thirdparty.lib.dir=<path_to_thirdparty_
     -Dsqoop.test.db2.connectstring.host_url=jdbc:db2://localhost:50000 \
     -Dsqoop.test.db2.connectstring.database=SQOOP \
     -Dsqoop.test.db2.connectstring.username=DB2INST1 \
-    -Dsqoop.test.db2.connectstring.password=Sqoop12345
+    -Dsqoop.test.db2.connectstring.password=Sqoop12345 \
+    -Ds3.bucket.url=<your-bucket-url> \
+    -Ds3.generator.command=<your-credential-generator-command>
 ----
 
 or
@@ -427,6 +430,8 @@ or
     -Dsqoop.test.db2.connectstring.database=SQOOP \
     -Dsqoop.test.db2.connectstring.username=DB2INST1 \
     -Dsqoop.test.db2.connectstring.password=Sqoop12345 \
+    -Ds3.bucket.url=<your-bucket-url> \
+    -Ds3.generator.command=<your-credential-generator-command> \
     thirdPartyTest
 ----
 
