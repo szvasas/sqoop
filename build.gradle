@@ -162,7 +162,7 @@ task unitTest (type: Test) {
 }
 
 task integrationTest(type: Test) {
-    description 'Run integration tests which do not need a docker container or an external database'
+    description 'Run integration tests which do not need a docker container or an external database/service'
     useJUnit {
         includeCategories 'org.apache.sqoop.testcategories.sqooptest.IntegrationTest'
         excludeCategories 'org.apache.sqoop.testcategories.sqooptest.ManualTest'
@@ -200,7 +200,7 @@ task thirdPartyTest (type: Test) {
 }
 
 test {
-    description 'Run tests that do not need exteral JDBC driver and/or a docker container. ' +
+    description 'Run tests that do not need external JDBC driver and/or a docker container. ' +
             'This the same as running unitTest, integrationTest and kerberizedTest.'
     useJUnit {
         includeCategories 'org.apache.sqoop.testcategories.sqooptest.UnitTest'
