@@ -295,6 +295,7 @@ checkstyle {
 
 jacocoTestReport {
     description "Generates a coverage report of the unit test results under $buildDir/jacocoHtml/test/index.html"
+    executionData test, kerberizedTest
     reports {
         xml.enabled true
         csv.enabled false
@@ -316,7 +317,7 @@ task jacocoThirdPartyReport(type: JacocoReport){
 task jacocoCompositeReport(type: JacocoReport){
     description "Generates a composite coverage report of test and thirdparty test results under $buildDir/jacocoHtml/index.html"
     sourceSets sourceSets.main
-    executionData test, thirdPartyTest
+    executionData test, kerberizedTest, thirdPartyTest
     reports {
         xml.enabled true
         csv.enabled false
