@@ -60,9 +60,9 @@ If you want to build everything (including the documentation), type
 Sqoop supports both Ant ant Gradle currently but the test tasks are a bit different in each build tools.
 
 === Testing with Ant
-When testing with Ant Sqoop has two main test categories: unit and third party tests.
+The Ant build defines two main test categories: unit and third party tests.
 
-Test classes with the 'Test' prefix will be unit tests and classes with the 'Test' postfix will be third party tests.
+Classes with the +Test+ prefix are unit tests and classes with the +Test+ postfix are third party tests.
 
 Sqoop unit tests can be run with +ant test+. This command
 will run all the "basic" checks against an in-memory database, HSQLDB.
@@ -72,13 +72,13 @@ several third-party databases. To enable these tests, you will need to install
 and configure the databases or run them in Docker containers, and download the JDBC drivers for each one. For more information
 about how to run this suite see the 'Third party tests' section.
 
-Note that the unit test suite contain several Amazon S3 test classes too which test the "RDBMS to Amazon S3" use case with an in-memory database, HSQLDB.
+Note that the unit test suite contains several Amazon S3 test classes too which test the "RDBMS to Amazon S3" use case with an in-memory database, HSQLDB.
 To enable these tests, you will need to have either permanent or temporary Amazon S3 security credentials.
 For more information about how to run this suite see the 'Amazon S3 tests' section.
 
 === Testing with Gradle
 
-Lorem ipsum...
+Since Gradle supports JUnit +@Category+ annotation out of the box developers c
 
 === Third party tests
 
