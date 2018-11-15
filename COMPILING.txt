@@ -1,7 +1,7 @@
 
 = Compiling
 
-This document explains how to compile Sqoop.
+This document explains how to compile and test Sqoop.
 
 ////
 Licensed to the Apache Software Foundation (ASF) under one
@@ -27,7 +27,7 @@ under the License.
 
 Compiling Sqoop requires the following tools:
 
-* Apache ant (1.9.7) or Gradle (3.5.1)
+* Apache ant (1.9.7) or Gradle (4.9)
 * Java JDK 1.8
 
 Additionally, building the documentation requires these tools:
@@ -47,31 +47,38 @@ Furthermore, Sqoop's build can be instrumented with the following:
 
 == The Basics
 
-Sqoop is compiled with ant. Type +ant -p+ to see the list of available targets.
+Sqoop can be compiled and tested with both Ant and Gradle. Type +ant -p+ or +./gradlew tasks --all+ to see the list of available targets/tasks.
 
-Type +ant+ to compile all java sources. You can then run Sqoop with +bin/sqoop+.
+Type +ant+ or +./gradlew jar+ to compile all java sources. You can then run Sqoop with +bin/sqoop+.
 
 If you want to build everything (including the documentation), type
 +ant package+ or +./gradlew package+. This will appear in the
 +build/sqoop-(version)/+ directory.
 
-This version of Sqoop is built against Hadoop 0.23 available from Apache
-maven repository by default. These dependencies are obtained via IVY which
-downloads the necessary binaries.
-
 == Testing Sqoop
 
-Sqoop has three main test categories: unit, third party and Amazon S3 tests.
+Sqoop supports both Ant ant Gradle currently but the test tasks are a bit different in each build tools.
+
+=== Testing with Ant
+When testing with Ant Sqoop has two main test categories: unit and third party tests.
+
+Test classes with the 'Test' prefix will be unit tests and classes with the 'Test' postfix will be third party tests.
 
 Sqoop unit tests can be run with +ant test+. This command
 will run all the "basic" checks against an in-memory database, HSQLDB.
 
 Sqoop's third party tests are compatibility tests that check its ability to work with
 several third-party databases. To enable these tests, you will need to install
-and configure the databases or run them in Docker containers, and download the JDBC drivers for each one.
+and configure the databases or run them in Docker containers, and download the JDBC drivers for each one. For more information
+about how to run this suite see the 'Third party tests' section.
 
-Sqoop's Amazon S3 test suite tests the "RDBMS to Amazon S3" use case with an in-memory database, HSQLDB.
+Note that the unit test suite contain several Amazon S3 test classes too which test the "RDBMS to Amazon S3" use case with an in-memory database, HSQLDB.
 To enable these tests, you will need to have either permanent or temporary Amazon S3 security credentials.
+For more information about how to run this suite see the 'Amazon S3 tests' section.
+
+=== Testing with Gradle
+
+Lorem ipsum...
 
 === Third party tests
 
@@ -312,11 +319,21 @@ of temporary credentials) having them separated by spaces.
 
 You can then pass the bucket URL and the generator command to the tests via system properties as follows:
 
-++++
+----
 ant clean test -Ds3.bucket.url=<your-bucket-url> -Ds3.generator.command=<your-credential-generator-command>
+----
+
 or
+
+----
 ./gradlew test -Ds3.bucket.url=<your-bucket-url> -Ds3.generator.command=<your-credential-generator-command>
-++++
+----
+
+or
+
+----
+./gradlew s3Test -Ds3.bucket.url=<your-bucket-url> -Ds3.generator.command=<your-credential-generator-command>
+----
 
 
 == Code Quality Analysis
