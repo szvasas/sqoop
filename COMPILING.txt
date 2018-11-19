@@ -635,7 +635,7 @@ export XML_CATALOG_FILES=/usr/local/etc/xml/catalog
 * +./gradlew tasks+ to list all top-level gradle tasks or run +./gradlew tasks --all+ to show all tasks and subtasks
 * +./gradlew compileJava+ to compile the main Java source
 * +./gradlew test --debug-jvm+ to run remote debug on port 5005
-* +./gradlew -Dtest.single=ClassName*Test test+ or +./gradlew tests --tests ClassName*Test+ to run a single test class (use with test or thirdPartyTest)
+* +./gradlew test --tests TestSqoopOptions+, +./gradlew thirdPartyTest --tests TestS3*+ to run one or more tests matching a pattern (use with test or thirdPartyTest)
 * +./gradlew build --refresh-dependencies+ to refresh dependencies for a build
 * +./gradle build -x test+ for skipping a single test or a set of tests
 * +./gradlew dependencyInsight --configuration optionalConfiguration --dependency searchedForDependency+ to get a dependency tree
