@@ -82,5 +82,6 @@ cache:
   - $HOME/.gradle/wrapper/
 notifications:
   email:
-    - dev@sqoop.apache.org
     - vasas@apache.org
+    - dev@sqoop.apache.org
+
