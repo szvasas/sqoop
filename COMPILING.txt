@@ -634,3 +634,6 @@ Note that by default the Oracle XE tests are also disabled because the necessary
 Contributors have to upload +ojdbc6.jar+ to a public drive and make it available to the CI job by setting
 the +ORACLE_DRIVER_URL+ environment variable in Travis (for more information see Travis
 https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings[documentation]).
+
+The Travis CI jobs of all the forks send notifications of failed builds to +sqoop-dev@apache.org+ so you might want to
+create filters for the forks you don't want to follow.

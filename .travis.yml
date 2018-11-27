@@ -80,3 +80,6 @@ cache:
   directories:
   - $HOME/.gradle/caches/
   - $HOME/.gradle/wrapper/
+notifications:
+  email:
+    - dev@sqoop.apache.org
