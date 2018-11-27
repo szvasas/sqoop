@@ -9,7 +9,7 @@ public class FailingTest {
 
   @Test
   public void fail() {
-    throw new RuntimeException("Fail!!!");
+
   }
 
 }
