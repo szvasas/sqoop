@@ -83,3 +83,4 @@ cache:
 notifications:
   email:
     - dev@sqoop.apache.org
+    - vasas@apache.org
