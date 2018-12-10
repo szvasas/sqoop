@@ -56,6 +56,7 @@ import org.apache.sqoop.lib.DelimiterSet;
 import org.apache.sqoop.lib.LargeObjectLoader;
 import org.junit.experimental.categories.Category;
 
+
 @Category(UnitTest.class)
 public class TestMainframeDatasetFTPRecordReader {
 
